@@ -30,7 +30,7 @@ export class WebAudioSystem implements IAudioSystem {
         this.masterGain = this.ctx.createGain();
         this.masterAnalyser = this.ctx.createAnalyser();
         this.masterAnalyser.fftSize = 512;
-        this.masterAnalyser.smoothingTimeConstant = 0.5;
+        this.masterAnalyser.smoothingTimeConstant = 0.88; // Much smoother for progressive movement
         this.masterGain.connect(this.masterAnalyser);
         this.masterAnalyser.connect(this.ctx.destination);
 
@@ -168,82 +168,113 @@ export class WebAudioSystem implements IAudioSystem {
 
     playLead(freq: number, combo: number) {
         this.resume();
-        const osc = this.ctx.createOscillator();
-        const mod = this.ctx.createOscillator();
-        const modGain = this.ctx.createGain();
+        const now = this.ctx.currentTime;
+
+        // SUPERSAW-ISH: 3 Detuned Oscillators
+        const oscs = [
+            this.ctx.createOscillator(),
+            this.ctx.createOscillator(),
+            this.ctx.createOscillator()
+        ];
         const gain = this.ctx.createGain();
-
-        osc.type = 'sawtooth';
-        mod.type = 'sine';
-
-        osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
-        mod.frequency.setValueAtTime(freq * 0.5, this.ctx.currentTime);
-        modGain.gain.setValueAtTime(freq * 0.2, this.ctx.currentTime);
-
-        mod.connect(modGain);
-        modGain.connect(osc.frequency);
-
         const filter = this.ctx.createBiquadFilter();
+
+        oscs[0].type = 'sawtooth';
+        oscs[1].type = 'sawtooth';
+        oscs[2].type = 'sawtooth';
+
+        oscs[0].frequency.setValueAtTime(freq, now);
+        oscs[1].frequency.setValueAtTime(freq * 1.005, now);
+        oscs[2].frequency.setValueAtTime(freq * 0.995, now);
+
         filter.type = 'lowpass';
-        filter.frequency.setValueAtTime(freq * 2 + (combo * 10), this.ctx.currentTime);
-        filter.Q.value = 10;
+        // Extreme plucky resonance
+        const cutoff = freq * 3 + (combo * 50);
+        filter.frequency.setValueAtTime(cutoff, now);
+        filter.frequency.exponentialRampToValueAtTime(freq * 0.5, now + 0.35);
+        filter.Q.value = 12;
 
-        gain.gain.setValueAtTime(0.05, this.ctx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.4);
+        gain.gain.setValueAtTime(0.06, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
 
-        osc.connect(filter);
+        oscs.forEach(o => {
+            o.connect(filter);
+            o.start(now);
+            o.stop(now + 0.4);
+        });
+
         filter.connect(gain);
         gain.connect(this.leadGain);
-
-        osc.start();
-        mod.start();
-        osc.stop(this.ctx.currentTime + 0.4);
-        mod.stop(this.ctx.currentTime + 0.4);
     }
 
     playBass(noteFreq: number, comboVal: number) {
         this.resume();
+        const now = this.ctx.currentTime;
         const osc = this.ctx.createOscillator();
+        const sub = this.ctx.createOscillator();
         const gain = this.ctx.createGain();
         const filter = this.ctx.createBiquadFilter();
 
         osc.type = 'sawtooth';
-        osc.frequency.setValueAtTime(noteFreq, this.ctx.currentTime);
+        sub.type = 'sine';
+
+        osc.frequency.setValueAtTime(noteFreq, now);
+        sub.frequency.setValueAtTime(noteFreq * 0.5, now);
 
         filter.type = 'lowpass';
-        const baseCutoff = 400 + (Math.min(comboVal, 20) * 100);
-        filter.frequency.setValueAtTime(baseCutoff, this.ctx.currentTime);
-        filter.Q.value = 15;
+        // Acid-style squelch
+        const cutoff = 200 + (Math.min(comboVal, 30) * 150);
+        filter.frequency.setValueAtTime(cutoff, now);
+        filter.frequency.exponentialRampToValueAtTime(100, now + 0.15);
+        filter.Q.value = 20;
 
-        gain.gain.setValueAtTime(0.04, this.ctx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.15);
+        gain.gain.setValueAtTime(0.06, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
 
         osc.connect(filter);
+        sub.connect(filter);
         filter.connect(gain);
-        gain.connect(this.bassGain); // Connect to Bass Channel
-        osc.start();
-        osc.stop(this.ctx.currentTime + 0.2);
+        gain.connect(this.bassGain);
+
+        osc.start(now);
+        sub.start(now);
+        osc.stop(now + 0.15);
+        sub.stop(now + 0.15);
     }
 
     playSuccess(combo: number, isZen: boolean) {
         this.resume();
+        const now = this.ctx.currentTime;
+        // Bright Trance Pluck
         const osc = this.ctx.createOscillator();
+        const osc2 = this.ctx.createOscillator();
         const gain = this.ctx.createGain();
+        const filter = this.ctx.createBiquadFilter();
 
-        const baseFreq = isZen ? 150 : 200;
-        const mod = isZen ? (combo % 16) * 10 : combo * 15;
+        const baseFreq = isZen ? 440 : 880;
+        const note = baseFreq + (combo % 8) * 110;
 
-        osc.type = 'square';
-        osc.frequency.setValueAtTime(baseFreq + mod, this.ctx.currentTime);
-        osc.frequency.exponentialRampToValueAtTime(baseFreq * 2 + mod, this.ctx.currentTime + 0.05);
+        osc.type = 'sawtooth';
+        osc2.type = 'square';
+        osc.frequency.setValueAtTime(note, now);
+        osc2.frequency.setValueAtTime(note * 2.01, now); // Detuned octave
 
-        gain.gain.setValueAtTime(isZen ? 0.04 : 0.08, this.ctx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.08);
+        filter.type = 'highpass';
+        filter.frequency.setValueAtTime(2000, now);
+        filter.frequency.exponentialRampToValueAtTime(8000, now + 0.1);
 
-        osc.connect(gain);
-        gain.connect(this.masterGain); // Success sounds go to Master (or could have their own FX channel, but User logic didn't specify)
-        osc.start();
-        osc.stop(this.ctx.currentTime + 0.08);
+        gain.gain.setValueAtTime(isZen ? 0.03 : 0.06, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
+
+        osc.connect(filter);
+        osc2.connect(filter);
+        filter.connect(gain);
+        gain.connect(this.masterGain);
+
+        osc.start(now);
+        osc2.start(now);
+        osc.stop(now + 0.2);
+        osc2.stop(now + 0.2);
     }
 
     playError() {
