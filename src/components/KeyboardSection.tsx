@@ -1,9 +1,11 @@
 import React from 'react';
-import Keyboard from '../../components/Keyboard';
-import MacKeyboard from '../../components/MacKeyboard';
+import Keyboard from './Keyboard';
+import MacKeyboard from './MacKeyboard';
+
 import { AudioWave } from './AudioWave';
 import { WebAudioSystem } from '../infrastructure/audio/WebAudioSystem';
 import { TypingStats } from '../../types';
+
 
 interface KeyboardSectionProps {
     keyboardType: 'standard' | 'mac';

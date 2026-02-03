@@ -1,5 +1,6 @@
 import React from 'react';
-import { KEY_TO_FINGER_MAP, FINGER_COLORS } from '../constants';
+import { KEY_TO_FINGER_MAP, FINGER_COLORS } from '../../constants';
+
 
 interface MacKeyboardProps {
   activeKey: string;

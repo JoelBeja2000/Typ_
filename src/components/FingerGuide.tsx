@@ -1,6 +1,7 @@
 import React from 'react';
-import { Finger, KeyData } from '../types';
-import { FINGER_NAMES, FINGER_COLORS } from '../constants';
+import { Finger, KeyData } from '../../types';
+import { FINGER_NAMES, FINGER_COLORS } from '../../constants';
+
 
 interface FingerGuideProps {
   targetKeyData?: KeyData;
@@ -25,15 +26,15 @@ const FingerGuide: React.FC<FingerGuideProps> = ({ targetKeyData }) => {
           {fingers.map((f) => {
             const isActive = targetKeyData?.finger === f;
             const color = FINGER_COLORS[f];
-            
+
             return (
               <div key={f} className="flex flex-col items-center">
-                <div 
-                  className={`w-4 rounded-full transition-all duration-700 ease-out ${isActive ? 'h-24 shadow-[0_0_25px_var(--accent-glow)]' : 'h-10'}`} 
-                  style={{ 
-                    backgroundColor: isActive ? color : 'var(--text-muted)', 
-                    boxShadow: isActive ? `0 0 25px ${color}` : 'none', 
-                    opacity: isActive ? 1 : 0.2 
+                <div
+                  className={`w-4 rounded-full transition-all duration-700 ease-out ${isActive ? 'h-24 shadow-[0_0_25px_var(--accent-glow)]' : 'h-10'}`}
+                  style={{
+                    backgroundColor: isActive ? color : 'var(--text-muted)',
+                    boxShadow: isActive ? `0 0 25px ${color}` : 'none',
+                    opacity: isActive ? 1 : 0.2
                   }}
                 />
               </div>

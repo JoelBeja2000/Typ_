@@ -1,6 +1,7 @@
 import React from 'react';
-import { KEYBOARD_LAYOUT, SPACE_DATA, FINGER_COLORS } from '../constants';
-import { KeyData } from '../types';
+import { KEYBOARD_LAYOUT, SPACE_DATA, FINGER_COLORS } from '../../constants';
+import { KeyData } from '../../types';
+
 
 interface KeyboardProps {
   activeKey: string;
