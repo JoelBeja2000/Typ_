@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import * as THREE from 'three';
 import { VisualsConfig, DEFAULT_VISUALS_CONFIG } from '../types/visuals';
-import { getBirdPoints, getMusicTransform } from '../domain/visuals/modeling';
+import { getMusicTransform } from '../domain/visuals/modeling';
 
 interface BirdAnimationProps {
     className?: string;
@@ -15,6 +15,7 @@ interface BirdAnimationProps {
     config?: VisualsConfig;
     combo?: number;
     onClick?: (e: React.MouseEvent) => void;
+    lightingEnabled?: boolean;
 }
 
 const BirdAnimation: React.FC<BirdAnimationProps> = ({
@@ -28,7 +29,8 @@ const BirdAnimation: React.FC<BirdAnimationProps> = ({
     scale = 1.0,
     config = DEFAULT_VISUALS_CONFIG,
     combo = 0,
-    onClick
+    onClick,
+    lightingEnabled = false
 }) => {
     const containerRef = useRef<HTMLDivElement>(null);
     const bandsRef = useRef(bands);
@@ -37,6 +39,7 @@ const BirdAnimation: React.FC<BirdAnimationProps> = ({
     const scaleRef = useRef(scale);
     const configRef = useRef(config);
     const comboRef = useRef(combo);
+    const activeLightingRef = useRef(lightingEnabled);
 
     // Sync refs
     useEffect(() => { bandsRef.current = bands; }, [bands]);
@@ -45,6 +48,15 @@ const BirdAnimation: React.FC<BirdAnimationProps> = ({
     useEffect(() => { scaleRef.current = scale; }, [scale]);
     useEffect(() => { configRef.current = config; }, [config]);
     useEffect(() => { comboRef.current = combo; }, [combo]);
+    useEffect(() => { activeLightingRef.current = lightingEnabled; }, [lightingEnabled]);
+
+    // Modulo de Color Rítmico
+    const [dynamicColor, setDynamicColor] = React.useState(new THREE.Color(color));
+
+    useEffect(() => {
+        // Instant update if base color changes (e.g. palette change)
+        setDynamicColor(new THREE.Color(color));
+    }, [color]);
 
     useEffect(() => {
         if (!containerRef.current) return;
@@ -63,38 +75,30 @@ const BirdAnimation: React.FC<BirdAnimationProps> = ({
         scene.add(meshGroup);
         camera.position.z = 10;
 
-        let birdMesh: THREE.Mesh | null = null;
         let outerSphere: THREE.Mesh | null = null;
         let innerSphere: THREE.Mesh | null = null;
         let outerOriginalPositions: Float32Array | null = null;
         let innerOriginalPositions: Float32Array | null = null;
 
-        const mainColor = new THREE.Color(color);
+        // Base material color ref for animation loop
+        const baseColorRef = new THREE.Color(color);
 
-        if (configRef.current.type === 'bird') {
-            const birdConf = configRef.current.bird;
-            const birdMat = new THREE.MeshBasicMaterial({ color: mainColor, wireframe: true, transparent: true, opacity: 0.8 });
-            const curve = new THREE.CatmullRomCurve3(getBirdPoints(0, undefined, birdConf, speed), true);
-            const geo = new THREE.TubeGeometry(curve, birdConf.segments, birdConf.tubeRadius, birdConf.radialSegments, true);
-            birdMesh = new THREE.Mesh(geo, birdMat);
-            meshGroup.add(birdMesh);
-        } else {
-            const oConf = configRef.current.outerSphere;
-            const iConf = configRef.current.innerSphere;
+        // ALWAYS RENDER SPHERES (Bird mode removed)
+        const oConf = configRef.current.outerSphere;
+        const iConf = configRef.current.innerSphere;
 
-            const oGeo = new THREE.IcosahedronGeometry(oConf.size, oConf.segments);
-            const oMat = new THREE.MeshBasicMaterial({ color: mainColor, wireframe: oConf.isWireframe, transparent: true, opacity: oConf.opacity });
-            outerSphere = new THREE.Mesh(oGeo, oMat);
-            outerOriginalPositions = oGeo.attributes.position.array.slice() as Float32Array;
+        const oGeo = new THREE.IcosahedronGeometry(oConf.size, oConf.segments);
+        const oMat = new THREE.MeshBasicMaterial({ color: baseColorRef, wireframe: oConf.isWireframe, transparent: true, opacity: oConf.opacity });
+        outerSphere = new THREE.Mesh(oGeo, oMat);
+        outerOriginalPositions = oGeo.attributes.position.array.slice() as Float32Array;
 
-            const iGeo = new THREE.IcosahedronGeometry(iConf.size, iConf.segments);
-            const iMat = new THREE.MeshBasicMaterial({ color: mainColor, wireframe: iConf.isWireframe, transparent: true, opacity: iConf.opacity });
-            innerSphere = new THREE.Mesh(iGeo, iMat);
-            innerOriginalPositions = iGeo.attributes.position.array.slice() as Float32Array;
+        const iGeo = new THREE.IcosahedronGeometry(iConf.size, iConf.segments);
+        const iMat = new THREE.MeshBasicMaterial({ color: baseColorRef, wireframe: iConf.isWireframe, transparent: true, opacity: iConf.opacity });
+        innerSphere = new THREE.Mesh(iGeo, iMat);
+        innerOriginalPositions = iGeo.attributes.position.array.slice() as Float32Array;
 
-            meshGroup.add(outerSphere);
-            meshGroup.add(innerSphere);
-        }
+        meshGroup.add(outerSphere);
+        meshGroup.add(innerSphere);
 
         // --- WEB WORKER INITIALIZATION ---
         const worker = new Worker(new URL('../domain/visuals/modeling.worker.ts', import.meta.url), { type: 'module' });
@@ -125,11 +129,39 @@ const BirdAnimation: React.FC<BirdAnimationProps> = ({
             const conf = configRef.current;
             const comb = comboRef.current;
 
-            if (conf.type === 'bird' && birdMesh) {
-                birdMesh.geometry.dispose();
-                const curve = new THREE.CatmullRomCurve3(getBirdPoints(time, b, conf.bird, speed), true, 'catmullrom', 0.5);
-                birdMesh.geometry = new THREE.TubeGeometry(curve, conf.bird.segments, conf.bird.tubeRadius, conf.bird.radialSegments, true);
-            } else if (conf.type === 'circle' && outerSphere && innerSphere) {
+            // RHYTHMIC COLOR PULSE
+            // RHYTHMIC COLOR PULSE
+            if (activeLightingRef.current) {
+                const energy = ((b?.bass || 0) + (b?.mid || 0)) / 512; // Normalize 0-1
+
+                // Keyboard Gradient Logic Replication
+                // Left side (Bass/Keys 1-5): Blue/Cyan (~220 hue)
+                // Right side (Treble/Keys 6-0): Pink/Red (~340 hue)
+                const targetHue = side === 'left' ? 220 : 340;
+
+                // Intensity modulates saturation and lightness for "glow" effect
+                const saturation = 0.7 + (energy * 0.3); // 70-100%
+                const lightness = 0.5 + (energy * 0.4);  // 50-90%
+
+                const rhythmicColor = new THREE.Color().setHSL(targetHue / 360, saturation, lightness);
+
+                // Pulse size slighty with color
+                const pulseScale = 1.0 + (energy * 0.2);
+
+                if (outerSphere) {
+                    (outerSphere.material as THREE.MeshBasicMaterial).color.copy(rhythmicColor);
+                    // Optional: could also pulse opacity slightly
+                }
+                if (innerSphere) {
+                    (innerSphere.material as THREE.MeshBasicMaterial).color.copy(rhythmicColor);
+                }
+            } else {
+                if (outerSphere) (outerSphere.material as THREE.MeshBasicMaterial).color.copy(baseColorRef);
+                if (innerSphere) (innerSphere.material as THREE.MeshBasicMaterial).color.copy(baseColorRef);
+            }
+
+            // ALWAYS ANIMATE SPHERES
+            if (outerSphere && innerSphere) {
                 if (outerOriginalPositions && !isOuterWorking) {
                     isOuterWorking = true;
                     const pos = outerSphere.geometry.attributes.position.array.slice() as Float32Array;

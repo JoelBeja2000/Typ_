@@ -18,10 +18,19 @@ worker.onmessage = (e: MessageEvent) => {
     const energy = (bass + mid + high) / 3;
 
     // Progression logic (copied from modeling.ts for self-containment)
-    const breathingGate = 0.5 + (Math.min(1.0, combo / 25) * 0.5);
-    const bassGate = Math.min(1.0, Math.max(0, (combo - 5) / 25));
-    const midGate = Math.min(1.0, Math.max(0, (combo - 25) / 35));
-    const highGate = Math.min(1.0, Math.max(0, (combo - 60) / 50));
+    // Progression logic (copied from modeling.ts for self-containment)
+    // TUNED FOR IMMEDIATE REACTIVITY: Gates now open much earlier or have baselines
+    const breathingGate = 0.8 + (Math.min(1.0, combo / 25) * 0.2); // Always breathing nicely
+
+    // Bass: Starts immediately (20% baseline), full by combo 15
+    const bassGate = 0.2 + (Math.min(1.0, Math.max(0, combo / 15)) * 0.8);
+
+    // Mids: Starts at combo 5 (was 25), full by 30
+    const midGate = Math.min(1.0, Math.max(0, (combo - 5) / 25));
+
+    // Highs: Starts at combo 15 (was 60), full by 50
+    const highGate = Math.min(1.0, Math.max(0, (combo - 15) / 35));
+
     const audioActivity = (energy > 0.01) ? 1.0 : energy * 100;
 
     for (let i = 0; i < positions.length / 3; i++) {

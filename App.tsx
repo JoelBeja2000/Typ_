@@ -96,6 +96,13 @@ const hexToRgba = (hex: string, alpha: number) => {
 
 type Palette = 'alpine' | 'ocean' | 'sunset' | 'amethyst' | 'custom';
 
+const PALETTE_COLORS: Record<string, string> = {
+  alpine: '#A2AD91',
+  ocean: '#22d3ee',
+  sunset: '#fb923c',
+  amethyst: '#c084fc',
+};
+
 const App: React.FC = () => {
   const [theme, setTheme] = useState<'dark' | 'light'>('dark');
   const [palette, setPalette] = useState<Palette>('alpine');
@@ -144,6 +151,7 @@ const App: React.FC = () => {
   };
   const [dimensionalMenuPos, setDimensionalMenuPos] = useState<{ x: number, y: number } | null>(null);
   const [showDimensionalSettings, setShowDimensionalSettings] = useState(false);
+  const [uiScale, setUiScale] = useState(1);
 
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const colorInputRef = useRef<HTMLInputElement>(null);
@@ -156,6 +164,7 @@ const App: React.FC = () => {
   const comboRef = useRef(combo);
   const [audioReady, setAudioReady] = useState(false);
 
+  // ... (useMemo hooks) ...
   const currentPhrase = useMemo(() => phrases[phraseIndex] || '', [phrases, phraseIndex]);
   const normalizedTypedText = useMemo(() => typedText.normalize('NFC'), [typedText]);
 
@@ -185,6 +194,24 @@ const App: React.FC = () => {
 
   useEffect(() => { comboRef.current = combo; }, [combo]);
 
+  // MOUSE WHEEL ZOOM IMPLEMENTATION
+  useEffect(() => {
+    const handleWheel = (e: WheelEvent) => {
+      // Prevent default only if we are treating this as zoom, though standard behavior is scroll.
+      // The user requested zoom "instead of up/down".
+      if (e.ctrlKey || !e.ctrlKey) { // Apply always as per user request
+        e.preventDefault();
+        setUiScale(prev => {
+          const newScale = prev - e.deltaY * 0.001;
+          return Math.min(Math.max(newScale, 0.5), 1.5);
+        });
+      }
+    };
+
+    window.addEventListener('wheel', handleWheel, { passive: false });
+    return () => window.removeEventListener('wheel', handleWheel);
+  }, []);
+
   useEffect(() => {
     // Initialize Hexagonal Audio System
     const sys = new WebAudioSystem();
@@ -211,11 +238,16 @@ const App: React.FC = () => {
     }
   }, [currentMusicStyle, isMusicEnabled, comboMultiplier]);
 
-  // Audio Reactive Keyboard Lighting Loop
+  // Audio Reactive Loop (Lighting & Visuals)
   useEffect(() => {
     let frameId: number;
     const pollEnergy = () => {
-      if (isMusicLightingEnabled && audioSystemRef.current) {
+      // Poll if we have an audio system and music/visuals are potentially active
+      // We check audioSystemRef.current to avoid errors
+      if (audioSystemRef.current) {
+        // Always update bands if system exists, so 3D visuals get data
+        // Optimization: Could check if (isMusicEnabled || isMusicLightingEnabled) but for now let's ensure it works.
+        // Actually, if music is OFF, getFrequencyBands returns 0s anyway, so it's safe.
         setFrequencyBands(audioSystemRef.current.getFrequencyBands());
       } else {
         setFrequencyBands({ bass: 0, mid: 0, high: 0 });
@@ -224,11 +256,14 @@ const App: React.FC = () => {
     };
     frameId = requestAnimationFrame(pollEnergy);
     return () => cancelAnimationFrame(frameId);
-  }, [isMusicLightingEnabled]);
+  }, []); // Run once on mount (dependencies handled inside ref check)
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
     document.documentElement.setAttribute('data-palette', palette);
+    // Apply UI Scale
+    document.documentElement.style.setProperty('--ui-scale', uiScale.toString());
+
     if (palette === 'custom') {
       document.documentElement.style.setProperty('--accent-primary', customColor);
       document.documentElement.style.setProperty('--accent-glow', hexToRgba(customColor, 0.4));
@@ -477,7 +512,15 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen relative flex flex-row items-stretch overflow-hidden bg-[var(--bg-app)] transition-colors duration-500">
+    <div
+      className="min-h-screen relative flex flex-row items-stretch overflow-hidden bg-[var(--bg-app)] transition-colors duration-500"
+      style={{
+        transform: `scale(${uiScale})`,
+        transformOrigin: 'center center',
+        width: '100%',
+        height: '100%'
+      }}
+    >
 
       <HiddenInput inputRef={inputRef} onInput={handleInput} onCompositionStart={handleCompositionStart} onCompositionEnd={handleCompositionEnd} onKeyDown={handleKeyDown} onBlur={() => setIsComposingState(false)} />
       <input type="color" ref={colorInputRef} onChange={(e) => { setCustomColor(e.target.value); setPalette('custom'); }} value={customColor} className="fixed opacity-0 pointer-events-none -z-10" />
@@ -570,21 +613,39 @@ const App: React.FC = () => {
                   <div className="w-full flex flex-col items-center gap-6 relative">
 
                     {/* CURRENT WORD PILL SECTION */}
-                    <div className="relative w-full flex justify-center items-center">
-
+                    <div className="relative">
                       {/* CINEMATIC ANIMATIONS FLANKING THE WORD PILL */}
-                      <div className="absolute left-1/2 top-1/2 -translate-y-1/2 pointer-events-auto opacity-80 z-50 transition-all duration-500 hidden lg:block"
-                        style={{ transform: `translate(${visualsConfig.type === 'circle' ? '-320px' : '-400px'}, -50%)`, width: `${visualsConfig.type === 'circle' ? 240 : 320}px`, height: `${visualsConfig.type === 'circle' ? 240 : 320}px` }}>
+                      <div className="absolute top-1/2 left-0 pointer-events-auto opacity-80 z-50 transition-all duration-500 hidden lg:block"
+                        style={{ transform: `translate(calc(-100% + 40px), -50%)`, width: `${birdSize * 0.8}px`, height: `${birdSize * 0.8}px` }}> {/* Larger size, positioned to left */}
                         <BirdAnimation
-                          key={`${visualsConfig.type}-left`}
-                          color={customColor} speed={0.75} bands={frequencyBands} rotation={birdRotation} position={birdPos3D} side="left" scale={(visualsConfig.type === 'circle' ? 0.6 : 1.0)} config={visualsConfig} combo={combo * comboMultiplier} onClick={(e) => { setDimensionalMenuPos({ x: e.clientX, y: e.clientY }); setShowDimensionalSettings(true); }} />
+                          key={`circle-left`}
+                          color={palette === 'custom' ? customColor : PALETTE_COLORS[palette] || customColor}
+                          speed={0.75}
+                          bands={frequencyBands}
+                          rotation={birdRotation}
+                          position={birdPos3D}
+                          side="left"
+                          scale={(birdSize * 0.8) / 180}
+                          config={visualsConfig}
+                          combo={combo * comboMultiplier}
+                          lightingEnabled={isMusicLightingEnabled}
+                          onClick={(e) => { setDimensionalMenuPos({ x: e.clientX, y: e.clientY }); setShowDimensionalSettings(true); }} />
                       </div>
-
-                      <div className="absolute left-1/2 top-1/2 -translate-y-1/2 pointer-events-auto opacity-80 z-50 transition-all duration-500 hidden lg:block"
-                        style={{ transform: `translate(${visualsConfig.type === 'circle' ? '80px' : '80px'}, -50%)`, width: `${visualsConfig.type === 'circle' ? 240 : 320}px`, height: `${visualsConfig.type === 'circle' ? 240 : 320}px` }}>
+                      <div className="absolute top-1/2 right-0 pointer-events-auto opacity-80 z-50 transition-all duration-500 hidden lg:block"
+                        style={{ transform: `translate(calc(100% - 40px), -50%)`, width: `${birdSize * 0.8}px`, height: `${birdSize * 0.8}px` }}> {/* Larger size, positioned to right */}
                         <BirdAnimation
-                          key={`${visualsConfig.type}-right`}
-                          color={customColor} speed={0.75} bands={frequencyBands} rotation={birdRotation} position={birdPos3D} side="right" scale={(visualsConfig.type === 'circle' ? 0.6 : 1.0)} config={visualsConfig} combo={combo * comboMultiplier} onClick={(e) => { setDimensionalMenuPos({ x: e.clientX, y: e.clientY }); setShowDimensionalSettings(true); }} />
+                          key={`circle-right`}
+                          color={palette === 'custom' ? customColor : PALETTE_COLORS[palette] || customColor}
+                          speed={0.75}
+                          bands={frequencyBands}
+                          rotation={birdRotation}
+                          position={birdPos3D}
+                          side="right"
+                          scale={(birdSize * 0.8) / 180}
+                          config={visualsConfig}
+                          combo={combo * comboMultiplier}
+                          lightingEnabled={isMusicLightingEnabled}
+                          onClick={(e) => { setDimensionalMenuPos({ x: e.clientX, y: e.clientY }); setShowDimensionalSettings(true); }} />
                       </div>
 
                       <div className="bg-[var(--bg-floating)] backdrop-blur-3xl border border-[var(--border-strong)] rounded-[2.5rem] px-14 h-24 flex items-center justify-center min-w-[400px] shadow-3xl scale-110 z-30 relative overflow-hidden">
@@ -605,8 +666,8 @@ const App: React.FC = () => {
                     {/* KEYBOARD SECTION */}
                     <div className="flex justify-center w-full transition-all duration-500 transform hover:scale-[1.01] z-20 pb-4">
                       {keyboardType === 'standard'
-                        ? <Keyboard activeKey={activeKey} targetKey={targetChar} showZones={showZones} bands={frequencyBands} />
-                        : <MacKeyboard activeKey={activeKey} targetKey={targetChar} showZones={showZones} bands={frequencyBands} />
+                        ? <Keyboard activeKey={activeKey} targetKey={targetChar} showZones={showZones} bands={isMusicLightingEnabled ? frequencyBands : { bass: 0, mid: 0, high: 0 }} />
+                        : <MacKeyboard activeKey={activeKey} targetKey={targetChar} showZones={showZones} bands={isMusicLightingEnabled ? frequencyBands : { bass: 0, mid: 0, high: 0 }} />
                       }
                     </div>
                   </div>
@@ -643,7 +704,9 @@ const App: React.FC = () => {
                   <button onClick={cyclePalette} className="h-12 flex items-center justify-center rounded-2xl border bg-white/5 border-white/10 text-[var(--accent-primary)]" title="Paleta"><i className="fa fa-paint-brush"></i></button>
                   <button onClick={() => colorInputRef.current?.click()} className="h-12 flex items-center justify-center rounded-2xl border bg-white/5 border-white/10 text-[var(--text-secondary)]" title="Color Personalizado"><i className="fa fa-eyedropper"></i></button>
                   <button onClick={() => setShowZones(!showZones)} className={`h-12 flex items-center justify-center rounded-2xl border transition-all ${showZones ? 'bg-[var(--accent-primary)]/20 border-[var(--accent-primary)] text-[var(--accent-primary)]' : 'bg-white/5 border-white/10 text-[var(--text-secondary)]'}`} title="Guía Dactilar"><i className="fa fa-hand-paper-o"></i></button>
-                  <button onClick={toggleAnimType} className="h-12 flex items-center justify-center rounded-2xl border bg-white/5 border-white/10 text-[var(--accent-primary)]" title="Modelo 3D"><i className={`fa ${visualsConfig.type === 'bird' ? 'fa-leaf' : 'fa-circle-o'}`}></i></button>
+                  <div className="flex gap-2">
+                    {/* Removed Bird Toggle Button per user request */}
+                  </div>
                 </div>
               </AccordionItem>
 
