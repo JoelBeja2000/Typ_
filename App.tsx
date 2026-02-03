@@ -1,9 +1,8 @@
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
-import Keyboard from './components/Keyboard';
-import MacKeyboard from './components/MacKeyboard';
 import FingerGuide from './components/FingerGuide';
-import { AudioWave } from './src/components/AudioWave';
-import BirdAnimation from './src/components/BirdAnimation';
+import { WordPanel } from './src/components/WordPanel';
+import { KeyboardSection } from './src/components/KeyboardSection';
+import BirdAnimation from './src/components/BirdAnimation'; // Still needed for some side effects or other uses? Let's check.
 import { WebAudioSystem } from './src/infrastructure/audio/WebAudioSystem';
 import { MusicSequencer } from './src/domain/services/MusicSequencer';
 import { TECHNO_STYLE, AMBIENT_STYLE, ACID_HOUSE_STYLE, MusicStyle } from './src/domain/models/MusicStyles';
@@ -142,7 +141,7 @@ const App: React.FC = () => {
   const [birdPos3D, setBirdPos3D] = useState({ x: 0, y: 0, z: 0 });
   const [birdSize, setBirdSize] = useState(180);
   const [animType, setAnimType] = useState<'bird' | 'circle'>('bird');
-  const [visualsConfig, setVisualsConfig] = useState<VisualsConfig>(DEFAULT_VISUALS_CONFIG);
+  const [visualsConfig, setVisualsConfig] = useState<VisualsConfig>({ ...DEFAULT_VISUALS_CONFIG, type: 'circle' });
 
   const toggleAnimType = () => {
     const nextType = visualsConfig.type === 'bird' ? 'circle' : 'bird';
@@ -194,23 +193,6 @@ const App: React.FC = () => {
 
   useEffect(() => { comboRef.current = combo; }, [combo]);
 
-  // MOUSE WHEEL ZOOM IMPLEMENTATION
-  useEffect(() => {
-    const handleWheel = (e: WheelEvent) => {
-      // Prevent default only if we are treating this as zoom, though standard behavior is scroll.
-      // The user requested zoom "instead of up/down".
-      if (e.ctrlKey || !e.ctrlKey) { // Apply always as per user request
-        e.preventDefault();
-        setUiScale(prev => {
-          const newScale = prev - e.deltaY * 0.001;
-          return Math.min(Math.max(newScale, 0.5), 1.5);
-        });
-      }
-    };
-
-    window.addEventListener('wheel', handleWheel, { passive: false });
-    return () => window.removeEventListener('wheel', handleWheel);
-  }, []);
 
   useEffect(() => {
     // Initialize Hexagonal Audio System
@@ -486,30 +468,6 @@ const App: React.FC = () => {
 
   const getBtnClass = (active: boolean) => `w-full p-4 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] transition-all duration-300 border flex items-center justify-between group ${active ? 'bg-[var(--accent-primary)]/10 border-[var(--accent-primary)] text-[var(--accent-primary)] shadow-[0_0_15px_var(--accent-glow)]' : 'bg-transparent border-[var(--border-glass)] text-[var(--text-secondary)] hover:border-[var(--text-primary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-glass)]'}`;
 
-  const renderVocabField = () => {
-    return (
-      <div className="w-full bg-[var(--bg-glass-strong)] border border-[var(--border-glass)] rounded-[2.5rem] p-10 md:p-14 min-h-[180px] flex flex-col justify-center relative overflow-hidden transition-all duration-1000 shadow-inner">
-        <div className="font-mono text-2xl md:text-3xl relative">
-          <div className="text-[var(--text-ghost)] whitespace-pre-wrap leading-relaxed">
-            {currentPhrase.split('').map((char, i) => {
-              let color = "text-[var(--text-ghost)]";
-              if (i < normalizedTypedText.length) {
-                color = normalizedTypedText[i] === char ? "text-[var(--accent-primary)]" : "text-red-400 bg-red-500/10 border-b-2 border-red-500/30";
-              }
-              return (
-                <span key={i} className={`${color} transition-all inline-block relative`}>
-                  {char === ' ' ? '\u00A0' : char}
-                  {i === normalizedTypedText.length && (
-                    <span className="absolute left-0 bottom-[-4px] w-full h-[3px] bg-[var(--accent-primary)] animate-pulse shadow-[0_0_15px_var(--accent-primary)]" />
-                  )}
-                </span>
-              );
-            })}
-          </div>
-        </div>
-      </div>
-    );
-  };
 
   return (
     <div
@@ -568,110 +526,56 @@ const App: React.FC = () => {
       </aside>
 
       {/* MAIN VIEWPORT */}
-      <main className="flex-grow flex flex-col items-center justify-center p-8 transition-all duration-500" style={{ opacity: (showLeftSidebar || showRightSidebar) ? 0.3 : 1 }}>
-        <div className="w-full max-w-5xl flex flex-col items-center gap-8 relative">
+      <main className="flex-grow flex flex-col items-center justify-center p-4 pt-2 transition-all duration-500" style={{ opacity: (showLeftSidebar || showRightSidebar) ? 0.3 : 1 }}>
+        <div className="w-full max-w-5xl flex flex-col items-center gap-4 relative">
 
           {!isLoading && !isFinished && (
             <div className="w-full relative group flex justify-center">
 
               {/* CENTRAL CINEMATIC BOX */}
-              <div className="w-full bg-[var(--bg-glass)] backdrop-blur-xl border border-[var(--border-glass)] rounded-[2.5rem] p-10 pt-24 flex flex-col items-center shadow-2xl relative">
+              <div className="w-full bg-[var(--bg-glass)] backdrop-blur-xl border border-[var(--border-glass)] rounded-[2.5rem] p-6 pt-6 flex flex-col items-center shadow-2xl relative" style={{ overflow: 'visible' }}>
 
-                {/* ACTION BUTTONS (LEFT) */}
-                <div className="absolute top-8 left-8 flex gap-2 z-[100]">
-                  <button onClick={restart} className="h-11 w-11 flex items-center justify-center bg-[var(--bg-glass)] border border-[var(--border-strong)] rounded-2xl text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-all" title="Reiniciar"><i className="fa fa-refresh"></i></button>
-                  <button onClick={() => setIsZenMode(!isZenMode)} className={`h-11 px-4 flex items-center justify-center border rounded-2xl font-black text-[10px] uppercase tracking-widest transition-all ${isZenMode ? 'bg-[var(--accent-primary)] text-[var(--bg-app)] border-[var(--accent-primary)] shadow-[0_0_15px_var(--accent-glow)]' : 'bg-[var(--bg-glass)] text-[var(--text-secondary)] border-[var(--border-strong)]'}`}>ZEN {isZenMode ? 'ON' : 'OFF'}</button>
-                </div>
+                <WordPanel
+                  currentPhrase={currentPhrase}
+                  normalizedTypedText={normalizedTypedText}
+                  currentWordInfo={currentWordInfo}
+                  isComposingState={isComposingState}
+                  palette={palette}
+                  customColor={customColor}
+                  frequencyBands={frequencyBands}
+                  birdRotation={birdRotation}
+                  birdPos3D={birdPos3D}
+                  birdSize={birdSize}
+                  visualsConfig={visualsConfig}
+                  combo={combo}
+                  comboMultiplier={comboMultiplier}
+                  isMusicLightingEnabled={isMusicLightingEnabled}
+                  onDimensionalMenu={(e) => { setDimensionalMenuPos({ x: e.clientX, y: e.clientY }); setShowDimensionalSettings(true); }}
+                  PALETTE_COLORS={PALETTE_COLORS}
+                />
 
-                {/* GEAR BUTTON (RIGHT) - Opens Unified Panel */}
-                <div className="absolute top-8 right-8 z-[100]">
-                  <button onClick={() => { setDimensionalMenuPos(null); setShowDimensionalSettings(!showDimensionalSettings); }} className={`h-11 w-11 flex items-center justify-center backdrop-blur-xl border rounded-2xl transition-all duration-500 ${showDimensionalSettings ? 'bg-[var(--accent-primary)] rotate-90 text-[var(--bg-app)] border-[var(--accent-primary)] shadow-[0_0_20px_var(--accent-glow)]' : 'bg-[var(--bg-glass)] border-[var(--border-strong)] text-[var(--text-secondary)]'}`} title="Control Center"><i className="fa fa-gear"></i></button>
-                </div>
-
-                {/* STATS BAR (CENTERED TOP) */}
-                <div className="absolute top-8 left-1/2 -translate-x-1/2 h-11 w-[420px] bg-[var(--bg-glass)] border border-[var(--border-strong)] rounded-2xl flex items-center px-6 overflow-hidden shadow-2xl z-20 transition-all duration-500" style={{ boxShadow: combo > 15 ? `0 0 30px ${hexToRgba(customColor, 0.3)}` : 'none' }}>
-                  {audioReady && audioSystemRef.current && currentMusicStyle.layers.map((layer) => (
-                    combo * comboMultiplier >= layer.minCombo && (layer.maxCombo === undefined || combo * comboMultiplier <= layer.maxCombo) && (
-                      <AudioWave key={layer.id} analyser={audioSystemRef.current!.getAnalysers()[layer.id as keyof ReturnType<WebAudioSystem['getAnalysers']>] || audioSystemRef.current!.getAnalysers().master} type={layer.type as any} color={layer.color} active={startTime !== null && !isFinished} opacityMultiplier={layer.opacity} yOffset={layer.yOffset} />
-                    )
-                  ))}
-                  <div className="flex items-center gap-5 relative z-10 w-full justify-between">
-                    <div className="flex items-baseline gap-1"><span className="text-[14px] font-black text-[var(--accent-primary)] font-mono">{stats.wpm}</span><span className="text-[7px] font-bold text-[var(--text-secondary)] uppercase">WPM</span></div>
-                    <div className="flex items-baseline gap-1"><span className="text-[14px] font-black text-[var(--text-primary)] font-mono">{stats.accuracy}</span><span className="text-[7px] font-bold text-[var(--text-secondary)] uppercase">%ACC</span></div>
-                    <div className="flex items-baseline gap-1"><span className={`text-[14px] font-black font-mono transition-all ${combo > 0 ? 'text-[var(--accent-primary)]' : 'text-[var(--text-muted)]'}`}>{combo}</span><span className="text-[7px] font-bold text-[var(--text-secondary)] uppercase">COMBO</span></div>
-                    <div className="flex items-center gap-1 opacity-40 animate-pulse"><div className="w-1.5 h-1.5 rounded-full bg-[var(--accent-primary)]" /><span className="text-[6px] font-black text-[var(--text-secondary)]">LIVE</span></div>
-                  </div>
-                </div>
-
-                {/* CONTENT AREA */}
-                <div className="w-full flex-grow flex flex-col items-center justify-between select-none">
-                  <div className="w-full">
-                    {renderVocabField()}
-                  </div>
-
-                  {/* BOTTOM INTERACTIVE GROUP: Word Pill + Keyboard + 3D Animations */}
-                  <div className="w-full flex flex-col items-center gap-6 relative">
-
-                    {/* CURRENT WORD PILL SECTION */}
-                    <div className="relative">
-                      {/* CINEMATIC ANIMATIONS FLANKING THE WORD PILL */}
-                      <div className="absolute top-1/2 left-0 pointer-events-auto opacity-80 z-50 transition-all duration-500 hidden lg:block"
-                        style={{ transform: `translate(calc(-100% + 40px), -50%)`, width: `${birdSize * 0.8}px`, height: `${birdSize * 0.8}px` }}> {/* Larger size, positioned to left */}
-                        <BirdAnimation
-                          key={`circle-left`}
-                          color={palette === 'custom' ? customColor : PALETTE_COLORS[palette] || customColor}
-                          speed={0.75}
-                          bands={frequencyBands}
-                          rotation={birdRotation}
-                          position={birdPos3D}
-                          side="left"
-                          scale={(birdSize * 0.8) / 180}
-                          config={visualsConfig}
-                          combo={combo * comboMultiplier}
-                          lightingEnabled={isMusicLightingEnabled}
-                          onClick={(e) => { setDimensionalMenuPos({ x: e.clientX, y: e.clientY }); setShowDimensionalSettings(true); }} />
-                      </div>
-                      <div className="absolute top-1/2 right-0 pointer-events-auto opacity-80 z-50 transition-all duration-500 hidden lg:block"
-                        style={{ transform: `translate(calc(100% - 40px), -50%)`, width: `${birdSize * 0.8}px`, height: `${birdSize * 0.8}px` }}> {/* Larger size, positioned to right */}
-                        <BirdAnimation
-                          key={`circle-right`}
-                          color={palette === 'custom' ? customColor : PALETTE_COLORS[palette] || customColor}
-                          speed={0.75}
-                          bands={frequencyBands}
-                          rotation={birdRotation}
-                          position={birdPos3D}
-                          side="right"
-                          scale={(birdSize * 0.8) / 180}
-                          config={visualsConfig}
-                          combo={combo * comboMultiplier}
-                          lightingEnabled={isMusicLightingEnabled}
-                          onClick={(e) => { setDimensionalMenuPos({ x: e.clientX, y: e.clientY }); setShowDimensionalSettings(true); }} />
-                      </div>
-
-                      <div className="bg-[var(--bg-floating)] backdrop-blur-3xl border border-[var(--border-strong)] rounded-[2.5rem] px-14 h-24 flex items-center justify-center min-w-[400px] shadow-3xl scale-110 z-30 relative overflow-hidden">
-                        <div className="relative font-mono text-4xl flex items-center h-full min-w-[200px]">
-                          <div className="absolute inset-0 text-[var(--text-ghost)] whitespace-pre flex items-center justify-start pointer-events-none opacity-40">{currentWordInfo.word}</div>
-                          <div className="relative flex items-center whitespace-pre h-full">
-                            {currentWordInfo.userTypedSlice.split('').map((userChar, idx) => {
-                              const correct = userChar === (currentWordInfo.word[idx] || '');
-                              const color = (isComposingState && idx === currentWordInfo.userTypedSlice.length - 1) ? "text-yellow-400" : (correct ? 'text-[var(--accent-primary)]' : 'text-red-400 bg-red-500/10 border-b-2 border-red-500/30');
-                              return <span key={idx} className={`relative inline-block ${color}`}>{userChar === ' ' ? '\u00A0' : userChar}</span>;
-                            })}
-                            <span className="inline-block w-0.5 h-10 bg-[var(--accent-primary)] shadow-[0_0_15px_var(--accent-primary)] animate-pulse rounded-full ml-1" />
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* KEYBOARD SECTION */}
-                    <div className="flex justify-center w-full transition-all duration-500 transform hover:scale-[1.01] z-20 pb-4">
-                      {keyboardType === 'standard'
-                        ? <Keyboard activeKey={activeKey} targetKey={targetChar} showZones={showZones} bands={isMusicLightingEnabled ? frequencyBands : { bass: 0, mid: 0, high: 0 }} />
-                        : <MacKeyboard activeKey={activeKey} targetKey={targetChar} showZones={showZones} bands={isMusicLightingEnabled ? frequencyBands : { bass: 0, mid: 0, high: 0 }} />
-                      }
-                    </div>
-                  </div>
-                </div>
+                <KeyboardSection
+                  keyboardType={keyboardType}
+                  activeKey={activeKey}
+                  targetChar={targetChar}
+                  showZones={showZones}
+                  isMusicLightingEnabled={isMusicLightingEnabled}
+                  frequencyBands={frequencyBands}
+                  stats={stats}
+                  isZenMode={isZenMode}
+                  onRestart={restart}
+                  onZenToggle={() => setIsZenMode(!isZenMode)}
+                  audioReady={audioReady}
+                  audioSystem={audioSystemRef.current}
+                  currentMusicStyle={currentMusicStyle}
+                  startTime={startTime}
+                  isFinished={isFinished}
+                  combo={combo}
+                  comboMultiplier={comboMultiplier}
+                  onDimensionalMenu={(e) => { setDimensionalMenuPos({ x: e.clientX, y: e.clientY }); setShowDimensionalSettings(true); }}
+                  hexToRgba={hexToRgba}
+                  customColor={customColor}
+                />
 
               </div>
             </div>

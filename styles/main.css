@@ -149,3 +149,12 @@ body {
 .char-incorrect { color: var(--state-error); background-color: var(--state-error-bg); border-bottom: 2px solid rgba(239, 68, 68, 0.3); }
 .char-pending { color: var(--text-muted); }
 .char-composing { color: var(--state-warning); border-bottom: 2px solid rgba(250, 204, 21, 0.5); }
+/* Visual tweak: separate balls from word field on large screens */
+@media (min-width: 1024px) {
+  .ball-left {
+    transform: translate(calc(-100% + 40px), calc(-50% + 48px)) !important;
+  }
+  .ball-right {
+    transform: translate(calc(100% - 40px), calc(-50% + 48px)) !important;
+  }
+}
