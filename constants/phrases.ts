@@ -1,5 +1,4 @@
-
-export type PhraseCategory = 'basico' | 'programacion' | 'teclas_raras';
+export type PhraseCategory = 'basico' | 'programacion' | 'teclas_raras' | 'acentuacion';
 
 export interface PhraseDatabase {
   [lang: string]: {
@@ -29,6 +28,18 @@ export const LOCAL_PHRASE_DB: PhraseDatabase = {
       "El símbolo ~ (tilde de la ñ) y ^ (circunflejo) son poco usados.",
       "La ruta C:\\Users\\Admin\\Documents/test.txt usa barras inversas.",
       "¿Sabías que 2^10 es igual a 1024? ¡Es potencia binaria!"
+    ],
+    acentuacion: [
+      "El capitán pidió un café exprés y un té tras el festín en el jardín.",
+      "Álvaro compró un jarrón de mármol azul y un sillón ortopédico.",
+      "Sé que él no te dio el libro, pero tú aún no sabes qué pasó allí.",
+      "El murciélago sobrevoló el área de forma frenética y enigmática.",
+      "Raúl leía la biografía de un héroe que vivía en un país lejano.",
+      "¿Cuándo vendrás? Dime si el examen de matemáticas fue difícil o fácil.",
+      "El árbol de caoba creció rápido gracias al fértil césped del jardín.",
+      "Sólo tú sabes qué es lo que más te conviene para el próximo decenio.",
+      "Ojalá el médico apruebe el análisis del líquido cefalorraquídeo hoy.",
+      "Escribía con ímpetu mientras el búho observaba desde el ático vacío."
     ]
   },
   en: {
@@ -52,6 +63,13 @@ export const LOCAL_PHRASE_DB: PhraseDatabase = {
       "Is it true that 5 > 3 and 2 < 4? Let's check logic!",
       "Type 'cd ../../' to go back two directories in the shell.",
       "The #hashtag is used for comments in many config files."
+    ],
+    acentuacion: [
+      "The résumé of the employé was impeccable and very detailed.",
+      "She visited the café to drink a frappé during her vacation.",
+      "The façade of the building had a beautiful décor in the façade.",
+      "Please cooperate with the naïve protégé during the soirée.",
+      "It is a cliché to say that the jalapeño is very spicy."
     ]
   },
   fr: {
@@ -72,9 +90,16 @@ export const LOCAL_PHRASE_DB: PhraseDatabase = {
     teclas_raras: [
       "L'élève a-t-il reçu ses 100€ pour son déjeuner ?",
       "Regardez l'icône { } et [ ] dans l'éditeur de code.",
-      "Le caractère ~ est rare, tout comme le symbole | (pipe).",
+      "Le carácter ~ est rare, tout comme le symbole | (pipe).",
       "Utilisez-vous souvent el guion bajo _ o el guion medio - ?",
       "Attention aux caractères spéciaux comme ^ y ¨ !"
+    ],
+    acentuacion: [
+      "L'événement théâtral a été un succès grâce à l'héroïne.",
+      "Où est le garçon qui a mangé le gâteau à la crème fraîche ?",
+      "C'est l'été, le maïs mûrit sous le château de la forêt.",
+      "L'étudiant a étudié l'algèbre et la géométrie à l'école.",
+      "Il paraît que le poète déteste les huîtres et le thé glacé."
     ]
   }
 };

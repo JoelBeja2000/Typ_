@@ -65,6 +65,7 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
         onToggle={onExpandCategory}
       >
         <div className="space-y-4">
+          {/* Idiomas */}
           <button
             onClick={() => onLanguageChange('es')}
             className={getBtnClass(language === 'es')}
@@ -77,7 +78,10 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
           >
             <span>English</span> <span>🇺🇸</span>
           </button>
+
           <div className="h-[1px] bg-[var(--border-glass)] my-2" />
+
+          {/* Modos de Práctica */}
           <button
             onClick={() => onFocusChange('Básico')}
             className={getBtnClass(focus === 'Básico')}
@@ -89,6 +93,13 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
             className={getBtnClass(focus === 'Programación')}
           >
             <span>Programación</span>
+          </button>
+          {/* Nueva opción de Acentuación */}
+          <button
+            onClick={() => onFocusChange('Acentuación')}
+            className={getBtnClass(focus === 'Acentuación')}
+          >
+            <span>Acentuación</span>
           </button>
         </div>
       </AccordionItem>
