@@ -1,0 +1,462 @@
+/* MAC KEYBOARD CSS - Para uso en otra app */
+/* Diseño completo del teclado Mac con distribución ISO Español */
+
+/* Variables CSS - Personaliza estos valores */
+:root {
+  /* Colores del teclado */
+  --key-bg: #2d2d2d;           /* Fondo de teclas */
+  --key-text: #ffffff;         /* Texto de teclas */
+  --key-target-bg: #4a90e2;    /* Fondo para tecla objetivo */
+  --key-shadow: #000000;       /* Sombra de teclas */
+  --border-glass: #3b3b3b;     /* Borde transparente */
+  
+  /* Colores de dedos (mismo que en la app original) */
+  --finger-left-pinky: #f472b6;    /* Rosa */
+  --finger-left-ring: #c084fc;     /* Morado */
+  --finger-left-middle: #60a5fa;   /* Azul */
+  --finger-left-index: #22d3ee;    /* Cyan */
+  --finger-thumb: #9ca3af;         /* Gris */
+  --finger-right-index: #4ade80;   /* Verde */
+  --finger-right-middle: #facc15;  /* Amarillo */
+  --finger-right-ring: #fb923c;    /* Naranja */
+  --finger-right-pinky: #f87171;   /* Rojo */
+  
+  /* Colores de acento (para estados activos) */
+  --accent-primary: #4a90e2;
+  --accent-glow: rgba(74, 144, 226, 0.4);
+  
+  /* Tamaños y espaciados */
+  --key-width: 44px;
+  --key-height: 44px;
+  --key-spacing: 6px;
+  --border-radius: 6px;
+  --font-size: 11px;
+}
+
+/* Estilos base del teclado */
+.mac-keyboard {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 
+               "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, 
+               "Helvetica Neue", sans-serif;
+  font-smoothing: antialiased;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  
+  /* Escala para diferentes tamaños de pantalla */
+  transform: scale(0.55);
+  transform-origin: center;
+  
+  /* Estructura principal */
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 1px;
+  background: transparent;
+  border-radius: 10px;
+  width: 755px;
+}
+
+/* Teclado completo - Contenedor */
+.mac-keyboard-container {
+  background: transparent;
+  border-radius: 10px;
+  padding: 1px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* Barra táctil (Touch Bar) */
+.touchbar {
+  display: flex;
+  gap: 1px;
+  align-items: center;
+  margin-bottom: 1px;
+  background: var(--key-bg);
+  border-radius: 4px;
+  padding: 0 2px;
+  height: 30px;
+}
+
+.touchbar-esc {
+  width: 60px;
+  height: 30px;
+  background: var(--key-bg);
+  border: 1px solid var(--border-glass);
+  border-radius: 4px;
+  color: var(--key-text);
+  font-size: 9px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: default;
+}
+
+.touchbar-functions {
+  flex: 1;
+  background: #1a1a1a;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  padding: 0 2px;
+}
+
+.touchbar-functions .function-key {
+  font-size: 8px;
+  font-weight: bold;
+  color: var(--text-secondary);
+  min-width: 20px;
+  text-align: center;
+  cursor: default;
+}
+
+.touchbar-volume {
+  width: 40px;
+  height: 30px;
+  background: var(--key-bg);
+  border: 1px solid var(--border-glass);
+  border-radius: 4px;
+  color: var(--key-text);
+  font-size: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: default;
+}
+
+/* Fila de números */
+.row-numbers {
+  display: flex;
+  gap: 6px;
+}
+
+/* Teclas individuales */
+.mac-key {
+  flex: 0 0 var(--key-width);
+  width: var(--key-width);
+  height: var(--key-height);
+  background: var(--key-bg);
+  border: 2px solid var(--border-glass);
+  border-radius: var(--border-radius);
+  color: var(--key-text);
+  font-size: var(--font-size);
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: default;
+  position: relative;
+  transition: all 0.1s ease;
+  box-shadow: 0 2px 0 var(--key-shadow);
+}
+
+.mac-key.flex-grow {
+  flex: 1;
+}
+
+.mac-key.w-68 {
+  width: 68px;
+}
+
+.mac-key.w-80 {
+  width: 80px;
+}
+
+.mac-key.w-52 {
+  width: 52px;
+}
+
+.mac-key.w-56 {
+  width: 56px;
+}
+
+.mac-key.w-54 {
+  width: 54px;
+}
+
+.mac-key.w-64 {
+  width: 64px;
+}
+
+.mac-key.w-250 {
+  width: 250px;
+}
+
+/* Teclas con contenido especial */
+.mac-key-dualsymbol {
+  padding: 4px 0;
+}
+
+.mac-key-dualsymbol .top-symbol {
+  font-size: 10px;
+  opacity: 0.7;
+  margin-bottom: -2px;
+}
+
+.mac-key-dualsymbol .bottom-symbol {
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.mac-key-isosymbol {
+  padding: 6px 0;
+}
+
+.mac-key-isosymbol .top-symbol {
+  font-size: 10px;
+  opacity: 0.8;
+  margin-bottom: 2px;
+  font-weight: 500;
+}
+
+.mac-key-isosymbol .bottom-symbol {
+  font-size: 13px;
+  font-weight: bold;
+}
+
+.mac-key-isosymbol .right-symbol {
+  position: absolute;
+  bottom: 4px;
+  right: 4px;
+  font-size: 10px;
+  opacity: 0.7;
+  font-weight: 500;
+}
+
+.mac-key-letter {
+  position: relative;
+}
+
+.mac-key-letter .letter {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.mac-key-letter .symbol {
+  position: absolute;
+  bottom: 4px;
+  right: 5px;
+  font-size: 11px;
+  opacity: 0.7;
+  font-weight: 500;
+}
+
+/* Teclas de función */
+.mac-key-func {
+  font-size: 10px;
+  font-weight: 500;
+}
+
+/* Teclas especiales */
+.mac-key-capslock {
+  position: relative;
+}
+
+.mac-key-capslock .capslock-indicator {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 3px;
+  height: 3px;
+  background: #4a90e2;
+  border-radius: 50%;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.mac-key-capslock.capslock-on .capslock-indicator {
+  opacity: 1;
+}
+
+/* Flechas de dirección */
+.mac-key-arrow {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.mac-key-arrow .arrow-icon {
+  font-size: 10px;
+}
+
+/* Estados de las teclas */
+.mac-key.active {
+  background: rgba(74, 144, 226, 0.2) !important;
+  border-color: #4a90e2 !important;
+  color: #4a90e2 !important;
+  transform: translateY(1px);
+  box-shadow: 0 0 20px rgba(74, 144, 226, 0.4) !important;
+}
+
+.mac-key.target {
+  background: #4a90e2 !important;
+  border-color: #4a90e2 !important;
+  color: white !important;
+  box-shadow: 0 0 15px rgba(74, 144, 226, 0.5) !important;
+  animation: pulse 1.5s infinite;
+}
+
+.mac-key.zone {
+  background: rgba(255, 255, 255, 0.05) !important;
+  border-color: currentColor !important;
+  color: currentColor !important;
+  box-shadow: 0 0 8px currentColor !important;
+}
+
+/* Animación de pulso */
+@keyframes pulse {
+  0% { box-shadow: 0 0 15px rgba(74, 144, 226, 0.5); }
+  50% { box-shadow: 0 0 25px rgba(74, 144, 226, 0.8); }
+  100% { box-shadow: 0 0 15px rgba(74, 144, 226, 0.5); }
+}
+
+/* Efectos de iluminación (opcional) */
+.mac-key.illuminated {
+  position: relative;
+  overflow: hidden;
+}
+
+.mac-key.illuminated::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at center, transparent 30%, rgba(74, 144, 226, 0.3) 70%);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.mac-key.illuminated.active::before {
+  opacity: 1;
+}
+
+/* Estilos para dedos (zonas) */
+.mac-key.left-pinky {
+  --finger-color: var(--finger-left-pinky);
+}
+
+.mac-key.left-ring {
+  --finger-color: var(--finger-left-ring);
+}
+
+.mac-key.left-middle {
+  --finger-color: var(--finger-left-middle);
+}
+
+.mac-key.left-index {
+  --finger-color: var(--finger-left-index);
+}
+
+.mac-key.thumb {
+  --finger-color: var(--finger-thumb);
+}
+
+.mac-key.right-index {
+  --finger-color: var(--finger-right-index);
+}
+
+.mac-key.right-middle {
+  --finger-color: var(--finger-right-middle);
+}
+
+.mac-key.right-ring {
+  --finger-color: var(--finger-right-ring);
+}
+
+.mac-key.right-pinky {
+  --finger-color: var(--finger-right-pinky);
+}
+
+/* Estilos responsivos */
+@media (max-width: 768px) {
+  .mac-keyboard {
+    transform: scale(0.45);
+  }
+  
+  .mac-keyboard.w-250 {
+    width: 200px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .mac-keyboard {
+    transform: scale(0.75);
+  }
+}
+
+@media (min-width: 1280px) {
+  .mac-keyboard {
+    transform: scale(0.85);
+  }
+}
+
+@media (min-width: 1440px) {
+  .mac-keyboard {
+    transform: scale(0.95);
+  }
+}
+
+/* Clases adicionales para uso en apps */
+.keyboard-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 300px;
+  background: #1a1a1a;
+  padding: 20px;
+  border-radius: 12px;
+}
+
+.keyboard-label {
+  font-size: 12px;
+  font-weight: 500;
+  color: #666;
+  text-align: center;
+  margin-top: 10px;
+}
+
+/* Tema oscuro (ya incluido en variables) */
+.mac-keyboard.dark-theme {
+  --key-bg: #2d2d2d;
+  --key-text: #ffffff;
+  --key-target-bg: #4a90e2;
+  --key-shadow: #000000;
+  --border-glass: #3b3b3b;
+}
+
+/* Tema claro (opcional) */
+.mac-keyboard.light-theme {
+  --key-bg: #e0e0e0;
+  --key-text: #000000;
+  --key-target-bg: #2196f3;
+  --key-shadow: #888888;
+  --border-glass: #cccccc;
+}
+
+/* Clases de utilidad */
+.text-center {
+  text-align: center;
+}
+
+.mt-2 {
+  margin-top: 8px;
+}
+
+.mb-1 {
+  margin-bottom: 4px;
+}
+
+/* Para integrar con frameworks modernos */
+/* React: className="mac-keyboard-container" */
+/* Vue: :class="mac-keyboard-container" */
+/* Angular: class="mac-keyboard-container" */
+
+/* Fin del archivo CSS del teclado Mac */

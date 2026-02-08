@@ -7,9 +7,18 @@ interface MacKeyboardProps {
   targetKey: string;
   showZones?: boolean;
   bands?: { bass: number; mid: number; high: number };
+  highlightedKeys?: string[];
+  isWaveActive?: boolean;
 }
 
-const MacKeyboard: React.FC<MacKeyboardProps> = ({ activeKey, targetKey, showZones = false, bands = { bass: 0, mid: 0, high: 0 } }) => {
+const MacKeyboard: React.FC<MacKeyboardProps> = ({
+  activeKey,
+  targetKey,
+  showZones = false,
+  bands = { bass: 0, mid: 0, high: 0 },
+  highlightedKeys = [],
+  isWaveActive = false
+}) => {
   const isKeyActive = (key: string) => activeKey.toLowerCase() === key.toLowerCase();
 
   const normalize = (str: string) => {
@@ -84,18 +93,54 @@ const MacKeyboard: React.FC<MacKeyboardProps> = ({ activeKey, targetKey, showZon
     return null;
   };
 
+  const isHighlighted = (key: string) => {
+    const lowerKey = key.toLowerCase();
+    return highlightedKeys.some(k => k.toLowerCase() === lowerKey);
+  }
+
   const getKeyStyle = (key: string, widthClass: string = 'w-[44px]', heightClass: string = 'h-[44px]', xRatio: number = 0.5) => {
     const active = isKeyActive(key);
     const target = isKeyTarget(key);
+    const highlighted = isHighlighted(key);
 
     let baseClass = `flex flex-col items-center justify-center rounded-[6px] text-[11px] font-medium transition-all duration-100 border relative `;
 
+    // Wave Animation
+    if (isWaveActive) {
+      baseClass += `animate-pulse `;
+      // Note: Real wave needs dynamic styling for delay, handled in extraStyle or inline style below
+    }
+
     let extraStyle: any = {};
 
-    if (active) {
+    // Wave Mode Logic
+    if (isWaveActive) {
+      const delay = xRatio * 1.5; // Sweep from left to right
+      extraStyle.animationDelay = `${delay}s`;
+      extraStyle.animationDuration = '2s';
+      extraStyle.animationIterationCount = 'infinite';
+
+      // Rainbow wave color
+      const hue = (xRatio * 360 + Date.now() / 20) % 360; // Date.now usage might need RAF, simpler static for now
+      // actually let's just do a static hue based on position that pulses
+      const waveHue = 200 + (xRatio * 100);
+      extraStyle.borderColor = `hsla(${waveHue}, 80%, 60%, 0.8)`;
+      extraStyle.boxShadow = `0 0 15px hsla(${waveHue}, 80%, 60%, 0.4)`;
+      baseClass += `text-[var(--text-primary)] bg-[var(--bg-glass)] `;
+    }
+    else if (active) {
       baseClass += `bg-[var(--accent-primary)]/20 border-[var(--accent-primary)] text-[var(--accent-primary)] translate-y-[1px] shadow-[0_0_20px_var(--accent-glow)] `;
     } else if (target) {
       baseClass += `border-[var(--accent-primary)] bg-[var(--key-target-bg)] text-[var(--text-primary)] shadow-[0_0_15px_var(--accent-glow)] animate-pulse `;
+    } else if (highlighted) {
+      // Highlighted from Guide
+      const fingerColor = getFingerColor(key);
+      baseClass += `bg-[var(--key-bg)] border-[var(--accent-secondary)] text-[var(--text-primary)] shadow-[0_0_15px_var(--accent-secondary)] `;
+      if (fingerColor) {
+        extraStyle.color = fingerColor;
+        extraStyle.borderColor = fingerColor;
+        extraStyle.boxShadow = `0 0 12px ${fingerColor}`;
+      }
     } else if (showZones) {
       const fingerColor = getFingerColor(key);
       if (fingerColor) {
@@ -112,7 +157,7 @@ const MacKeyboard: React.FC<MacKeyboardProps> = ({ activeKey, targetKey, showZon
     } else {
       baseClass += `bg-[var(--key-bg)] border-b-2 border-[var(--border-glass)] text-[var(--key-text)] shadow-[0_2px_0_var(--key-shadow)] `;
 
-      // GAMING RGB EFFECTS
+      // GAMING RGB EFFECTS (Only if not wave active)
       const bassWeight = Math.max(0, 1 - xRatio * 2);
       const midWeight = Math.max(0, 1 - Math.abs(xRatio - 0.5) * 4);
       const highWeight = Math.max(0, (xRatio - 0.5) * 2);

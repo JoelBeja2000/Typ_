@@ -1,731 +1,428 @@
-# Sistema Modular de Esferas 3D - Guía Completa
+# Plan de Mecanografía - Teclado MacBook ISO Español
 
-## 📋 Índice
-1. [Descripción General](#descripción-general)
-2. [Arquitectura del Sistema](#arquitectura-del-sistema)
-3. [Instalación y Setup](#instalación-y-setup)
-4. [Archivos a Crear](#archivos-a-crear)
-5. [Cómo Usar](#cómo-usar)
-6. [Ejemplos de Uso](#ejemplos-de-uso)
-7. [API de Referencia](#api-de-referencia)
-8. [Buenas Prácticas](#buenas-prácticas)
+## Mapeo Completo: Teclas por Dedo
 
----
+### FILA GUÍA (Posición Base)
 
-## 🎯 Descripción General
+#### Mano Izquierda
+- **Meñique**: A
+- **Anular**: S
+- **Medio**: D
+- **Índice**: F (con marca táctil)
 
-Este sistema proporciona una forma modular, reutilizable y escalable de crear y gestionar múltiples esferas 3D independientes en tu aplicación React/TypeScript.
-
-**Características principales:**
-- ✅ Crear ilimitadas esferas 3D
-- ✅ Configuración independiente para cada esfera
-- ✅ Duplicar esferas fácilmente
-- ✅ Modificar propiedades en tiempo real
-- ✅ TypeScript con tipos seguros
-- ✅ Hook personalizado para gestión de estado
-- ✅ Componentes separados por responsabilidad
+#### Mano Derecha
+- **Índice**: J (con marca táctil)
+- **Medio**: K
+- **Anular**: L
+- **Meñique**: Ñ
 
 ---
 
-## 🏗️ Arquitectura del Sistema
+### FILA SUPERIOR (Letras)
 
-```
-useSpheresManager (Hook)
-        ↓
-  SpheresContainer (Componente contenedor)
-        ↓
-    Sphere3D (Componente individual)
-```
+#### Mano Izquierda
+- **Meñique**: Q
+- **Anular**: W
+- **Medio**: E
+- **Índice**: R, T
 
-### **Componentes:**
-
-1. **Sphere3D.tsx** - Esfera 3D individual
-   - Dibuja una esfera en canvas
-   - Aplica rotaciones
-   - Posicionamiento independiente
-   - Colores y opacidad personalizables
-
-2. **SpheresContainer.tsx** - Contenedor de esferas
-   - Renderiza múltiples esferas
-   - Gestiona el array de esferas
-   - Interfaz para comunicación
-
-3. **useSpheresManager.ts** - Hook de lógica
-   - Gestiona estado de esferas
-   - Operaciones CRUD
-   - Métodos de utilidad
+#### Mano Derecha
+- **Índice**: Y, U
+- **Medio**: I
+- **Anular**: O
+- **Meñique**: P
 
 ---
 
-## 🚀 Instalación y Setup
+### FILA INFERIOR (Letras)
 
-### Paso 1: Crear la estructura de directorios
+#### Mano Izquierda
+- **Meñique**: < > (tecla exclusiva ISO), Z
+- **Anular**: X
+- **Medio**: C
+- **Índice**: V, B
 
-```bash
-src/
-├── components/
-│   ├── Sphere3D.tsx
-│   └── SpheresContainer.tsx
-└── hooks/
-    └── useSpheresManager.ts
-```
-
-### Paso 2: Crear los archivos
-
-Sigue la sección "Archivos a Crear" más abajo.
+#### Mano Derecha
+- **Índice**: N, M
+- **Medio**: , (coma)
+- **Anular**: . (punto)
+- **Meñique**: - (guion)
 
 ---
 
-## 📝 Archivos a Crear
+### FILA DE NÚMEROS
 
-### **1. src/components/Sphere3D.tsx**
+#### Mano Izquierda
+- **Meñique**: º, 1
+- **Anular**: 2 (@ = Option+2)
+- **Medio**: 3 (# = Option+3)
+- **Índice**: 4, 5
 
-```typescript
-import React, { useEffect, useRef } from 'react';
+#### Mano Derecha
+- **Índice**: 6, 7
+- **Medio**: 8
+- **Anular**: 9
+- **Meñique**: 0, '
 
-interface Sphere3DProps {
-  id: string;
-  size: number;
-  rotation: { x: number; y: number; z: number };
-  position: { x: number; y: number; z: number };
-  color?: string;
-  opacity?: number;
-  className?: string;
-  style?: React.CSSProperties;
-}
+---
 
-export const Sphere3D: React.FC<Sphere3DProps> = ({
-  id,
-  size,
-  rotation,
-  position,
-  color = '#A2AD91',
-  opacity = 1,
-  className = '',
-  style = {},
-}) => {
-  const containerRef = useRef<HTMLDivElement>(null);
+### ZONA ESPECIAL - Meñique Derecho
+- **´** (acento agudo - tecla muerta)
+- **+** (más/asterisco)
+- **ç** (cedilla)
+- **Enter** (forma L vertical - característica ISO)
 
-  useEffect(() => {
-    if (!containerRef.current) return;
+---
 
-    const canvas = document.createElement('canvas');
-    canvas.width = size;
-    canvas.height = size;
-    const ctx = canvas.getContext('2d');
+### PULGARES
+- **Barra espaciadora** (alternar ambos pulgares)
+- **Command (⌘)** (izquierdo y derecho)
+- **Option/Alt** (para símbolos especiales)
 
-    if (!ctx) return;
+---
 
-    // Limpiar canvas
-    ctx.clearRect(0, 0, size, size);
+### TECLAS DE NAVEGACIÓN (Flechas)
+**Ubicación**: Esquina inferior derecha
+**Mano**: Derecha (fuera de posición base)
+- **←** (izquierda)
+- **↓** (abajo)
+- **→** (derecha)
+- **↑** (arriba)
 
-    // Configurar estilo de línea
-    ctx.strokeStyle = color;
-    ctx.lineWidth = 1;
-    ctx.globalAlpha = opacity;
+**Nota**: Se usan con dedos medio, anular o índice según preferencia personal.
 
-    // Calcular puntos de la esfera
-    const drawSphere = () => {
-      const rings = 12;
-      const segments = 24;
-      const radius = size / 2.5;
-      const centerX = size / 2;
-      const centerY = size / 2;
+---
 
-      // Convertir rotación de grados a radianes
-      const rotX = (rotation.x * Math.PI) / 180;
-      const rotY = (rotation.y * Math.PI) / 180;
-      const rotZ = (rotation.z * Math.PI) / 180;
+## Resumen de Asignación por Dedo
 
-      // Matrices de rotación
-      const rotateX = (point: { x: number; y: number; z: number }) => {
-        const cos = Math.cos(rotX);
-        const sin = Math.sin(rotX);
-        return {
-          x: point.x,
-          y: point.y * cos - point.z * sin,
-          z: point.y * sin + point.z * cos,
-        };
-      };
+### Mano Izquierda
 
-      const rotateY = (point: { x: number; y: number; z: number }) => {
-        const cos = Math.cos(rotY);
-        const sin = Math.sin(rotY);
-        return {
-          x: point.x * cos + point.z * sin,
-          y: point.y,
-          z: -point.x * sin + point.z * cos,
-        };
-      };
+| Dedo | Fila Números | Fila Superior | Fila Guía | Fila Inferior | Especiales |
+|------|--------------|---------------|-----------|---------------|------------|
+| **Meñique** | º, 1 | Q | A | <>, Z | Shift, Ctrl, Fn |
+| **Anular** | 2 | W | S | X | - |
+| **Medio** | 3 | E | D | C | - |
+| **Índice** | 4, 5 | R, T | F | V, B | G (lateral) |
 
-      const rotateZ = (point: { x: number; y: number; z: number }) => {
-        const cos = Math.cos(rotZ);
-        const sin = Math.sin(rotZ);
-        return {
-          x: point.x * cos - point.y * sin,
-          y: point.x * sin + point.y * cos,
-          z: point.z,
-        };
-      };
+### Mano Derecha
 
-      const project = (point: { x: number; y: number; z: number }) => {
-        let p = rotateX(point);
-        p = rotateY(p);
-        p = rotateZ(p);
+| Dedo | Fila Números | Fila Superior | Fila Guía | Fila Inferior | Especiales |
+|------|--------------|---------------|-----------|---------------|------------|
+| **Índice** | 6, 7 | Y, U | J | N, M | H (lateral) |
+| **Medio** | 8 | I | K | , | - |
+| **Anular** | 9 | O | L | . | - |
+| **Meñique** | 0, ' | P | Ñ | - | ´, +, ç, Enter |
 
-        const scale = 500 / (500 + p.z);
-        return {
-          x: centerX + p.x * scale,
-          y: centerY + p.y * scale,
-          z: p.z,
-        };
-      };
+---
 
-      // Dibujar líneas de latitud
-      for (let i = 0; i <= rings; i++) {
-        const lat = (Math.PI * i) / rings - Math.PI / 2;
-        const points: Array<{ x: number; y: number; z: number }> = [];
+## Frases de Práctica por Nivel
 
-        for (let j = 0; j <= segments; j++) {
-          const lon = (2 * Math.PI * j) / segments;
-          const x = radius * Math.cos(lat) * Math.cos(lon);
-          const y = radius * Math.sin(lat);
-          const z = radius * Math.cos(lat) * Math.sin(lon);
+### NIVEL 1: Índices (Ambas Manos)
+**Teclas**: F, R, T, V, B, G, 4, 5 + J, Y, U, H, N, M, 6, 7
 
-          points.push(project({ x, y, z }));
-        }
-
-        ctx.beginPath();
-        ctx.moveTo(points[0].x, points[0].y);
-        for (let j = 1; j < points.length; j++) {
-          ctx.lineTo(points[j].x, points[j].y);
-        }
-        ctx.stroke();
-      }
-
-      // Dibujar líneas de longitud
-      for (let j = 0; j <= segments; j++) {
-        const lon = (2 * Math.PI * j) / segments;
-        const points: Array<{ x: number; y: number; z: number }> = [];
-
-        for (let i = 0; i <= rings; i++) {
-          const lat = (Math.PI * i) / rings - Math.PI / 2;
-          const x = radius * Math.cos(lat) * Math.cos(lon);
-          const y = radius * Math.sin(lat);
-          const z = radius * Math.cos(lat) * Math.sin(lon);
-
-          points.push(project({ x, y, z }));
-        }
-
-        ctx.beginPath();
-        ctx.moveTo(points[0].x, points[0].y);
-        for (let k = 1; k < points.length; k++) {
-          ctx.lineTo(points[k].x, points[k].y);
-        }
-        ctx.stroke();
-      }
-    };
-
-    drawSphere();
-
-    // Limpiar canvas anterior
-    containerRef.current.innerHTML = '';
-    containerRef.current.appendChild(canvas);
-  }, [size, rotation, color, opacity]);
-
-  return (
-    <div
-      ref={containerRef}
-      className={`flex items-center justify-center ${className}`}
-      style={{
-        width: `${size}px`,
-        height: `${size}px`,
-        position: 'absolute',
-        left: `${position.x}px`,
-        top: `${position.y}px`,
-        transform: `translateZ(${position.z}px)`,
-        ...style,
-      }}
-    />
-  );
-};
-
-export default Sphere3D;
 ```
-
-### **2. src/components/SpheresContainer.tsx**
-
-```typescript
-import React from 'react';
-import Sphere3D from './Sphere3D';
-
-export interface SphereConfig {
-  id: string;
-  size: number;
-  rotation: { x: number; y: number; z: number };
-  position: { x: number; y: number; z: number };
-  color?: string;
-  opacity?: number;
-  className?: string;
-  style?: React.CSSProperties;
-}
-
-interface SpheresContainerProps {
-  spheres: SphereConfig[];
-  onSphereUpdate?: (id: string, config: Partial<SphereConfig>) => void;
-}
-
-export const SpheresContainer: React.FC<SpheresContainerProps> = ({
-  spheres,
-  onSphereUpdate,
-}) => {
-  return (
-    <>
-      {spheres.map((sphere) => (
-        <Sphere3D
-          key={sphere.id}
-          id={sphere.id}
-          size={sphere.size}
-          rotation={sphere.rotation}
-          position={sphere.position}
-          color={sphere.color}
-          opacity={sphere.opacity}
-          className={sphere.className}
-          style={sphere.style}
-        />
-      ))}
-    </>
-  );
-};
-
-export default SpheresContainer;
-```
-
-### **3. src/hooks/useSpheresManager.ts**
-
-```typescript
-import { useState, useCallback } from 'react';
-import { SphereConfig } from '../components/SpheresContainer';
-
-const DEFAULT_SPHERE_CONFIG: SphereConfig = {
-  id: 'sphere-1',
-  size: 180,
-  rotation: { x: 0, y: 0, z: 20 },
-  position: { x: 0, y: 0, z: 0 },
-  color: '#A2AD91',
-  opacity: 1,
-};
-
-export const useSpheresManager = (initialSpheres?: SphereConfig[]) => {
-  const [spheres, setSpheres] = useState<SphereConfig[]>(
-    initialSpheres || [DEFAULT_SPHERE_CONFIG]
-  );
-
-  const addSphere = useCallback((config?: Partial<SphereConfig>) => {
-    setSpheres((prev) => {
-      const newId = `sphere-${prev.length + 1}`;
-      const newSphere: SphereConfig = {
-        ...DEFAULT_SPHERE_CONFIG,
-        ...config,
-        id: newId,
-      };
-      return [...prev, newSphere];
-    });
-  }, []);
-
-  const removeSphere = useCallback((id: string) => {
-    setSpheres((prev) => prev.filter((sphere) => sphere.id !== id));
-  }, []);
-
-  const updateSphere = useCallback((id: string, config: Partial<SphereConfig>) => {
-    setSpheres((prev) =>
-      prev.map((sphere) =>
-        sphere.id === id ? { ...sphere, ...config } : sphere
-      )
-    );
-  }, []);
-
-  const duplicateSphere = useCallback((id: string) => {
-    setSpheres((prev) => {
-      const sphereToDuplicate = prev.find((s) => s.id === id);
-      if (!sphereToDuplicate) return prev;
-
-      const newId = `sphere-${prev.length + 1}`;
-      const newSphere: SphereConfig = {
-        ...sphereToDuplicate,
-        id: newId,
-        position: {
-          x: sphereToDuplicate.position.x + 50,
-          y: sphereToDuplicate.position.y + 50,
-          z: sphereToDuplicate.position.z,
-        },
-      };
-      return [...prev, newSphere];
-    });
-  }, []);
-
-  const resetSpheres = useCallback(() => {
-    setSpheres([DEFAULT_SPHERE_CONFIG]);
-  }, []);
-
-  return {
-    spheres,
-    addSphere,
-    removeSphere,
-    updateSphere,
-    duplicateSphere,
-    resetSpheres,
-    setSpheres,
-  };
-};
-
-export default useSpheresManager;
+tu y mi hijo fueron muy brutos en un bar
+un vino tinto y un jugo natural muy bueno
+mi burro fugitivo bebe un jugo en tu granja
+un bruto muy humano traga fruta verde
 ```
 
 ---
 
-## 💡 Cómo Usar
+### NIVEL 2: Mano Izquierda - Por Dedo
 
-### **En tu componente principal (App.tsx o similar):**
+#### Meñique Izquierdo
+**Teclas**: A, Q, Z, 1, º, <>
 
-```typescript
-import React from 'react';
-import SpheresContainer from './src/components/SpheresContainer';
-import useSpheresManager from './src/hooks/useSpheresManager';
+```
+la casa azul queda a la plaza
+aquella zanja queda alla en la sabana
+aza a esa casa que esta aca
+la plaza azul alza la bandera blanca
+```
 
-const App = () => {
-  // Inicializar el gestor de esferas
-  const {
-    spheres,
-    addSphere,
-    removeSphere,
-    updateSphere,
-    duplicateSphere,
-    resetSpheres,
-  } = useSpheresManager();
+#### Anular Izquierdo
+**Teclas**: S, W, X, 2
 
-  return (
-    <div>
-      {/* Renderizar las esferas */}
-      <SpheresContainer spheres={spheres} />
+```
+esos saxos suenan sexy y sensual
+sus osos asesinos asaltan las asas
+saxo suave sana esa sala
+esos sesos son sus ases
+```
 
-      {/* Controles de ejemplo */}
-      <div style={{ position: 'fixed', bottom: 20, right: 20 }}>
-        <button onClick={() => addSphere({ color: '#22d3ee' })}>
-          Agregar Esfera Azul
-        </button>
+#### Medio Izquierdo
+**Teclas**: D, E, C, 3
 
-        <button onClick={() => duplicateSphere('sphere-1')}>
-          Duplicar Esfera 1
-        </button>
+```
+decede ese cede de ese deceso
+cede ese dedal de cedec
+ece desde ese ece de cedec
+ese conde cede desde el decanato
+```
 
-        <button
-          onClick={() =>
-            updateSphere('sphere-1', { rotation: { x: 45, y: 90, z: 20 } })
-          }
-        >
-          Rotar Esfera 1
-        </button>
+#### Índice Izquierdo
+**Teclas**: F, R, T, V, B, G, 4, 5
 
-        <button onClick={resetSpheres}>
-          Resetear
-        </button>
-      </div>
-    </div>
-  );
-};
-
-export default App;
+```
+el bruto feroz traga fruta verde
+roberto regatea brutalmente en la gruta
+elvert fugitivo bebe brut en la verbena
+fernando forja cuatro vigas grandes
 ```
 
 ---
 
-## 📚 Ejemplos de Uso
+### NIVEL 3: Mano Derecha - Por Dedo
 
-### **Ejemplo 1: Crear una esfera simple**
+#### Índice Derecho
+**Teclas**: J, Y, U, H, N, M, 6, 7
 
-```typescript
-const { spheres } = useSpheresManager();
-
-// Resultado: Una esfera por defecto
-// Size: 180px
-// Color: #A2AD91
-// Rotation: { x: 0, y: 0, z: 20 }
+```
+juan y yo juntos huimos muy humanos
+mi mono juny muy humano huy majo
+un jumento muy mono huyo en mayo
+mujeres jóvenes humean un jamón jugoso
 ```
 
-### **Ejemplo 2: Agregar una esfera con color personalizado**
+#### Medio Derecho
+**Teclas**: K, I, ,
 
-```typescript
-const { addSphere } = useSpheresManager();
-
-addSphere({
-  color: '#22d3ee',      // Azul
-  size: 150,
-  opacity: 0.8,
-});
+```
+kiko, kiki y un bikini
+un kiwi, kimono y uniki
+kiki mira un kiwi, kilo y bikini
 ```
 
-### **Ejemplo 3: Duplicar y modificar independientemente**
+#### Anular Derecho
+**Teclas**: L, O, .
 
-```typescript
-const { duplicateSphere, updateSphere } = useSpheresManager();
-
-// Duplicar la esfera 1
-duplicateSphere('sphere-1');
-
-// Modificar la copia (sphere-2) con color diferente
-updateSphere('sphere-2', {
-  color: '#fb923c',  // Naranja
-  size: 200,
-});
-
-// Ahora tienes dos esferas idénticas pero con colores y tamaños diferentes
+```
+lolo solo bolo.
+el sol ilumina el olo.
+solo lola lol.
+el loro lolo volo solo.
 ```
 
-### **Ejemplo 4: Actualizar rotación en tiempo real**
+#### Meñique Derecho
+**Teclas**: Ñ, P, -, ´, 0, '
 
-```typescript
-const { updateSphere } = useSpheresManager();
-
-// Rotar la esfera
-updateSphere('sphere-1', {
-  rotation: {
-    x: 45,
-    y: 90,
-    z: 20,
-  },
-});
 ```
-
-### **Ejemplo 5: Múltiples esferas en diferentes posiciones**
-
-```typescript
-const { addSphere } = useSpheresManager();
-
-// Agregar esfera izquierda
-addSphere({
-  position: { x: -200, y: 0, z: 0 },
-  color: '#A2AD91',
-  size: 180,
-});
-
-// Agregar esfera derecha
-addSphere({
-  position: { x: 200, y: 0, z: 0 },
-  color: '#22d3ee',
-  size: 180,
-});
-
-// Agregar esfera central
-addSphere({
-  position: { x: 0, y: 0, z: 0 },
-  color: '#fb923c',
-  size: 150,
-});
-```
-
-### **Ejemplo 6: Animación de rotación**
-
-```typescript
-const { updateSphere } = useSpheresManager();
-const [rotation, setRotation] = useState(0);
-
-useEffect(() => {
-  const interval = setInterval(() => {
-    setRotation((prev) => (prev + 1) % 360);
-    updateSphere('sphere-1', {
-      rotation: { x: rotation, y: rotation * 2, z: 20 },
-    });
-  }, 50);
-
-  return () => clearInterval(interval);
-}, [rotation, updateSphere]);
+papá pasea por españa en otoño
+ese ñoño peña pio en la peña
+mi año en la pipa es pésimo
+el niño español come piña en septiembre
 ```
 
 ---
 
-## 🔧 API de Referencia
+### NIVEL 4: Combinaciones de Pares
 
-### **SphereConfig Interface**
+#### Meñiques (A + Ñ)
+```
+la caña de aquel año es añeja
+esa araña añade pañal a la cabaña
+cada mañana la niña baña a la araña
+```
 
-```typescript
-interface SphereConfig {
-  id: string;                              // ID único de la esfera
-  size: number;                            // Tamaño en píxeles
-  rotation: { x: number; y: number; z: number };  // Rotación en grados
-  position: { x: number; y: number; z: number };  // Posición en píxeles
-  color?: string;                          // Color hex (#RRGGBB)
-  opacity?: number;                        // Opacidad 0-1
-  className?: string;                      // Clases CSS personalizadas
-  style?: React.CSSProperties;             // Estilos inline
+#### Anulares (S + L)
+```
+las islas solas son las mas ralas
+los salones son las salas sucias
+sal solar sale sola las islas
+```
+
+#### Medios (D + K)
+```
+dk kodak
+(combinación rara, pocas palabras)
+```
+
+#### Índices Completos (Todas sus Teclas)
+```
+tu burro fugitivo y mi mejor jamón natural fueron muy buenos
+un tinto brut muy humano y un jugo nutritivo en tu granja
+mi hijo mayor bebe vino tinto y un juguete roto en un rincón muy bruto
+```
+
+---
+
+### NIVEL 5: Fila Guía Completa
+**Teclas**: A, S, D, F + J, K, L, Ñ
+
+```
+fallas falsas sañas jañas
+alla la dañada falda
+salsa falsaallaask
+```
+
+---
+
+### NIVEL 6: Todas las Letras (Texto Completo)
+
+```
+el veloz murciélago hindú comía feliz cardillo y kiwi
+la cigüeña tocaba el saxofón detrás del palenque de paja
+```
+
+---
+
+## Símbolos Especiales con Option (Mac)
+
+| Símbolo | Combinación | Dedos Involucrados |
+|---------|-------------|-------------------|
+| @ | Option + 2 | Pulgar Izq + Anular Izq |
+| # | Option + 3 | Pulgar Izq + Medio Izq |
+| € | Option + E | Pulgar Izq + Medio Izq |
+| ¬ | Option + L | Pulgar Izq + Anular Der |
+| { | Option + ' | Pulgar Izq + Meñique Der |
+| } | Option + ç | Pulgar Izq + Meñique Der |
+| \ | Option + º | Pulgar Izq + Meñique Izq |
+
+---
+
+## Técnicas de Acentuación (Crítico para Español)
+
+### Acento Agudo (´)
+**Tecla muerta**: Meñique Derecho en ´, luego vocal
+
+**Secuencias comunes**:
+- **á**: ´ (meñique der) → A (meñique izq)
+- **é**: ´ (meñique der) → E (medio izq)
+- **í**: ´ (meñique der) → I (medio der)
+- **ó**: ´ (meñique der) → O (anular der)
+- **ú**: ´ (meñique der) → U (índice der)
+
+**Ritmo**: Tap-Tap casi simultáneo, sin esperar confirmación visual.
+
+### Diéresis (¨)
+**Combinación**: Shift + ´, luego vocal (ü, ï)
+
+---
+
+## Plan de Implementación para App
+
+### Estructura Recomendada
+
+```json
+{
+  "niveles": [
+    {
+      "id": "nivel_1_indices",
+      "nombre": "Índices - Ambas Manos",
+      "dedos": ["indice_izq", "indice_der"],
+      "teclas": ["F", "R", "T", "V", "B", "G", "4", "5", "J", "Y", "U", "H", "N", "M", "6", "7"],
+      "frases": [
+        "tu y mi hijo fueron muy brutos en un bar",
+        "un vino tinto y un jugo natural muy bueno",
+        "mi burro fugitivo bebe un jugo en tu granja"
+      ]
+    },
+    {
+      "id": "nivel_2_menique_izq",
+      "nombre": "Meñique Izquierdo",
+      "dedos": ["menique_izq"],
+      "teclas": ["A", "Q", "Z", "1", "º", "<", ">"],
+      "frases": [
+        "la casa azul queda a la plaza",
+        "aquella zanja queda alla en la sabana"
+      ]
+    }
+    // ... más niveles
+  ]
 }
 ```
 
-### **useSpheresManager Hook**
+### Progresión Sugerida
 
-```typescript
-const {
-  spheres,              // SphereConfig[] - Array actual de esferas
-  addSphere,            // (config?: Partial<SphereConfig>) => void
-  removeSphere,         // (id: string) => void
-  updateSphere,         // (id: string, config: Partial<SphereConfig>) => void
-  duplicateSphere,      // (id: string) => void
-  resetSpheres,         // () => void
-  setSpheres,           // (spheres: SphereConfig[]) => void
-} = useSpheresManager();
+1. **Fase 1**: Solo índices (ambas manos)
+2. **Fase 2**: Mano izquierda individual (meñique → anular → medio → índice)
+3. **Fase 3**: Mano derecha individual (meñique → anular → medio → índice)
+4. **Fase 4**: Combinaciones de pares de dedos
+5. **Fase 5**: Fila guía completa
+6. **Fase 6**: Todas las filas
+7. **Fase 7**: Acentos y símbolos especiales
+8. **Fase 8**: Texto libre completo
+
+### Métricas a Trackear
+
+- **WPM** (Words Per Minute)
+- **Precisión** (% de aciertos)
+- **Teclas por dedo** (distribución de carga)
+- **Errores por tecla específica**
+- **Tiempo de retorno a fila guía**
+
+---
+
+## Reglas de Oro
+
+1. **Los índices cubren 2 columnas cada uno**
+2. **Los demás dedos: 1 columna vertical estricta**
+3. **Nunca mirar el teclado** (usar las marcas táctiles en F y J)
+4. **Retornar siempre a la fila guía**
+5. **Flotar las muñecas**, no apoyarlas
+6. **Alternar pulgares** para el espacio
+7. **Usar Option con el pulgar** para símbolos
+8. **Precisión antes que velocidad**
+
+---
+
+## Caracteres Especiales ISO Español
+
+### Tecla < > (Exclusiva ISO)
+**Ubicación**: Entre Shift izquierdo y Z  
+**Dedo**: Meñique izquierdo  
+**Uso**: Símbolos menor/mayor que, HTML
+
+### Enter en forma de L
+**Ubicación**: Extremo derecho, forma vertical  
+**Dedo**: Meñique derecho  
+**Movimiento**: Extensión lateral pronunciada
+
+### Ñ en Fila Guía
+**Ventaja ergonómica**: No requiere estiramiento  
+**Dedo**: Meñique derecho (posición base)
+
+---
+
+## Ejercicios Complementarios
+
+### Ejercicio de Ritmo
+Usar metrónomo a 60 BPM, una tecla por pulso.
+
+### Ejercicio de Sílabas Comunes
+```
+que qui ción ado ido para ente mente
 ```
 
-### **SpheresContainer Props**
-
-```typescript
-interface SpheresContainerProps {
-  spheres: SphereConfig[];
-  onSphereUpdate?: (id: string, config: Partial<SphereConfig>) => void;
-}
+### Ejercicio de Palabras Frecuentes
+```
+el la de que y a en un por con no
 ```
 
-### **Sphere3D Props**
+### Ejercicio de Corrección Rápida
+**Técnica**: Option + Backspace (borra palabra completa)  
+**Dedos**: Pulgar izq + Meñique der
 
-```typescript
-interface Sphere3DProps {
-  id: string;
-  size: number;
-  rotation: { x: number; y: number; z: number };
-  position: { x: number; y: number; z: number };
-  color?: string;
-  opacity?: number;
-  className?: string;
-  style?: React.CSSProperties;
-}
+---
+
+## Notas Técnicas
+
+- **Recorrido de tecla MacBook**: ~1mm (muy corto)
+- **Tipo de mecanismo**: Tijera de bajo perfil
+- **Retroalimentación táctil**: Sutil pero precisa
+- **Postura óptima**: Muñecas flotantes, antebrazos paralelos al suelo
+
+---
+
+## Palabras Pangrama para Práctica Avanzada
+
+```
+el veloz murciélago hindú comía feliz cardillo y kiwi
+la cigüeña tocaba el saxofón detrás del palenque de paja
+benjamín pidió una bebida de kiwi y fresa; noé, sin vergüenza, la más exquisita champaña del menú
 ```
 
 ---
 
-## ✅ Buenas Prácticas
-
-### **1. Separación de Responsabilidades**
-- `Sphere3D`: Solo renderiza una esfera
-- `SpheresContainer`: Solo gestiona el array de esferas
-- `useSpheresManager`: Solo gestiona la lógica de estado
-
-### **2. Componentes Puros**
-```typescript
-// ✅ Bueno - componente puro
-const Sphere3D = ({ id, size, rotation, ... }) => {
-  // Lógica pura, sin efectos secundarios
-};
-
-// ❌ Evitar - lógica mezclada
-const Sphere3D = ({ id, ...props }) => {
-  const { updateSphere } = useSpheresManager();
-  // Acoplamiento innecesario
-};
-```
-
-### **3. Tipado Fuerte**
-```typescript
-// ✅ Bueno - tipos explícitos
-interface SphereConfig {
-  id: string;
-  size: number;
-  // ...
-}
-
-// ❌ Evitar - tipos débiles
-const sphere = {
-  id: "1",
-  size: "180",  // Error: debería ser number
-};
-```
-
-### **4. Hooks Personalizados**
-```typescript
-// ✅ Bueno - lógica en hook
-const { addSphere, updateSphere } = useSpheresManager();
-
-// ❌ Evitar - lógica en componente
-const MyComponent = () => {
-  const [spheres, setSpheres] = useState([]);
-  // 100 líneas de lógica...
-};
-```
-
-### **5. Optimización con useCallback**
-```typescript
-// ✅ Bueno - evita renders innecesarios
-const addSphere = useCallback((config) => {
-  setSpheres((prev) => [...prev, newSphere]);
-}, []);
-
-// ❌ Evitar - función nueva cada render
-const addSphere = (config) => {
-  setSpheres((prev) => [...prev, newSphere]);
-};
-```
-
-### **6. Composición sobre Herencia**
-```typescript
-// ✅ Bueno - componibles
-<SpheresContainer spheres={spheres} />
-
-// ❌ Evitar - jerarquía rígida
-<SphereList>
-  <SphereItem />
-  <SphereItem />
-</SphereList>
-```
-
----
-
-## 📊 Estructura Final de Carpetas
-
-```
-src/
-├── components/
-│   ├── Sphere3D.tsx           // Componente esfera individual
-│   ├── SpheresContainer.tsx   // Contenedor de esferas
-│   └── App.tsx                // Componente principal
-├── hooks/
-│   └── useSpheresManager.ts   // Hook de lógica
-└── types/                     // (Opcional)
-    └── sphere.types.ts        // Tipos compartidos
-```
-
----
-
-## 🎓 Resumen de Beneficios
-
-| Aspecto | Beneficio |
-|--------|----------|
-| **Modularidad** | Cada componente tiene una responsabilidad clara |
-| **Reutilización** | Usa en cualquier proyecto React |
-| **Escalabilidad** | Agregar más esferas es trivial |
-| **Independencia** | Cada esfera se modifica independientemente |
-| **Type Safety** | TypeScript previene errores |
-| **Testabilidad** | Fácil de testear componentes aislados |
-| **Mantenibilidad** | Código limpio y organizado |
-| **Performance** | useCallback optimiza renders |
-
----
-
-## 🚀 Próximos Pasos
-
-1. ✅ Crear los 3 archivos en tu proyecto
-2. ✅ Importar en tu componente principal
-3. ✅ Usar `useSpheresManager` para gestionar esferas
-4. ✅ Personalizar según tus necesidades
-5. ✅ Considerar agregar persistencia (localStorage/DB)
-6. ✅ Implementar controles visuales para las esferas
-
----
-
-## 📞 Soporte
-
-Si tienes dudas sobre cómo usar este sistema:
-
-1. Consulta los **Ejemplos de Uso** arriba
-2. Revisa la **API de Referencia**
-3. Verifica que los archivos estén en las rutas correctas
-4. Comprueba que los tipos estén bien importados
-
-¡Happy coding! 🎉
+**Fin del documento**

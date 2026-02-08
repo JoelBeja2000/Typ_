@@ -17,6 +17,8 @@ interface LeftSidebarProps {
   AMBIENT_STYLE: MusicStyle;
   ACID_HOUSE_STYLE: MusicStyle;
   getBtnClass: (active: boolean) => string;
+  uiScale: number;
+  onUiScaleChange: (scale: number) => void;
 }
 
 export const LeftSidebar: React.FC<LeftSidebarProps> = ({
@@ -34,6 +36,8 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
   AMBIENT_STYLE,
   ACID_HOUSE_STYLE,
   getBtnClass,
+  uiScale,
+  onUiScaleChange,
 }) => {
   return (
     <aside
@@ -101,6 +105,25 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
           >
             <span>Acentuación</span>
           </button>
+
+          <div className="h-[1px] bg-[var(--border-glass)] my-2" />
+
+          {/* Escala de Interfaz */}
+          <div className="flex flex-col gap-2">
+            <div className="flex justify-between items-center text-[10px] uppercase font-bold text-[var(--text-secondary)] tracking-wider">
+              <span>Zoom Interfaz</span>
+              <span className="text-[var(--accent-primary)]">{Math.round(uiScale * 100)}%</span>
+            </div>
+            <input
+              type="range"
+              min="0.7"
+              max="1.3"
+              step="0.05"
+              value={uiScale}
+              onChange={(e) => onUiScaleChange(parseFloat(e.target.value))}
+              className="w-full h-1 bg-[var(--bg-glass)] rounded-lg appearance-none cursor-pointer accent-[var(--accent-primary)] hover:accent-[var(--accent-bright)] transition-all"
+            />
+          </div>
         </div>
       </AccordionItem>
 
@@ -132,7 +155,7 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
           </button>
         </div>
       </AccordionItem>
-    </aside>
+    </aside >
   );
 };
 

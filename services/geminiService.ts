@@ -14,6 +14,7 @@ export const generatePracticePhrases = async (language: Language, focus: string,
   let category: PhraseCategory = 'basico';
   if (focus.toLowerCase().includes('raras') || focus.toLowerCase().includes('especial')) category = 'teclas_raras';
   if (focus.toLowerCase().includes('progra') || focus.toLowerCase().includes('código')) category = 'programacion';
+  if (focus.toLowerCase().includes('acent') || focus.toLowerCase().includes('ácent')) category = 'acentuacion';
 
   // Intentamos obtener de la base de datos local
   const localPhrases = LOCAL_PHRASE_DB[language]?.[category];

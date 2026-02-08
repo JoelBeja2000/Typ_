@@ -29,6 +29,9 @@ interface KeyboardSectionProps {
     onDimensionalMenu: (e: React.MouseEvent | any) => void;
     hexToRgba: (hex: string, alpha: number) => string;
     customColor: string;
+    // Guide Integration
+    highlightedKeys?: string[];
+    isWaveActive?: boolean;
 }
 
 export const KeyboardSection: React.FC<KeyboardSectionProps> = ({
@@ -52,6 +55,8 @@ export const KeyboardSection: React.FC<KeyboardSectionProps> = ({
     onDimensionalMenu,
     hexToRgba,
     customColor,
+    highlightedKeys = [],
+    isWaveActive = false,
 }) => {
     const bands = isMusicLightingEnabled ? frequencyBands : { bass: 0, mid: 0, high: 0 };
 
@@ -102,6 +107,8 @@ export const KeyboardSection: React.FC<KeyboardSectionProps> = ({
                         targetKey={targetChar}
                         showZones={showZones}
                         bands={bands}
+                        highlightedKeys={highlightedKeys}
+                        isWaveActive={isWaveActive}
                     />
                 )}
             </div>

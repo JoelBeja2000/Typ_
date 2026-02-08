@@ -13,6 +13,13 @@ import { KEY_TO_FINGER_MAP, SPACE_DATA } from './constants';
 import { Language, TypingStats } from './types';
 import { generatePracticePhrases } from './services/geminiService';
 import { VisualsConfig, DEFAULT_VISUALS_CONFIG } from './src/types/visuals';
+import { GUIDE_PHASES } from './src/data/GuideData';
+
+// ... (existing imports)
+
+// ... (existing imports)
+
+// Inside App component:
 
 const HiddenInput = React.memo(({
   inputRef,
@@ -101,6 +108,10 @@ const App: React.FC = () => {
   const [isMusicLightingEnabled, setIsMusicLightingEnabled] = useState(false);
   const [frequencyBands, setFrequencyBands] = useState({ bass: 0, mid: 0, high: 0 });
 
+  const [isGuideMode, setIsGuideMode] = useState(false);
+  const [isCircuitMode, setIsCircuitMode] = useState(false);
+  const circuitIntervalRef = useRef<NodeJS.Timeout | null>(null);
+
   const [isComposingState, setIsComposingState] = useState(false);
 
   // BIRD 3D CONTROLS
@@ -110,6 +121,10 @@ const App: React.FC = () => {
   const [visualsConfig, setVisualsConfig] = useState<VisualsConfig>({ ...DEFAULT_VISUALS_CONFIG, type: 'circle' });
   const [showDimensionalSettings, setShowDimensionalSettings] = useState(false);
   const [uiScale, setUiScale] = useState(1);
+
+  // GUIDE STATE
+  const [highlightedKeys, setHighlightedKeys] = useState<string[]>([]);
+  const [isWaveActive, setIsWaveActive] = useState(false);
 
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const colorInputRef = useRef<HTMLInputElement>(null);
@@ -122,6 +137,88 @@ const App: React.FC = () => {
   const comboRef = useRef(combo);
   const [audioReady, setAudioReady] = useState(false);
 
+  // CIRCUIT MODE LOGIC
+  const [circuitTimer, setCircuitTimer] = useState(30);
+  const [circuitDuration, setCircuitDuration] = useState(30);
+  const [isRandomCircuit, setIsRandomCircuit] = useState(false);
+  const [currentCircuitTitle, setCurrentCircuitTitle] = useState('');
+  const [circuitLevelIndex, setCircuitLevelIndex] = useState(0);
+
+  // Load Level Data when Index or Mode changes
+  useEffect(() => {
+    if (isCircuitMode) {
+      setIsGuideMode(true);
+      const levels = GUIDE_PHASES[0].levels;
+      const level = levels[circuitLevelIndex % levels.length];
+
+      if (level) {
+        setHighlightedKeys(level.keys);
+        setPhrases(level.phrases);
+        setCurrentCircuitTitle(level.title.replace('Pares: ', ''));
+        // Reset typing state
+        setTypedText('');
+        lastProcessedText.current = '';
+        setPhraseIndex(0);
+        setCombo(0);
+        setWordHasMistake(false);
+        if (inputRef.current) inputRef.current.value = '';
+        setTimeout(() => inputRef.current?.focus(), 10);
+      }
+    }
+  }, [isCircuitMode, circuitLevelIndex]);
+
+  // Timer Logic
+  useEffect(() => {
+    if (!isCircuitMode) {
+      if (circuitIntervalRef.current) {
+        clearInterval(circuitIntervalRef.current);
+        circuitIntervalRef.current = null;
+      }
+      setCircuitTimer(circuitDuration);
+      return;
+    }
+
+    const levels = GUIDE_PHASES[0].levels;
+    setCircuitTimer(circuitDuration); // Reset timer on mode/duration change or manual cycle if we add dependency
+
+    const interval = setInterval(() => {
+      setCircuitTimer(prev => {
+        if (prev <= 1) {
+          // Time's up, cycle level
+          setCircuitLevelIndex(currentIndex => {
+            if (isRandomCircuit) {
+              let nextIndex = Math.floor(Math.random() * levels.length);
+              if (levels.length > 1 && nextIndex === currentIndex) {
+                nextIndex = (nextIndex + 1) % levels.length;
+              }
+              return nextIndex;
+            }
+            return (currentIndex + 1) % levels.length;
+          });
+          return circuitDuration; // Reset timer
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    circuitIntervalRef.current = interval;
+    return () => clearInterval(interval);
+  }, [isCircuitMode, circuitDuration, isRandomCircuit]); // Note: We don't depend on circuitLevelIndex here to avoid resetting timer on auto-cycle? 
+  // Actually, if we use setCircuitTimer in the interval callback, it's fine.
+  // BUT: if we want manual click to reset timer, we need a way.
+  // The logic below `handleCircuitCycle` will handle manual reset.
+
+  const handleManualCircuitCycle = useCallback(() => {
+    if (!isCircuitMode) return;
+    const levels = GUIDE_PHASES[0].levels;
+    setCircuitLevelIndex(prev => {
+      if (isRandomCircuit) {
+        return Math.floor(Math.random() * levels.length);
+      }
+      return (prev + 1) % levels.length;
+    });
+    setCircuitTimer(circuitDuration); // Manually reset timer
+  }, [isCircuitMode, isRandomCircuit, circuitDuration]);
   const currentPhrase = useMemo(() => phrases[phraseIndex] || '', [phrases, phraseIndex]);
   const normalizedTypedText = useMemo(() => typedText.normalize('NFC'), [typedText]);
 
@@ -227,6 +324,7 @@ const App: React.FC = () => {
   useEffect(() => {
     const init = async () => {
       setIsLoading(true);
+      setIsGuideMode(false); // Reset to generator mode when language/focus changes
       const newPhrases = await generatePracticePhrases(language, focus, 10);
       setPhrases(newPhrases.map(p => p.normalize('NFC')));
       setTypedText(''); lastProcessedText.current = ''; setPhraseIndex(0); setCombo(0); setWordHasMistake(false);
@@ -291,7 +389,17 @@ const App: React.FC = () => {
         if (isZenMode) {
           const delay = 50;
           setTimeout(() => {
-            setPhraseIndex(0);
+            // Cycle back to 0 if in Guide Mode (Zen Loop), otherwise maybe fetch more (handled by other effect)
+            if (isGuideMode) {
+              setPhraseIndex(0);
+            } else {
+              setPhraseIndex(0); // Also reset here, but fetcher will append?
+              // Actually Zen Mode usually appends. If we are at the end and no more phrases, loop?
+              // The fetcher below handles appending.
+              // If isGuideMode is true, we simply loop or stop.
+              // Let's just reset index to 0 effectively looping the drill.
+              setPhraseIndex(0);
+            }
             setTypedText('');
             lastProcessedText.current = '';
             if (inputRef.current) inputRef.current.value = '';
@@ -301,12 +409,48 @@ const App: React.FC = () => {
         }
       }
     }
-  }, [normalizedTypedText, currentPhrase, phraseIndex, phrases.length, startTime, wordHasMistake, combo, isZenMode]);
+  }, [normalizedTypedText, currentPhrase, phraseIndex, phrases.length, startTime, wordHasMistake, combo, isZenMode, isGuideMode]);
 
   const isFetchingMore = useRef(false);
 
+  // CIRCUIT MODE LOGIC
   useEffect(() => {
-    if (isZenMode && !isLoading && !isFetchingMore.current && phraseIndex >= phrases.length - 5) {
+    let interval: NodeJS.Timeout;
+    if (isCircuitMode) {
+      // Start with first level of Phase 1 if not already there, or keep cycling
+      // We need a ref to track current level index to cycle
+      let currentLevelIndex = 0;
+
+      const cycleLevel = () => {
+        // Import phases dynamically or use if available. 
+        // Assuming GUIDE_PHASES is available. If not, I need to add import. 
+        // For now, I'll use a mocked cycle or ideally I have the data.
+        // Actually, I should probably import GUIDE_PHASES at the top. 
+        // Since I can't see the top imports easily right now to add it in the same `replace`, 
+        // I will trust the user has the file and I will add the import in a separate step if missing.
+        // Wait, I can't use GUIDE_PHASES without importing it.
+        // I'll add the logic assuming GUIDE_PHASES is imported.
+
+        // We will cycle through Phase 1 (Indices -> Medios -> Anulares -> Meniques)
+        // This is a simplified "Circuit".
+        // ID order: 0, 1, 2, 3
+
+        // We need to access the data. 
+        // I will disable this effect until I add the import.
+      };
+
+      // logic placeholder
+    }
+    return () => clearInterval(interval);
+  }, [isCircuitMode]);
+
+  // Real implementation needs GUIDE_PHASES.
+  // I will skip adding the full effect here and do it properly with the import in the next step.
+  // This step is just to update the Sidebar prop.
+
+  useEffect(() => {
+    // Disable fetching more in Guide Mode (drills are fixed set)
+    if (isZenMode && !isLoading && !isFetchingMore.current && phraseIndex >= phrases.length - 5 && !isGuideMode) {
       const fetchMore = async () => {
         isFetchingMore.current = true;
         try {
@@ -323,7 +467,7 @@ const App: React.FC = () => {
       };
       fetchMore();
     }
-  }, [isZenMode, phraseIndex, phrases.length, language, focus, isLoading]);
+  }, [isZenMode, phraseIndex, phrases.length, language, focus, isLoading, isGuideMode]);
 
   const handleInput = useCallback((e: React.FormEvent<HTMLTextAreaElement>) => {
     let val = e.currentTarget.value.normalize('NFC');
@@ -381,7 +525,16 @@ const App: React.FC = () => {
     setTypedText(''); lastProcessedText.current = ''; setPhraseIndex(0); setCombo(0); setWordHasMistake(false);
     if (inputRef.current) inputRef.current.value = '';
     setStats({ wpm: 0, accuracy: 100, mistakes: 0, totalChars: 0 });
-    setStartTime(null); setIsFinished(false); setIsLoading(true);
+    setStartTime(null); setIsFinished(false);
+
+    // If in Guide Mode, just reset state, don't fetch new phrases
+    if (isGuideMode) {
+      setIsLoading(false);
+      setTimeout(() => inputRef.current?.focus(), 10);
+      return;
+    }
+
+    setIsLoading(true);
     const newPhrases = await generatePracticePhrases(language, focus, 10);
     setPhrases(newPhrases.map(p => p.normalize('NFC')));
     setIsLoading(false);
@@ -389,6 +542,22 @@ const App: React.FC = () => {
   };
 
   const getBtnClass = (active: boolean) => `w-full p-4 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] transition-all duration-300 border flex items-center justify-between group ${active ? 'bg-[var(--accent-primary)]/10 border-[var(--accent-primary)] text-[var(--accent-primary)] shadow-[0_0_15px_var(--accent-glow)]' : 'bg-transparent border-[var(--border-glass)] text-[var(--text-secondary)] hover:border-[var(--text-primary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-glass)]'}`;
+
+  const handleSelectPhrases = useCallback((newPhrases: string[]) => {
+    if (!newPhrases || newPhrases.length === 0) return;
+    setIsGuideMode(true); // Enable Guide Mode
+    setPhrases(newPhrases.map(p => p.normalize('NFC')));
+    setTypedText('');
+    lastProcessedText.current = '';
+    setPhraseIndex(0);
+    setCombo(0);
+    setWordHasMistake(false);
+    if (inputRef.current) inputRef.current.value = '';
+    setStartTime(null);
+    setIsFinished(false);
+    setIsLoading(false);
+    setTimeout(() => inputRef.current?.focus(), 10);
+  }, []);
 
   return (
     <div
@@ -426,6 +595,8 @@ const App: React.FC = () => {
         AMBIENT_STYLE={AMBIENT_STYLE}
         ACID_HOUSE_STYLE={ACID_HOUSE_STYLE}
         getBtnClass={getBtnClass}
+        uiScale={uiScale}
+        onUiScaleChange={setUiScale}
       />
 
       {/* RIGHT SIDEBAR */}
@@ -433,6 +604,17 @@ const App: React.FC = () => {
         isOpen={showRightSidebar}
         onClose={() => setShowRightSidebar(false)}
         targetKeyData={targetKeyData}
+        onSelectLevel={setHighlightedKeys}
+        onSelectPhrases={handleSelectPhrases}
+        onWaveMode={setIsWaveActive}
+        isCircuitMode={isCircuitMode}
+        onToggleCircuitMode={() => setIsCircuitMode(!isCircuitMode)}
+        circuitTimer={circuitTimer}
+        circuitDuration={circuitDuration}
+        onDurationChange={setCircuitDuration}
+        isRandomCircuit={isRandomCircuit}
+        onToggleRandomCircuit={() => setIsRandomCircuit(!isRandomCircuit)}
+        onCircuitCycle={handleManualCircuitCycle}
       />
 
       {/* MAIN VIEWPORT */}
@@ -462,6 +644,10 @@ const App: React.FC = () => {
                   isMusicLightingEnabled={isMusicLightingEnabled}
                   onDimensionalMenu={(e) => { setShowDimensionalSettings(!showDimensionalSettings); }}
                   PALETTE_COLORS={PALETTE_COLORS}
+                  isCircuitMode={isCircuitMode}
+                  circuitTimer={circuitTimer}
+                  circuitTitle={currentCircuitTitle}
+                  onCircuitCycle={handleManualCircuitCycle}
                 />
 
                 <KeyboardSection
@@ -485,6 +671,8 @@ const App: React.FC = () => {
                   onDimensionalMenu={(e) => { setShowDimensionalSettings(!showDimensionalSettings); }}
                   hexToRgba={hexToRgba}
                   customColor={customColor}
+                  highlightedKeys={highlightedKeys}
+                  isWaveActive={isWaveActive}
                 />
 
               </div>
