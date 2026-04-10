@@ -1,20 +1,70 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# Typ_ (Type Master)
 
-# Run and deploy your AI Studio app
+**Typ_** is a professional-grade typing trainer designed for efficiency, speed, and precision. Built with a focus on biomechanics and auditory feedback, it provides a cinematic training experience for developers and typing enthusiasts.
 
-This contains everything you need to run your app locally.
+![Typ_ Landing](docs/media/landing.png)
 
-View your app in AI Studio: https://ai.studio/apps/drive/1lcFXG9zQy6WXxVUvfFOhHlGgoWMTSS7p
+## Core Features
 
-## Run Locally
+- **Technical Training**: Specialized phases for strict finger coordination and muscle memory.
+- **Biomechanical Guides**: Visual representation of finger-to-key mapping.
+- **Cinematic Feedback**: Real-time auditory and visual feedback (WPM, Accuracy, Combo systems).
+- **Customizable Experience**: Multiple focus modes (Basic, Programming, Accents), UI scaling, and curated color palettes.
+- **Multilingual Support**: Training sets in English and Spanish.
 
-**Prerequisites:**  Node.js
+## Visual Demo
 
+![Demo Recording](docs/media/demo.webp)
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+## Project Structure
+
+### Configuration & Customization
+![Configuration](docs/media/config.png)
+Easily switch between languages, focus modes, and visual styles to suit your training environment.
+
+### Technical Training
+![Training](docs/media/training.png)
+Follow structured phases from basic finger pairs to advanced combinations and pangrams.
+
+## Getting Started
+
+### Prerequisites
+
+- **Node.js**: Required to run the Vite development server.
+- **Git**: For version control.
+
+### Installation
+
+1. **Clone the repository**:
+   ```bash
+   git clone https://github.com/JoelBeja2000/Typ_.git
+   cd Typ_
+   ```
+
+2. **Install dependencies**:
+   ```bash
+   npm install
+   ```
+
+3. **Set up environment variables**:
+   Create a `.env.local` file and add your `GEMINI_API_KEY`:
+   ```bash
+   GEMINI_API_KEY=your_api_key_here
+   ```
+
+4. **Run the application**:
+   ```bash
+   npm run dev
+   ```
+
+## Development
+
+Built with:
+- **Tauri**: For cross-platform desktop integration.
+- **React**: For the user interface.
+- **Web Audio API**: For low-latency auditory feedback.
+- **Gemini AI**: For dynamic practice phrase generation.
+
+---
+
+*ALPINE_ECODECOR_PRO // 2025*
