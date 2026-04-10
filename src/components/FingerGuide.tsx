@@ -109,32 +109,8 @@ const FingerGuide: React.FC<FingerGuideProps> = ({ targetKeyData, onSelectLevel,
 
           {mode === 'practice' && (
             <div className="space-y-6 animate-fade-in">
-              {/* Target Key Context (only show if active in practice) */}
-              {targetKeyData && (
-                <div
-                  onClick={onCircuitCycle}
-                  className={`p-4 rounded-xl bg-[var(--bg-glass-strong)] border border-[var(--accent-primary)]/40 shadow-[0_0_20px_rgba(var(--accent-rgb),0.15)] cursor-pointer hover:bg-[var(--accent-primary)]/10 transition-all transform hover:scale-[1.02] active:scale-[0.98] animate-fade-in`}
-                >
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="flex items-center gap-3">
-                      <span
-                        className="w-3 h-3 rounded-full shadow-[0_0_10px]"
-                        style={{ backgroundColor: (FINGER_COLORS as any)[targetKeyData.finger], boxShadow: `0 0 12px ${(FINGER_COLORS as any)[targetKeyData.finger]}` }}
-                      />
-                      <span className="text-sm font-bold text-[var(--text-primary)]">
-                        {FINGER_NAMES[targetKeyData.finger]}
-                      </span>
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-center py-2">
-                     <span className="text-4xl font-black text-[var(--accent-primary)] font-mono drop-shadow-[0_0_10px_rgba(var(--accent-rgb),0.5)]">
-                       {targetKeyData.label}
-                     </span>
-                  </div>
-                </div>
-              )}
-
               {/* Wave Mode Toggle */}
+
               <button
                 onClick={() => setIsWaveActive(!isWaveActive)}
                 className={`w-full py-4 rounded-xl border flex items-center justify-center gap-3 transition-all duration-500 group relative overflow-hidden ${isWaveActive ? 'border-[var(--accent-primary)] shadow-[0_0_30px_rgba(var(--accent-rgb),0.3)]' : 'border-[var(--border-glass)] bg-[var(--bg-glass)]'}`}
