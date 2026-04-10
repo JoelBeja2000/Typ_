@@ -49,16 +49,11 @@ Follow structured phases from basic finger pairs to advanced combinations and pa
    npm install
    ```
 
-3. **Set up environment variables**:
-   Create a `.env.local` file and add your `GEMINI_API_KEY`:
-   ```bash
-   GEMINI_API_KEY=your_api_key_here
-   ```
-
-4. **Run the application**:
+3. **Run the application**:
    ```bash
    npm run dev
    ```
+
 
 ## Development
 
