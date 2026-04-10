@@ -3,12 +3,12 @@
 >
 > [Leer en Español](README.es.md)
 
-# Typ_ (Type Master)
+# OveTyp_ (Type Master)
 
 
-**Typ_** is a professional-grade typing trainer designed for efficiency, speed, and precision. Built with a focus on biomechanics and auditory feedback, it provides a cinematic training experience for developers and typing enthusiasts.
+**OveTyp_** is a professional-grade typing trainer designed for efficiency, speed, and precision. Built with a focus on biomechanics and auditory feedback, it provides a cinematic training experience for developers and typing enthusiasts.
 
-![Typ_ Landing](docs/media/landing.png)
+![OveTyp_ Landing](docs/media/landing.png)
 
 ## Core Features
 
@@ -54,8 +54,8 @@ Easily switch between languages, focus modes, and visual styles to suit your tra
 
 1. **Clone the repository**:
    ```bash
-   git clone https://github.com/JoelBeja2000/Typ_.git
-   cd Typ_
+   git clone https://github.com/JoelBeja2000/OveTyp_.git
+   cd OveTyp_
    ```
 
 2. **Install dependencies**:
