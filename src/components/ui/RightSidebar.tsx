@@ -37,10 +37,10 @@ export const RightSidebar: React.FC<RightSidebarProps> = ({
 }) => {
   return (
     <aside
-      className={`fixed top-0 right-0 h-full w-[450px] z-[2001] bg-[var(--bg-glass-strong)] backdrop-blur-3xl border-l border-[var(--border-glass)] p-8 transition-all duration-500 transform ${isOpen ? 'translate-x-0' : 'translate-x-full'
+      className={`fixed top-0 right-0 h-full w-[450px] z-[2001] bg-[var(--bg-glass-strong)] backdrop-blur-3xl border-l border-[var(--border-glass)] p-8 transition-all duration-500 transform flex flex-col ${isOpen ? 'translate-x-0' : 'translate-x-full'
         }`}
     >
-      <div className="flex flex-col gap-4 mb-12">
+      <div className="flex flex-col gap-4 mb-8 shrink-0">
         <div className="flex items-center justify-between">
           <h2 className="text-[10px] font-black uppercase tracking-[0.5em] text-[var(--accent-primary)]">
             Guía Técnica
@@ -86,13 +86,15 @@ export const RightSidebar: React.FC<RightSidebarProps> = ({
           </div>
         </div>
       </div>
-      <FingerGuide
-        targetKeyData={targetKeyData}
-        onSelectLevel={onSelectLevel}
-        onSelectPhrases={onSelectPhrases}
-        onWaveMode={onWaveMode}
-        onCircuitCycle={onCircuitCycle}
-      />
+      <div className="flex-1 min-h-0">
+        <FingerGuide
+          targetKeyData={targetKeyData}
+          onSelectLevel={onSelectLevel}
+          onSelectPhrases={onSelectPhrases}
+          onWaveMode={onWaveMode}
+          onCircuitCycle={onCircuitCycle}
+        />
+      </div>
     </aside>
   );
 };

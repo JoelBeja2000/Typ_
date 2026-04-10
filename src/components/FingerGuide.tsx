@@ -51,7 +51,7 @@ const FingerGuide: React.FC<FingerGuideProps> = ({ targetKeyData, onSelectLevel,
   }, [currentLevel, onSelectLevel, onSelectPhrases]);
 
   return (
-    <div className="flex flex-col h-full bg-[var(--bg-glass-strong)] rounded-2xl border border-[var(--border-glass)] overflow-hidden transition-all duration-500">
+    <div className="flex flex-col h-full min-h-0 bg-[var(--bg-glass-strong)] rounded-2xl border border-[var(--border-glass)] overflow-hidden transition-all duration-500">
 
       {/* Header - Tab Switcher */}
       <div className="flex border-b border-[var(--border-glass)]">
