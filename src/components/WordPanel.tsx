@@ -55,7 +55,19 @@ export const WordPanel: React.FC<WordPanelProps> = ({
                         {currentPhrase.split('').map((char, i) => {
                             let color = "text-[var(--text-ghost)]";
                             if (i < normalizedTypedText.length) {
-                                color = normalizedTypedText[i] === char ? "text-[var(--accent-primary)]" : "text-red-400 bg-red-500/10 border-b-2 border-red-500/30";
+                                const isMismatch = normalizedTypedText[i] !== char;
+                                const isLastChar = i === normalizedTypedText.length - 1;
+
+                                if (isMismatch) {
+                                    if (isLastChar && isComposingState) {
+                                        // Pending accent/composition - show neutral/pending instead of error
+                                        color = "text-[var(--text-primary)] border-b-2 border-[var(--accent-primary)] animate-pulse";
+                                    } else {
+                                        color = "text-red-400 bg-red-500/10 border-b-2 border-red-500/30";
+                                    }
+                                } else {
+                                    color = "text-[var(--accent-primary)]";
+                                }
                             }
                             return (
                                 <span key={i} className={`${color} transition-all inline-block relative`}>

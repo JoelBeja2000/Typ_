@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { KeyData } from '../../types';
 import { FINGER_NAMES, FINGER_COLORS, KEYBOARD_LAYOUT } from '../../constants';
-import { GUIDE_PHASES, GUIDE_SECTIONS } from '../data/GuideData';
+import { GUIDE_PHASES } from '../data/GuideData';
 
 interface FingerGuideProps {
   targetKeyData?: KeyData;
@@ -14,14 +14,13 @@ interface FingerGuideProps {
 type Mode = 'guide' | 'practice';
 
 const FingerGuide: React.FC<FingerGuideProps> = ({ targetKeyData, onSelectLevel, onSelectPhrases, onWaveMode, onCircuitCycle }) => {
-  const [mode, setMode] = useState<Mode>('guide');
-  const [selectedSectionId, setSelectedSectionId] = useState<string>(GUIDE_SECTIONS[0].id);
+  const [mode, setMode] = useState<Mode>('practice');
   const [expandedPhaseId, setExpandedPhaseId] = useState<string | null>(GUIDE_PHASES[0].id);
   const [selectedLevelId, setSelectedLevelId] = useState<string | null>(null);
   const [isWaveActive, setIsWaveActive] = useState(false);
 
   // Derived state
-  const currentSection = GUIDE_SECTIONS.find(s => s.id === selectedSectionId);
+
   // Find current level across all phases
   const currentLevel = GUIDE_PHASES.flatMap(p => p.levels).find(l => l.id === selectedLevelId);
 
@@ -46,20 +45,11 @@ const FingerGuide: React.FC<FingerGuideProps> = ({ targetKeyData, onSelectLevel,
   return (
     <div className="flex flex-col h-full bg-[var(--bg-glass-strong)] rounded-2xl border border-[var(--border-glass)] overflow-hidden transition-all duration-500">
 
-      {/* Header Tabs */}
+      {/* Header - Now simplified without tabs */}
       <div className="flex border-b border-[var(--border-glass)]">
-        <button
-          onClick={() => setMode('guide')}
-          className={`flex-1 py-3 text-xs font-bold uppercase tracking-wider transition-colors ${mode === 'guide' ? 'bg-[var(--accent-primary)] text-black' : 'text-[var(--text-secondary)] hover:bg-[var(--bg-glass)]'}`}
-        >
-          Teoría
-        </button>
-        <button
-          onClick={() => setMode('practice')}
-          className={`flex-1 py-3 text-xs font-bold uppercase tracking-wider transition-colors ${mode === 'practice' ? 'bg-[var(--accent-primary)] text-black' : 'text-[var(--text-secondary)] hover:bg-[var(--bg-glass)]'}`}
-        >
-          Práctica
-        </button>
+        <div className="flex-1 py-3 text-xs font-bold uppercase tracking-[0.3em] text-[var(--accent-primary)] text-center bg-[var(--bg-glass)]">
+          Entrenamiento Técnico
+        </div>
       </div>
 
       <div className="flex-1 overflow-y-auto p-6 space-y-6 custom-scrollbar">
@@ -97,31 +87,7 @@ const FingerGuide: React.FC<FingerGuideProps> = ({ targetKeyData, onSelectLevel,
             </div>
           )}
 
-          {mode === 'guide' && (
-            <div className="space-y-4">
-              <div className="grid grid-cols-1 gap-2">
-                {GUIDE_SECTIONS.map(section => (
-                  <div key={section.id}>
-                    <button
-                      onClick={() => setSelectedSectionId(section.id)}
-                      className={`w-full p-3 rounded-lg text-left transition-all border ${selectedSectionId === section.id ? 'bg-[var(--bg-glass)] border-[var(--accent-primary)]' : 'border-transparent hover:bg-[var(--bg-glass)]'}`}
-                    >
-                      <h3 className={`text-sm font-bold ${selectedSectionId === section.id ? 'text-[var(--accent-primary)]' : 'text-[var(--text-primary)]'}`}>
-                        {section.title}
-                      </h3>
-                    </button>
-                    {selectedSectionId === section.id && (
-                      <div className="p-4 rounded-xl bg-[var(--bg-glass)] border border-[var(--border-glass)] mt-2 animate-fade-in">
-                        <p className="text-sm text-[var(--text-secondary)] leading-relaxed whitespace-pre-line">
-                          {section.content}
-                        </p>
-                      </div>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
+
 
           {mode === 'practice' && (
             <div className="space-y-6">
@@ -184,7 +150,7 @@ const FingerGuide: React.FC<FingerGuideProps> = ({ targetKeyData, onSelectLevel,
 
       {/* Footer / Status */}
       <div className="p-4 border-t border-[var(--border-glass)] bg-[var(--bg-glass)] text-[10px] text-[var(--text-secondary)] text-center">
-        {mode === 'guide' ? 'Selecciona un tema para leer.' : 'Selecciona una fase y nivel para practicar.'}
+        Selecciona una fase y nivel para practicar.
       </div>
     </div>
   );

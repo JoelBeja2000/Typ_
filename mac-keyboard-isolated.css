@@ -1,0 +1,490 @@
+/* 
+   MAC KEYBOARD ISOLATED CSS 
+   ----------------------------------------------------------------
+   This file contains all necessary styles to render the Mac Keyboard 
+   component independently of the main application.
+*/
+
+:root {
+    /* --- PALETTE & THEME VARIABLES (Extracted from main.css) --- */
+
+    /* Backgrounds */
+    --bg-app: #020202;
+    --bg-glass: rgba(0, 0, 0, 0.4);
+    --bg-glass-strong: rgba(5, 5, 5, 0.95);
+
+    /* Borders */
+    --border-glass: rgba(255, 255, 255, 0.05);
+
+    /* Text */
+    --text-primary: #ffffff;
+    --text-secondary: #9ca3af;
+    /* gray-400 */
+    --text-muted: rgba(255, 255, 255, 0.15);
+
+    /* Keyboard Specific Colors */
+    --key-bg: #111111;
+    --key-target-bg: #1a1a1a;
+    --key-text: #9ca3af;
+    --key-shadow: rgba(0, 0, 0, 0.8);
+
+    /* Accents */
+    --accent-primary: #A2AD91;
+    /* Alpine Green */
+    --accent-glow: rgba(162, 173, 145, 0.4);
+    --accent-secondary: #ffffff;
+    /* For highlighted keys */
+
+    /* Finger Colors (Extracted from constants.tsx) */
+    --finger-left-pinky: #f472b6;
+    /* Pink 400 */
+    --finger-left-ring: #c084fc;
+    /* Purple 400 */
+    --finger-left-middle: #60a5fa;
+    /* Blue 400 */
+    --finger-left-index: #22d3ee;
+    /* Cyan 400 */
+    --finger-thumb: #9ca3af;
+    /* Gray 400 */
+    --finger-right-index: #4ade80;
+    /* Green 400 */
+    --finger-right-middle: #facc15;
+    /* Yellow 400 */
+    --finger-right-ring: #fb923c;
+    /* Orange 400 */
+    --finger-right-pinky: #f87171;
+    /* Red 400 */
+
+    /* Dimensions */
+    --key-base-width: 44px;
+    --key-base-height: 44px;
+    --radius-key: 6px;
+}
+
+/* --- BASE CONTAINER --- */
+
+.mac-keyboard {
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 1px;
+    background: transparent;
+    border-radius: 10px;
+    width: 755px;
+    /* Scale handling is usually done on the parent wrapper in the app, 
+     but you can add transform: scale(...) here if needed */
+    transform-origin: center;
+    user-select: none;
+}
+
+/* --- KEY STYLES --- */
+
+.mac-key {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-key);
+    font-size: 11px;
+    font-weight: 500;
+    transition: all 0.1s ease;
+    position: relative;
+
+    /* Default Appearance */
+    background-color: var(--key-bg);
+    border-bottom: 2px solid var(--border-glass);
+    border-left: 1px solid var(--border-glass);
+    /* Adding explicit borders for definition */
+    border-right: 1px solid var(--border-glass);
+    border-top: 1px solid var(--border-glass);
+    color: var(--key-text);
+    box-shadow: 0 2px 0 var(--key-shadow);
+
+    /* Dimensions defaults */
+    width: var(--key-base-width);
+    height: var(--key-base-height);
+}
+
+/* Width Utilities (matching Tailwind classes used in component) */
+.w-\[44px\] {
+    width: 44px;
+}
+
+.w-\[54px\] {
+    width: 54px;
+}
+
+.w-\[56px\] {
+    width: 56px;
+}
+
+.w-\[60px\] {
+    width: 60px;
+}
+
+.w-\[64px\] {
+    width: 64px;
+}
+
+.w-\[68px\] {
+    width: 68px;
+}
+
+.w-\[80px\] {
+    width: 80px;
+}
+
+.w-\[52px\] {
+    width: 52px;
+}
+
+.w-\[250px\] {
+    width: 250px;
+}
+
+.w-full {
+    width: 100%;
+}
+
+.flex-grow {
+    flex-grow: 1;
+}
+
+/* Height Utilities */
+.h-\[44px\] {
+    height: 44px;
+}
+
+.h-\[94px\] {
+    height: 94px;
+}
+
+.h-\[30px\] {
+    height: 30px;
+}
+
+.h-\[21px\] {
+    height: 21px;
+}
+
+.h-full {
+    height: 100%;
+}
+
+/* Layout Utilities */
+.flex {
+    display: flex;
+}
+
+.flex-col {
+    flex-direction: column;
+}
+
+.flex-row {
+    flex-direction: row;
+}
+
+.items-center {
+    align-items: center;
+}
+
+.justify-center {
+    justify-content: center;
+}
+
+.justify-end {
+    justify-content: flex-end;
+}
+
+.justify-around {
+    justify-content: space-around;
+}
+
+.gap-\[1px\] {
+    gap: 1px;
+}
+
+.gap-\[2px\] {
+    gap: 2px;
+}
+
+.gap-\[6px\] {
+    gap: 6px;
+}
+
+.mb-1 {
+    margin-bottom: 4px;
+}
+
+.p-1 {
+    padding: 4px;
+}
+
+.px-2 {
+    padding-left: 8px;
+    padding-right: 8px;
+}
+
+.pt-1 {
+    padding-top: 4px;
+}
+
+.pb-4 {
+    padding-bottom: 16px;
+}
+
+/* For vertical enter */
+.absolute {
+    position: absolute;
+}
+
+.relative {
+    position: relative;
+}
+
+.inset-0 {
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+}
+
+.top-2 {
+    top: 8px;
+}
+
+.left-2 {
+    left: 8px;
+}
+
+.bottom-\[4px\] {
+    bottom: 4px;
+}
+
+.right-\[4px\] {
+    right: 4px;
+}
+
+.right-\[5px\] {
+    right: 5px;
+}
+
+/* Text Utilities */
+.text-\[8px\] {
+    font-size: 8px;
+}
+
+.text-\[9px\] {
+    font-size: 9px;
+}
+
+.text-\[10px\] {
+    font-size: 10px;
+}
+
+.text-\[11px\] {
+    font-size: 11px;
+}
+
+.text-\[12px\] {
+    font-size: 12px;
+}
+
+.text-\[13px\] {
+    font-size: 13px;
+}
+
+.text-xl {
+    font-size: 1.25rem;
+}
+
+.font-bold {
+    font-weight: 700;
+}
+
+.font-medium {
+    font-weight: 500;
+}
+
+.leading-none {
+    line-height: 1;
+}
+
+.opacity-70 {
+    opacity: 0.7;
+}
+
+.opacity-80 {
+    opacity: 0.8;
+}
+
+.opacity-100 {
+    opacity: 1;
+}
+
+.opacity-0 {
+    opacity: 0;
+}
+
+.mb-0\.5 {
+    margin-bottom: 2px;
+}
+
+.mb-\[-2px\] {
+    margin-bottom: -2px;
+}
+
+/* --- STATE CLASSES --- */
+
+/* Active State (Pressed) */
+.mac-key.active {
+    background-color: rgba(162, 173, 145, 0.2);
+    /* Using accent-primary alpha */
+    border-color: var(--accent-primary);
+    color: var(--accent-primary);
+    transform: translateY(1px);
+    box-shadow: 0 0 20px var(--accent-glow);
+}
+
+/* Target State (Next to press) */
+.mac-key.target {
+    border-color: var(--accent-primary);
+    background-color: var(--key-target-bg);
+    color: var(--text-primary);
+    box-shadow: 0 0 15px var(--accent-glow);
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Highlighted (Guide) */
+.mac-key.highlighted {
+    background-color: var(--key-bg);
+    border-color: var(--accent-secondary);
+    color: var(--text-primary);
+    box-shadow: 0 0 15px var(--accent-secondary);
+}
+
+/* Wave Active Mode */
+.mac-key.wave-active {
+    color: var(--text-primary);
+    background-color: var(--bg-glass);
+    animation: wave-pulse 2s infinite;
+    /* Note: Animation delay is usually set inline via JS */
+}
+
+/* Caps Lock Indicator */
+.caps-indicator {
+    width: 4px;
+    height: 4px;
+    border-radius: 9999px;
+    background-color: #22c55e;
+    /* green-500 */
+}
+
+/* --- ANIMATIONS --- */
+
+@keyframes pulse {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: .5;
+    }
+}
+
+@keyframes wave-pulse {
+
+    0%,
+    100% {
+        border-color: transparent;
+        box-shadow: none;
+    }
+
+    50% {
+        /* These values are usually dynamic, providing a fallback */
+        border-color: hsla(200, 80%, 60%, 0.8);
+        box-shadow: 0 0 15px hsla(200, 80%, 60%, 0.4);
+    }
+}
+
+/* --- SPECIFIC COMPONENT STYLES --- */
+
+/* Touchbar */
+.touchbar-container {
+    display: flex;
+    gap: 1px;
+    align-items: center;
+    margin-bottom: 4px;
+}
+
+.touchbar-esc {
+    height: 30px;
+    width: 60px;
+    background-color: var(--key-bg);
+    border-radius: 4px;
+    font-size: 9px;
+    color: var(--key-text);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.touchbar-screen {
+    height: 30px;
+    flex-grow: 1;
+    background-color: var(--bg-app);
+    /* Or specific touchbar bg */
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    padding: 0 8px;
+}
+
+.touchbar-vol {
+    height: 30px;
+    width: 40px;
+    background-color: var(--key-bg);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--key-text);
+}
+
+/* Icons replacement (if FontAwesome is not available) */
+.icon-vol::before {
+    content: "🔊";
+    font-size: 10px;
+}
+
+.icon-caret-left::before {
+    content: "◀";
+}
+
+.icon-caret-up::before {
+    content: "▲";
+}
+
+.icon-caret-down::before {
+    content: "▼";
+}
+
+.icon-caret-right::before {
+    content: "▶";
+}
+
+/* Theme Compatibility Helpers */
+.mac-keyboard-dark {
+    --key-bg: #111111;
+    --key-text: #9ca3af;
+}
+
+.mac-keyboard-light {
+    --key-bg: #ffffff;
+    --key-text: #525252;
+    --bg-app: #f2f2f2;
+}

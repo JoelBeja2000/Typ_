@@ -144,28 +144,56 @@ const App: React.FC = () => {
   const [currentCircuitTitle, setCurrentCircuitTitle] = useState('');
   const [circuitLevelIndex, setCircuitLevelIndex] = useState(0);
 
+  const allCircuitLevels = useMemo(() => {
+    // Phases: 1 (Pairs), 2 (Left Hand), 3 (Right Hand)
+    // Indexes in GUIDE_PHASES are 0, 1, 2 respectively based on data structure
+    const p1 = GUIDE_PHASES.find(p => p.id === 'fase_1')?.levels || [];
+    const p2 = GUIDE_PHASES.find(p => p.id === 'fase_2')?.levels || [];
+    const p3 = GUIDE_PHASES.find(p => p.id === 'fase_3')?.levels || [];
+    return [...p1, ...p2, ...p3];
+  }, []);
+
   // Load Level Data when Index or Mode changes
   useEffect(() => {
     if (isCircuitMode) {
       setIsGuideMode(true);
-      const levels = GUIDE_PHASES[0].levels;
+
+      const levels = allCircuitLevels;
+      if (levels.length === 0) return;
+
       const level = levels[circuitLevelIndex % levels.length];
 
       if (level) {
         setHighlightedKeys(level.keys);
         setPhrases(level.phrases);
-        setCurrentCircuitTitle(level.title.replace('Pares: ', ''));
+        // Clean title: Remove "Pares: " and numbering like "1. "
+        setCurrentCircuitTitle(level.title.replace(/^Pares: |^\d+\.\s+/g, ''));
         // Reset typing state
         setTypedText('');
         lastProcessedText.current = '';
         setPhraseIndex(0);
-        setCombo(0);
+
+        // SMART COMBO DECAY: Lose one instrument layer instead of full reset
+        setCombo(prevCombo => {
+          // Find the highest active layer
+          const activeLayers = currentMusicStyle.layers
+            .filter(l => l.minCombo <= prevCombo)
+            .sort((a, b) => b.minCombo - a.minCombo);
+
+          if (activeLayers.length > 0) {
+            // Drop to just below the current highest layer's threshold
+            const penaltyTarget = activeLayers[0].minCombo - 1;
+            return Math.max(0, penaltyTarget);
+          }
+          return 0;
+        });
+
         setWordHasMistake(false);
         if (inputRef.current) inputRef.current.value = '';
         setTimeout(() => inputRef.current?.focus(), 10);
       }
     }
-  }, [isCircuitMode, circuitLevelIndex]);
+  }, [isCircuitMode, circuitLevelIndex, currentMusicStyle]);
 
   // Timer Logic
   useEffect(() => {
@@ -178,7 +206,7 @@ const App: React.FC = () => {
       return;
     }
 
-    const levels = GUIDE_PHASES[0].levels;
+    const levels = allCircuitLevels;
     setCircuitTimer(circuitDuration); // Reset timer on mode/duration change or manual cycle if we add dependency
 
     const interval = setInterval(() => {
@@ -203,14 +231,15 @@ const App: React.FC = () => {
 
     circuitIntervalRef.current = interval;
     return () => clearInterval(interval);
-  }, [isCircuitMode, circuitDuration, isRandomCircuit]); // Note: We don't depend on circuitLevelIndex here to avoid resetting timer on auto-cycle? 
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isCircuitMode, circuitDuration, isRandomCircuit, allCircuitLevels]);
   // Actually, if we use setCircuitTimer in the interval callback, it's fine.
   // BUT: if we want manual click to reset timer, we need a way.
   // The logic below `handleCircuitCycle` will handle manual reset.
 
   const handleManualCircuitCycle = useCallback(() => {
     if (!isCircuitMode) return;
-    const levels = GUIDE_PHASES[0].levels;
+    const levels = allCircuitLevels;
     setCircuitLevelIndex(prev => {
       if (isRandomCircuit) {
         return Math.floor(Math.random() * levels.length);
@@ -218,7 +247,7 @@ const App: React.FC = () => {
       return (prev + 1) % levels.length;
     });
     setCircuitTimer(circuitDuration); // Manually reset timer
-  }, [isCircuitMode, isRandomCircuit, circuitDuration]);
+  }, [isCircuitMode, isRandomCircuit, circuitDuration, allCircuitLevels]);
   const currentPhrase = useMemo(() => phrases[phraseIndex] || '', [phrases, phraseIndex]);
   const normalizedTypedText = useMemo(() => typedText.normalize('NFC'), [typedText]);
 
