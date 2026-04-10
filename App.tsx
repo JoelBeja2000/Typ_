@@ -14,6 +14,7 @@ import { generatePracticePhrases } from './services/geminiService';
 import { VisualsConfig, DEFAULT_VISUALS_CONFIG } from './src/types/visuals';
 import { GUIDE_PHASES } from './src/data/GuideData';
 import { BrowserThemeManager } from './src/infrastructure/ui/BrowserThemeManager';
+import { ZEN_PHRASES } from './src/data/ZenPhrases';
 import { THEMES } from './src/domain/models/Theme';
 import './src/infrastructure/ui/styles/Keyboard.css';
 
@@ -97,6 +98,17 @@ const App: React.FC = () => {
     });
   }, [currentTheme, uiScale, isPureBlack, forceScheme]);
 
+  const toggleInfiniteMode = () => {
+    if (!isInfiniteMode) {
+      const randomIdx = Math.floor(Math.random() * ZEN_PHRASES.length);
+      setPhrases([ZEN_PHRASES[randomIdx]]);
+      setPhraseIndex(0);
+      setIsFinished(false);
+      setIsGuideMode(false);
+    }
+    setIsInfiniteMode(!isInfiniteMode);
+  };
+
   const setPalette = (id: string) => {
     const theme = THEMES.find(t => t.id === id);
     if (theme) setCurrentTheme(theme);
@@ -107,6 +119,8 @@ const App: React.FC = () => {
   const [isMusicEnabled, setIsMusicEnabled] = useState(false);
   const [currentMusicStyle, setCurrentMusicStyle] = useState<MusicStyle>(TECHNO_STYLE);
   const [isZenMode, setIsZenMode] = useState(false);
+  const [isInfiniteMode, setIsInfiniteMode] = useState(false);
+  const [score, setScore] = useState(() => Number(localStorage.getItem('typ_total_score') || 0));
   const [isTypingSoundsEnabled, setIsTypingSoundsEnabled] = useState(true);
   const [comboMultiplier, setComboMultiplier] = useState(1.0);
   const [isMusicLightingEnabled, setIsMusicLightingEnabled] = useState(false);
@@ -139,6 +153,10 @@ const App: React.FC = () => {
   const sequencerRef = useRef<MusicSequencer | null>(null);
   const comboRef = useRef(combo);
   const [audioReady, setAudioReady] = useState(false);
+
+  useEffect(() => {
+    localStorage.setItem('typ_total_score', String(score));
+  }, [score]);
 
   // CIRCUIT MODE LOGIC
   const [circuitTimer, setCircuitTimer] = useState(30);
@@ -374,7 +392,7 @@ const App: React.FC = () => {
       const typedChar = current[idx];
 
       if (idx < currentPhrase.length) {
-        if (!isZenMode && typedChar !== tChar) {
+        if (!isInfiniteMode && typedChar !== tChar) {
           setWordHasMistake(true); setCombo(0);
           if (isTypingSoundsEnabled) audioSystemRef.current?.playError();
           setStats(prev => ({
@@ -388,7 +406,7 @@ const App: React.FC = () => {
           }));
 
           if (typedChar === ' ' || idx === currentPhrase.length - 1) {
-            if (isZenMode || !wordHasMistake) {
+            if (isInfiniteMode || !wordHasMistake) {
               const newCombo = combo + 1;
               setCombo(newCombo);
               comboRef.current = newCombo;
@@ -396,7 +414,7 @@ const App: React.FC = () => {
             }
             setWordHasMistake(false);
           } else {
-            if (isZenMode && isTypingSoundsEnabled) audioSystemRef.current?.playSuccess(combo, true);
+            if (isInfiniteMode && isTypingSoundsEnabled) audioSystemRef.current?.playSuccess(combo, isZenMode);
           }
         }
       }
@@ -406,7 +424,7 @@ const App: React.FC = () => {
 
     if (current === currentPhrase && currentPhrase.length > 0) {
       if (phraseIndex < phrases.length - 1) {
-        const delay = isZenMode ? 0 : 50;
+        const delay = isInfiniteMode ? 0 : 50;
         setTimeout(() => {
           setPhraseIndex(prev => prev + 1);
           setTypedText('');
@@ -414,20 +432,17 @@ const App: React.FC = () => {
           if (inputRef.current) inputRef.current.value = '';
         }, delay);
       } else {
-        if (isZenMode) {
+        if (isInfiniteMode) {
           const delay = 50;
           setTimeout(() => {
-            // Cycle back to 0 if in Guide Mode (Zen Loop), otherwise maybe fetch more (handled by other effect)
-            if (isGuideMode) {
-              setPhraseIndex(0);
-            } else {
-              setPhraseIndex(0); // Also reset here, but fetcher will append?
-              // Actually Zen Mode usually appends. If we are at the end and no more phrases, loop?
-              // The fetcher below handles appending.
-              // If isGuideMode is true, we simply loop or stop.
-              // Let's just reset index to 0 effectively looping the drill.
-              setPhraseIndex(0);
-            }
+            const randomIdx = Math.floor(Math.random() * ZEN_PHRASES.length);
+            setPhrases([ZEN_PHRASES[randomIdx]]);
+            setPhraseIndex(0);
+            
+            // Score Calculation: WPM * Accuracy% * 10
+            const earned = Math.floor(stats.wpm * (stats.accuracy / 100) * 10);
+            setScore(prev => prev + earned);
+
             setTypedText('');
             lastProcessedText.current = '';
             if (inputRef.current) inputRef.current.value = '';
@@ -437,7 +452,7 @@ const App: React.FC = () => {
         }
       }
     }
-  }, [normalizedTypedText, currentPhrase, phraseIndex, phrases.length, startTime, wordHasMistake, combo, isZenMode, isGuideMode]);
+  }, [normalizedTypedText, currentPhrase, phraseIndex, phrases.length, startTime, wordHasMistake, combo, isInfiniteMode, isGuideMode]);
 
   const isFetchingMore = useRef(false);
 
@@ -478,7 +493,7 @@ const App: React.FC = () => {
 
   useEffect(() => {
     // Disable fetching more in Guide Mode (drills are fixed set)
-    if (isZenMode && !isLoading && !isFetchingMore.current && phraseIndex >= phrases.length - 5 && !isGuideMode) {
+    if (isInfiniteMode && !isLoading && !isFetchingMore.current && phraseIndex >= phrases.length - 5 && !isGuideMode) {
       const fetchMore = async () => {
         isFetchingMore.current = true;
         try {
@@ -495,7 +510,7 @@ const App: React.FC = () => {
       };
       fetchMore();
     }
-  }, [isZenMode, phraseIndex, phrases.length, language, focus, isLoading, isGuideMode]);
+  }, [isInfiniteMode, phraseIndex, phrases.length, language, focus, isLoading, isGuideMode]);
 
   const handleInput = useCallback((e: React.FormEvent<HTMLTextAreaElement>) => {
     let val = e.currentTarget.value.normalize('NFC');
@@ -512,7 +527,7 @@ const App: React.FC = () => {
     }
 
     setTypedText(val);
-  }, [isZenMode, phrases, phraseIndex]);
+  }, [isInfiniteMode, phrases, phraseIndex]);
 
   const handleCompositionStart = useCallback(() => { isComposingRef.current = true; setIsComposingState(true); }, []);
   const handleCompositionEnd = useCallback((e: React.CompositionEvent<HTMLTextAreaElement>) => {
@@ -528,7 +543,7 @@ const App: React.FC = () => {
     }
 
     setTypedText(val);
-  }, [isZenMode, phrases, phraseIndex]);
+  }, [isInfiniteMode, phrases, phraseIndex]);
 
   const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
     setActiveKey(e.key);
@@ -648,10 +663,13 @@ const App: React.FC = () => {
         TECHNO_STYLE={TECHNO_STYLE}
         AMBIENT_STYLE={AMBIENT_STYLE}
         ACID_HOUSE_STYLE={ACID_HOUSE_STYLE}
+        isInfiniteMode={isInfiniteMode}
+        onToggleZenMode={toggleInfiniteMode}
+        score={score}
       />
 
       {/* MAIN VIEWPORT */}
-      <main className="flex-grow flex flex-col items-center justify-center p-4 pt-2 transition-all duration-500" style={{ opacity: (showLeftSidebar || showRightSidebar) ? 0.3 : 1 }}>
+      <main className="flex-grow flex flex-col items-center justify-center p-4 pt-2 relative transition-all duration-500" style={{ opacity: (showLeftSidebar || showRightSidebar) ? 0.3 : 1 }}>
         <div className="w-full max-w-5xl flex flex-col items-center gap-4 relative">
 
           {!isLoading && !isFinished && (
@@ -725,6 +743,12 @@ const App: React.FC = () => {
 
             {/* DROPDOWN ITEMS */}
             <div className="flex flex-col divide-y divide-[var(--border-glass)] max-h-[400px] overflow-y-auto custom-scrollbar">
+              <div className="p-4 bg-[var(--accent-primary)]/5 border-b border-[var(--border-glass)]">
+                <div className="text-[9px] font-black uppercase tracking-[0.3em] text-[var(--accent-primary)] mb-1 opacity-60">Puntos Totales</div>
+                <div className="text-2xl font-black text-[var(--text-primary)] tracking-tighter tabular-nums">
+                  {score.toLocaleString()}
+                </div>
+              </div>
               <div className="p-4">
                 <div className="text-[10px] font-black uppercase tracking-[0.2em] text-[var(--text-secondary)] mb-4 flex items-center gap-2">
                   <i className="fa fa-paint-brush"></i>
