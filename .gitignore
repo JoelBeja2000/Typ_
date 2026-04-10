@@ -25,6 +25,18 @@ dist-ssr
 
 # Build and large artifacts
 src-tauri/target
-src-tauri/bin
 Whisky.app
+
+# Agent and temporary files
+.agent
+.kilocode
+.gemini
+*.zip
+vibecheck_*.json
+metadata.json
+screenshot*.png
+siguelo.md
+cssNuevo.css
+mac-keyboard*.css
+
 
