@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { KeyData } from '../../types';
 import { FINGER_NAMES, FINGER_COLORS, KEYBOARD_LAYOUT } from '../../constants';
 import { GUIDE_PHASES } from '../data/GuideData';
@@ -19,10 +19,15 @@ const FingerGuide: React.FC<FingerGuideProps> = ({ targetKeyData, onSelectLevel,
   const [selectedLevelId, setSelectedLevelId] = useState<string | null>(null);
   const [isWaveActive, setIsWaveActive] = useState(false);
 
-  // Derived state
-
-  // Find current level across all phases
-  const currentLevel = GUIDE_PHASES.flatMap(p => p.levels).find(l => l.id === selectedLevelId);
+  // Derived state to get all finger cards for the mapping tab
+  const fingerKeys = useMemo(() => {
+    const map: Record<string, string[]> = {};
+    KEYBOARD_LAYOUT.flat().forEach(k => {
+      if (!map[k.finger]) map[k.finger] = [];
+      if (!map[k.finger].includes(k.label)) map[k.finger].push(k.label);
+    });
+    return map;
+  }, []);
 
   // Animation effect for Wave Mode
   useEffect(() => {
@@ -35,6 +40,9 @@ const FingerGuide: React.FC<FingerGuideProps> = ({ targetKeyData, onSelectLevel,
     return () => clearInterval(interval);
   }, [isWaveActive, onWaveMode]);
 
+  // Find current level across all phases
+  const currentLevel = useMemo(() => GUIDE_PHASES.flatMap(p => p.levels).find(l => l.id === selectedLevelId), [selectedLevelId]);
+
   useEffect(() => {
     if (currentLevel) {
       if (onSelectLevel) onSelectLevel(currentLevel.keys);
@@ -45,52 +53,87 @@ const FingerGuide: React.FC<FingerGuideProps> = ({ targetKeyData, onSelectLevel,
   return (
     <div className="flex flex-col h-full bg-[var(--bg-glass-strong)] rounded-2xl border border-[var(--border-glass)] overflow-hidden transition-all duration-500">
 
-      {/* Header - Now simplified without tabs */}
+      {/* Header - Tab Switcher */}
       <div className="flex border-b border-[var(--border-glass)]">
-        <div className="flex-1 py-3 text-xs font-bold uppercase tracking-[0.3em] text-[var(--accent-primary)] text-center bg-[var(--bg-glass)]">
-          Entrenamiento Técnico
-        </div>
+        <button
+          onClick={() => setMode('practice')}
+          className={`flex-1 py-3 text-[10px] font-bold uppercase tracking-[0.2em] transition-all ${mode === 'practice' ? 'text-[var(--accent-primary)] bg-[var(--bg-glass)] border-b-2 border-[var(--accent-primary)]' : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'}`}
+        >
+          Práctica
+        </button>
+        <button
+          onClick={() => setMode('guide')}
+          className={`flex-1 py-3 text-[10px] font-bold uppercase tracking-[0.2em] transition-all ${mode === 'guide' ? 'text-[var(--accent-primary)] bg-[var(--bg-glass)] border-b-2 border-[var(--accent-primary)]' : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'}`}
+        >
+          Mapeo de Dedos
+        </button>
       </div>
 
       <div className="flex-1 overflow-y-auto p-6 space-y-6 custom-scrollbar">
 
         {/* Dynamic Content Area */}
         <div className="space-y-6">
-          {targetKeyData && (
-            <div
-              onClick={onCircuitCycle}
-              className={`animate-fade-in p-4 rounded-xl bg-[var(--bg-glass)] border border-[var(--accent-primary)]/30 shadow-[0_0_15px_rgba(var(--accent-rgb),0.1)] ${onCircuitCycle ? 'cursor-pointer hover:bg-[var(--accent-primary)]/10 transition-colors' : ''}`}
-            >
-              <div className="flex items-center justify-between mb-3">
-                <div className="flex items-center gap-3">
-                  <span
-                    className="w-3 h-3 rounded-full shadow-[0_0_10px]"
-                    style={{ backgroundColor: (FINGER_COLORS as any)[targetKeyData.finger], boxShadow: `0 0 12px ${(FINGER_COLORS as any)[targetKeyData.finger]}` }}
-                  />
-                  <span className="text-sm font-bold text-[var(--text-primary)]">
-                    {FINGER_NAMES[targetKeyData.finger]}
-                  </span>
-                </div>
-                {/* Optional: Add a close button if needed, but for now purely informative */}
-              </div>
 
-              <div className="space-y-2">
-                <div className="text-[10px] uppercase text-[var(--text-secondary)] font-bold tracking-wider">Teclas Asignadas</div>
-                <div className="flex flex-wrap gap-2">
-                  {KEYBOARD_LAYOUT.flat().filter(k => k.finger === targetKeyData.finger).map(k => (
-                    <span key={k.label} className={`px-2 py-1 text-xs rounded border transition-colors ${k.key === targetKeyData.key ? 'border-[var(--accent-primary)] bg-[var(--accent-primary)]/20 text-[var(--accent-primary)]' : 'border-[var(--border-glass)] text-[var(--text-secondary)]'}`}>
-                      {k.label}
+          {mode === 'guide' && (
+            <div className="space-y-4 animate-fade-in">
+              <h4 className="text-xs uppercase text-[var(--text-secondary)] font-bold tracking-wider mb-4">Guía de Asignación Física</h4>
+              {Object.entries(FINGER_NAMES).filter(([f]) => f !== 'thumb').map(([finger, name]) => (
+                <div
+                  key={finger}
+                  className="p-4 rounded-xl bg-[var(--bg-glass)] border border-[var(--border-glass)] hover:border-[var(--accent-primary)]/30 transition-all duration-300 group"
+                >
+                  <div className="flex items-center gap-3 mb-3">
+                    <span
+                      className="w-3 h-3 rounded-full shadow-[0_0_10px]"
+                      style={{
+                        backgroundColor: (FINGER_COLORS as any)[finger],
+                        boxShadow: `0 0 12px ${(FINGER_COLORS as any)[finger]}`
+                      }}
+                    />
+                    <span className="text-sm font-bold text-[var(--text-primary)] group-hover:text-[var(--accent-primary)] transition-colors">
+                      {name}
                     </span>
-                  ))}
+                  </div>
+
+                  <div className="flex flex-wrap gap-2">
+                    {(fingerKeys[finger] || []).sort().map(label => (
+                      <span key={label} className="px-2 py-1 text-[10px] font-mono rounded bg-[var(--bg-app)]/50 border border-[var(--border-glass)] text-[var(--text-secondary)]">
+                        {label}
+                      </span>
+                    ))}
+                  </div>
                 </div>
-              </div>
+              ))}
             </div>
           )}
 
-
-
           {mode === 'practice' && (
-            <div className="space-y-6">
+            <div className="space-y-6 animate-fade-in">
+              {/* Target Key Context (only show if active in practice) */}
+              {targetKeyData && (
+                <div
+                  onClick={onCircuitCycle}
+                  className={`p-4 rounded-xl bg-[var(--bg-glass-strong)] border border-[var(--accent-primary)]/40 shadow-[0_0_20px_rgba(var(--accent-rgb),0.15)] cursor-pointer hover:bg-[var(--accent-primary)]/10 transition-all transform hover:scale-[1.02] active:scale-[0.98] animate-fade-in`}
+                >
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-3">
+                      <span
+                        className="w-3 h-3 rounded-full shadow-[0_0_10px]"
+                        style={{ backgroundColor: (FINGER_COLORS as any)[targetKeyData.finger], boxShadow: `0 0 12px ${(FINGER_COLORS as any)[targetKeyData.finger]}` }}
+                      />
+                      <span className="text-sm font-bold text-[var(--text-primary)]">
+                        {FINGER_NAMES[targetKeyData.finger]}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-center py-2">
+                     <span className="text-4xl font-black text-[var(--accent-primary)] font-mono drop-shadow-[0_0_10px_rgba(var(--accent-rgb),0.5)]">
+                       {targetKeyData.label}
+                     </span>
+                  </div>
+                </div>
+              )}
+
               {/* Wave Mode Toggle */}
               <button
                 onClick={() => setIsWaveActive(!isWaveActive)}
@@ -150,9 +193,10 @@ const FingerGuide: React.FC<FingerGuideProps> = ({ targetKeyData, onSelectLevel,
 
       {/* Footer / Status */}
       <div className="p-4 border-t border-[var(--border-glass)] bg-[var(--bg-glass)] text-[10px] text-[var(--text-secondary)] text-center">
-        Selecciona una fase y nivel para practicar.
+        {mode === 'practice' ? 'Selecciona una fase y nivel para practicar.' : 'Mapeo físico de dedos para teclado ISO.'}
       </div>
     </div>
+
   );
 };
 
