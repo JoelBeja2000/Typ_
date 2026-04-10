@@ -15,7 +15,7 @@ type Mode = 'guide' | 'practice';
 
 const FingerGuide: React.FC<FingerGuideProps> = ({ targetKeyData, onSelectLevel, onSelectPhrases, onWaveMode, onCircuitCycle }) => {
   const [mode, setMode] = useState<Mode>('practice');
-  const [expandedPhaseId, setExpandedPhaseId] = useState<string | null>(GUIDE_PHASES[0].id);
+  const [expandedPhaseId, setExpandedPhaseId] = useState<string | null>(null);
   const [selectedLevelId, setSelectedLevelId] = useState<string | null>(null);
   const [isWaveActive, setIsWaveActive] = useState(false);
 
