@@ -39,29 +39,16 @@ export const RightSidebar: React.FC<RightSidebarProps> = ({
         }`}
     >
       <div className="flex flex-col gap-8 mb-8 shrink-0">
-        <div>
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-[10px] font-black uppercase tracking-[0.5em] text-[var(--accent-primary)]">
-              Modos de Práctica
-            </h2>
-            <button
-              onClick={onClose}
-              className="w-8 h-8 flex items-center justify-center rounded-full bg-[var(--bg-glass)] text-[var(--text-secondary)]"
-            >
-              <i className="fa fa-close"></i>
-            </button>
-          </div>
-          <div className="grid grid-cols-2 gap-3">
-            {['Básico', 'Programación', 'Acentuación'].map((m) => (
-              <button
-                key={m}
-                onClick={() => onFocusChange(m)}
-                className={getBtnClass(focus === m)}
-              >
-                <span>{m}</span>
-              </button>
-            ))}
-          </div>
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-[10px] font-black uppercase tracking-[0.5em] text-[var(--accent-primary)]">
+            Progreso de Usuario
+          </h2>
+          <button
+            onClick={onClose}
+            className="w-8 h-8 flex items-center justify-center rounded-full bg-[var(--bg-glass)] text-[var(--text-secondary)]"
+          >
+            <i className="fa fa-close"></i>
+          </button>
         </div>
 
         <div>

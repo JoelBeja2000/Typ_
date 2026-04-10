@@ -55,12 +55,29 @@ const FingerGuide: React.FC<FingerGuideProps> = ({ targetKeyData, onSelectLevel,
                           className={`w-full p-3 rounded-lg text-left border flex items-center justify-between transition-all ${selectedLevelId === level.id ? 'bg-[var(--accent-primary)]/10 border-[var(--accent-primary)]' : 'border-transparent hover:bg-[var(--bg-glass)]'}`}
                         >
                           <div className="flex flex-col">
-                            <span className={`text-xs font-bold ${selectedLevelId === level.id ? 'text-[var(--accent-primary)]' : 'text-[var(--text-primary)]'}`}>{level.title}</span>
+                            <span className={`text-[11px] font-black uppercase tracking-wider ${selectedLevelId === level.id ? 'text-[var(--accent-primary)]' : 'text-[var(--text-primary)]'}`}>
+                              {level.title}
+                            </span>
+                            <div className="flex items-center gap-1.5 mt-1">
+                              <div className="flex gap-0.5">
+                                {[...Array(3)].map((_, i) => (
+                                  <i 
+                                    key={i} 
+                                    className={`fa ${i < level.difficulty ? 'fa-star text-amber-400 drop-shadow-[0_0_5px_rgba(251,191,36,0.5)]' : 'fa-star-o text-white/10'} text-[8px]`}
+                                  ></i>
+                                ))}
+                              </div>
+                              <span className="text-[8px] font-black uppercase tracking-widest text-[var(--text-secondary)] opacity-40">
+                                {level.difficulty === 1 ? 'Básico' : level.difficulty === 2 ? 'Medio' : 'Experto'}
+                              </span>
+                            </div>
                             {selectedLevelId === level.id && (
-                              <span className="text-[9px] text-[var(--text-secondary)] mt-1 font-mono">"{level.phrases[0].substring(0, 30)}..."</span>
+                              <span className="text-[9px] text-[var(--text-secondary)] mt-2 font-mono leading-relaxed opacity-60">
+                                "{level.phrases[0].substring(0, 30)}..."
+                              </span>
                             )}
                           </div>
-                          {selectedLevelId === level.id && <i className="fa fa-check text-[var(--accent-primary)] text-xs"></i>}
+                          {selectedLevelId === level.id && <i className="fa fa-chevron-right text-[var(--accent-primary)] text-[10px] animate-pulse"></i>}
                         </button>
                       ))}
                     </div>

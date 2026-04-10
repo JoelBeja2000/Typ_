@@ -6,6 +6,7 @@ export interface GuideLevel {
     fingers: string[];
     keys: string[];
     phrases: string[];
+    difficulty: number; // 1-3 stars
 }
 
 export interface GuidePhase {
@@ -33,6 +34,7 @@ export const GUIDE_PHASES: GuidePhase[] = [
                 description: 'Teclas: F, G, V, B, R, T + J, H, N, M, Y, U (Solo U)',
                 fingers: ['L2', 'R2'],
                 keys: ['F', 'G', 'V', 'B', 'R', 'T', 'J', 'H', 'N', 'M', 'Y', 'U', '4', '5', '6', '7'],
+                difficulty: 1,
                 phrases: [
                     "un muy tu hutu run fun gun bun my ugh",
                     "tu hutu muy un tu hutu muy un tu hutu",
@@ -47,6 +49,7 @@ export const GUIDE_PHASES: GuidePhase[] = [
                 description: 'Teclas: D, E, C + K, I (Solo E, I)',
                 fingers: ['L3', 'R3'],
                 keys: ['D', 'E', 'C', 'K', 'I', '3', '8', ','],
+                difficulty: 1,
                 phrases: [
                     "dice kiki decide ceder ese cedi de kiev",
                     "kiki dice cede ese dique y decide",
@@ -61,6 +64,7 @@ export const GUIDE_PHASES: GuidePhase[] = [
                 description: 'Teclas: S, W, X + L, O (Solo O)',
                 fingers: ['L4', 'R4'],
                 keys: ['S', 'W', 'X', 'L', 'O', '2', '9', '.'],
+                difficulty: 1,
                 phrases: [
                     "oso soso solo lo olo los sol",
                     "lolo olo los osos solos o lo olo",
@@ -75,6 +79,7 @@ export const GUIDE_PHASES: GuidePhase[] = [
                 description: 'Teclas: A, Q, Z + Ñ, P (Solo A)',
                 fingers: ['L5', 'R5'],
                 keys: ['A', 'Q', 'Z', 'Ñ', 'P', '1', '0', '-', '´', "'"],
+                difficulty: 1,
                 phrases: [
                     "papa aña zapa a aza paña a papa",
                     "aza a paña a papa aña a zapa",
@@ -96,6 +101,7 @@ export const GUIDE_PHASES: GuidePhase[] = [
                 description: 'F, R, T, G, V, B (Sin Vocales)',
                 fingers: ['L2'],
                 keys: ['F', 'R', 'T', 'G', 'V', 'B', '4', '5'],
+                difficulty: 2,
                 phrases: [
                     "frt gvb frt gvb frt gvb frt gvb",
                     "fgf rtr vbv fgf rtr vbv fgf rtr",
@@ -110,6 +116,7 @@ export const GUIDE_PHASES: GuidePhase[] = [
                 description: 'D, E, C (Vocal E)',
                 fingers: ['L3'],
                 keys: ['D', 'E', 'C', '3'],
+                difficulty: 2,
                 phrases: [
                     "cede de cede de cede de cede",
                     "dede cede dede cede dede cede",
@@ -124,6 +131,7 @@ export const GUIDE_PHASES: GuidePhase[] = [
                 description: 'S, W, X (Sin Vocales)',
                 fingers: ['L4'],
                 keys: ['S', 'W', 'X', '2'],
+                difficulty: 2,
                 phrases: [
                     "sws xws sws xws sws xws sws",
                     "wxw sxs wxw sxs wxw sxs wxw",
@@ -138,6 +146,7 @@ export const GUIDE_PHASES: GuidePhase[] = [
                 description: 'A, Q, Z (Vocal A)',
                 fingers: ['L5'],
                 keys: ['A', 'Q', 'Z', '1', '<', '>'],
+                difficulty: 2,
                 phrases: [
                     "aza aqa aza aqa aza aqa aza",
                     "aqa zaza aqa zaza aqa zaza",
@@ -159,6 +168,7 @@ export const GUIDE_PHASES: GuidePhase[] = [
                 description: 'J, H, N, M, U, Y (Vocales U, Y)',
                 fingers: ['R2'],
                 keys: ['J', 'H', 'N', 'M', 'U', 'Y', '6', '7'],
+                difficulty: 2,
                 phrases: [
                     "un muy hum un muy hum un muy",
                     "muum nunn muum nunn muum nunn",
@@ -173,6 +183,7 @@ export const GUIDE_PHASES: GuidePhase[] = [
                 description: 'K, I (Vocal I)',
                 fingers: ['R3'],
                 keys: ['K', 'I', '8', ','],
+                difficulty: 2,
                 phrases: [
                     "kik iii kik iii kik iii kik",
                     "ki ik ki ik ki ik ki ik ki",
@@ -187,6 +198,7 @@ export const GUIDE_PHASES: GuidePhase[] = [
                 description: 'L, O (Vocal O)',
                 fingers: ['R4'],
                 keys: ['L', 'O', '9', '.'],
+                difficulty: 2,
                 phrases: [
                     "lol olo lol olo lol olo lol",
                     "lo ol lo ol lo ol lo ol lo",
@@ -201,6 +213,7 @@ export const GUIDE_PHASES: GuidePhase[] = [
                 description: 'Ñ, P (Sin Vocales)',
                 fingers: ['R5'],
                 keys: ['Ñ', 'P', '0', '-', '´'],
+                difficulty: 2,
                 phrases: [
                     "ñpñ pñp ñpñ pñp ñpñ pñp ñpñ",
                     "ññ pp ññ pp ññ pp ññ pp ññ",
@@ -222,6 +235,7 @@ export const GUIDE_PHASES: GuidePhase[] = [
                 description: 'Las 100 palabras más usadas.',
                 fingers: ['L2', 'L3', 'L4', 'L5', 'R2', 'R3', 'R4', 'R5'],
                 keys: ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'L', 'M', 'N', 'Ñ', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'Y', 'Z'],
+                difficulty: 3,
                 phrases: [
                     "para que sirve la vida si no hacemos cosas buenas por los demas cada dia",
                     "como estan las cosas en tu casa despues de todo lo que paso ayer",
@@ -242,6 +256,7 @@ export const GUIDE_PHASES: GuidePhase[] = [
                 description: 'Todas las letras.',
                 fingers: ['L2', 'L3', 'L4', 'L5', 'R2', 'R3', 'R4', 'R5'],
                 keys: [],
+                difficulty: 3,
                 phrases: [
                     "el veloz murciélago hindú comía feliz cardillo y kiwi",
                     "la cigüeña tocaba el saxofón detrás del palenque de paja",
@@ -261,6 +276,7 @@ export const GUIDE_PHASES: GuidePhase[] = [
                 description: 'Vocales acentuadas.',
                 fingers: ['R5', 'L2', 'L3', 'L5', 'R2', 'R3', 'R4'],
                 keys: ['´', 'A', 'E', 'I', 'O', 'U'],
+                difficulty: 3,
                 phrases: [
                     "á é í ó ú",
                     "mamá comió puré",
