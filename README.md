@@ -12,6 +12,8 @@
 
 ## Core Features
 
+- **Hexagonal Architecture**: Strict separation of concerns (Domain, Ports, Infrastructure) for maximum maintainability.
+- **Ultra-Low Latency**: Synchronous typing engine providing sub-16ms response times.
 - **Technical Training**: Specialized phases for strict finger coordination and muscle memory.
 - **Biomechanical Guides**: Visual representation of finger-to-key mapping.
 - **Cinematic Feedback**: Real-time auditory and visual feedback (WPM, Accuracy, Combo systems).
@@ -24,13 +26,22 @@
 
 ## Project Structure
 
-### Configuration & Customization
-![Configuration](docs/media/config.png)
-Easily switch between languages, focus modes, and visual styles to suit your training environment.
+### Architecture & Performance
+![Architecture](docs/media/architecture.png)
+The app follows a **Hexagonal Architecture** pattern:
+- **Domain**: Pure business logic (Typing, Scoring, Stats).
+- **Ports**: Interface definitions for external dependencies.
+- **Infrastructure**: Adapters for Browser APIs (Web Audio, LocalStorage).
+
+Optimized for **20ms Priority**: All audio and typing events bypass asynchronous React state cycles for immediate feedback.
 
 ### Technical Training
 ![Training](docs/media/training.png)
 Follow structured phases from basic finger pairs to advanced combinations and pangrams.
+
+### Configuration & Customization
+![Configuration](docs/media/config.png)
+Easily switch between languages, focus modes, and visual styles to suit your training environment.
 
 ## Getting Started
 

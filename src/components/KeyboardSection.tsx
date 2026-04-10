@@ -17,6 +17,7 @@ interface KeyboardSectionProps {
     // New props for integrated UI
     stats: TypingStats;
     isZenMode: boolean;
+    score: number;
     onRestart: () => void;
     onZenToggle: () => void;
     audioReady: boolean;
@@ -34,7 +35,7 @@ interface KeyboardSectionProps {
     isWaveActive?: boolean;
 }
 
-export const KeyboardSection: React.FC<KeyboardSectionProps> = ({
+export const KeyboardSection: React.FC<KeyboardSectionProps> = React.memo(({
     keyboardType,
     activeKey,
     targetChar,
@@ -43,6 +44,7 @@ export const KeyboardSection: React.FC<KeyboardSectionProps> = ({
     frequencyBands,
     stats,
     isZenMode,
+    score,
     onRestart,
     onZenToggle,
     audioReady,
@@ -79,10 +81,11 @@ export const KeyboardSection: React.FC<KeyboardSectionProps> = ({
                             <AudioWave key={layer.id} analyser={audioSystem.getAnalysers()[layer.id as keyof ReturnType<WebAudioSystem['getAnalysers']>] || audioSystem.getAnalysers().master} type={layer.type as any} color={layer.color} active={startTime !== null && !isFinished} opacityMultiplier={layer.opacity} yOffset={layer.yOffset} />
                         )
                     ))}
-                    <div className="flex items-center gap-5 relative z-10 w-full justify-between">
-                        <div className="flex items-baseline gap-1"><span className="text-[14px] font-black text-[var(--accent-primary)] font-mono">{stats.wpm}</span><span className="text-[7px] font-bold text-[var(--text-secondary)] uppercase">WPM</span></div>
-                        <div className="flex items-baseline gap-1"><span className="text-[14px] font-black text-[var(--text-primary)] font-mono">{stats.accuracy}</span><span className="text-[7px] font-bold text-[var(--text-secondary)] uppercase">%ACC</span></div>
-                        <div className="flex items-baseline gap-1"><span className={`text-[14px] font-black font-mono transition-all ${combo > 0 ? 'text-[var(--accent-primary)]' : 'text-[var(--text-muted)]'}`}>{combo}</span><span className="text-[7px] font-bold text-[var(--text-secondary)] uppercase">COMBO</span></div>
+                    <div className="flex items-center gap-4 relative z-10 w-full justify-between">
+                        <div className="flex items-baseline gap-1"><span className="text-[12px] font-black text-[var(--accent-primary)] font-mono">{stats.wpm}</span><span className="text-[6px] font-bold text-[var(--text-secondary)] opacity-60 uppercase">WPM</span></div>
+                        <div className="flex items-baseline gap-1"><span className="text-[12px] font-black text-[var(--text-primary)] font-mono">{stats.accuracy}</span><span className="text-[6px] font-bold text-[var(--text-secondary)] opacity-60 uppercase">%ACC</span></div>
+                        <div className="flex items-baseline gap-1"><span className={`text-[12px] font-black font-mono transition-all ${combo > 0 ? 'text-[var(--accent-primary)]' : 'text-[var(--text-muted)]'}`}>{combo}</span><span className="text-[6px] font-bold text-[var(--text-secondary)] opacity-60 uppercase">COMBO</span></div>
+                        <div className="flex items-baseline gap-1 bg-white/5 px-2 py-0.5 rounded-full border border-white/5"><span className="text-[12px] font-black text-[var(--accent-primary)] font-mono">{score.toLocaleString()}</span><span className="text-[6px] font-bold text-[var(--text-secondary)] opacity-60 uppercase ml-1">SCORE</span></div>
                         <div className="flex items-center gap-1 opacity-40 animate-pulse"><div className="w-1.5 h-1.5 rounded-full bg-[var(--accent-primary)]" /><span className="text-[6px] font-black text-[var(--text-secondary)]">LIVE</span></div>
                     </div>
                 </div>
@@ -114,6 +117,6 @@ export const KeyboardSection: React.FC<KeyboardSectionProps> = ({
             </div>
         </div>
     );
-};
+});
 
 export default KeyboardSection;

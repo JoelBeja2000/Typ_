@@ -16,6 +16,10 @@ import { GUIDE_PHASES } from './src/data/GuideData';
 import { BrowserThemeManager } from './src/infrastructure/ui/BrowserThemeManager';
 import { ZEN_PHRASES } from './src/data/ZenPhrases';
 import { THEMES } from './src/domain/models/Theme';
+import { TypingService } from './src/domain/services/TypingService';
+import { BrowserPhraseProvider, BrowserStorageProvider } from './src/infrastructure/adapters/BrowserAdapters';
+import { useTypingEngine } from './src/hooks/useTypingEngine';
+
 import './src/infrastructure/ui/styles/Keyboard.css';
 
 const HiddenInput = React.memo(({
@@ -74,17 +78,61 @@ const App: React.FC = () => {
 
   const [language, setLanguage] = useState<Language>('es');
   const [focus, setFocus] = useState('Básico');
-  const [phrases, setPhrases] = useState<string[]>([]);
-  const [phraseIndex, setPhraseIndex] = useState(0);
-  const [typedText, setTypedText] = useState('');
-  const [activeKey, setActiveKey] = useState('');
-  const [stats, setStats] = useState<TypingStats>({ wpm: 0, accuracy: 100, mistakes: 0, totalChars: 0 });
-  const [combo, setCombo] = useState(0);
-  const [wordHasMistake, setWordHasMistake] = useState(false);
+  
+  // HEXAGONAL ARCHITECTURE: Dependencies
+  const phraseProvider = useMemo(() => new BrowserPhraseProvider(), []);
+  const storageProvider = useMemo(() => new BrowserStorageProvider(), []);
+  const typingService = useMemo(() => new TypingService(), []);
 
-  const [startTime, setStartTime] = useState<number | null>(null);
+  // Hook-based State Management
+  const {
+    phrases,
+    setPhrases,
+    phraseIndex,
+    setPhraseIndex,
+    currentPhrase,
+    typedText,
+    setTypedText,
+    processNewValue,
+    stats,
+    setStats,
+    combo,
+    setCombo,
+    score,
+    setScore,
+    isFinished,
+    setIsFinished,
+    startTime,
+    setStartTime,
+    isInfiniteMode,
+    setIsInfiniteMode,
+    restart
+  } = useTypingEngine(phraseProvider, storageProvider, typingService, {
+    onCorrectChar: (char, combo) => {
+      if (isTypingSoundsEnabled) {
+        if (char === ' ') {
+          audioSystemRef.current?.playSuccess(combo, isZenMode);
+        } else {
+          // Play a subtle high-pitch click or the success sound based on mode
+          if (isInfiniteMode) {
+             audioSystemRef.current?.playSuccess(combo, isZenMode);
+          }
+        }
+      }
+    },
+    onErrorChar: () => {
+      if (isTypingSoundsEnabled) audioSystemRef.current?.playError();
+      setWordHasMistake(true);
+    },
+    onPhraseComplete: () => {
+      setWordHasMistake(false);
+      if (inputRef.current) inputRef.current.value = '';
+    }
+  });
+
+  const [activeKey, setActiveKey] = useState('');
+  const [wordHasMistake, setWordHasMistake] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [isFinished, setIsFinished] = useState(false);
   const [uiScale, setUiScale] = useState(1);
   const [showLeftSidebar, setShowLeftSidebar] = useState(false);
   const [showRightSidebar, setShowRightSidebar] = useState(false);
@@ -105,8 +153,10 @@ const App: React.FC = () => {
       setPhraseIndex(0);
       setIsFinished(false);
       setIsGuideMode(false);
+      setIsInfiniteMode(true);
+    } else {
+      setIsInfiniteMode(false);
     }
-    setIsInfiniteMode(!isInfiniteMode);
   };
 
   const setPalette = (id: string) => {
@@ -119,8 +169,6 @@ const App: React.FC = () => {
   const [isMusicEnabled, setIsMusicEnabled] = useState(false);
   const [currentMusicStyle, setCurrentMusicStyle] = useState<MusicStyle>(TECHNO_STYLE);
   const [isZenMode, setIsZenMode] = useState(false);
-  const [isInfiniteMode, setIsInfiniteMode] = useState(false);
-  const [score, setScore] = useState(() => Number(localStorage.getItem('typ_total_score') || 0));
   const [isTypingSoundsEnabled, setIsTypingSoundsEnabled] = useState(true);
   const [comboMultiplier, setComboMultiplier] = useState(1.0);
   const [isMusicLightingEnabled, setIsMusicLightingEnabled] = useState(false);
@@ -153,10 +201,6 @@ const App: React.FC = () => {
   const sequencerRef = useRef<MusicSequencer | null>(null);
   const comboRef = useRef(combo);
   const [audioReady, setAudioReady] = useState(false);
-
-  useEffect(() => {
-    localStorage.setItem('typ_total_score', String(score));
-  }, [score]);
 
   // CIRCUIT MODE LOGIC
   const [circuitTimer, setCircuitTimer] = useState(30);
@@ -269,27 +313,27 @@ const App: React.FC = () => {
     });
     setCircuitTimer(circuitDuration); // Manually reset timer
   }, [isCircuitMode, isRandomCircuit, circuitDuration, allCircuitLevels]);
-  const currentPhrase = useMemo(() => phrases[phraseIndex] || '', [phrases, phraseIndex]);
+
   const normalizedTypedText = useMemo(() => typedText.normalize('NFC'), [typedText]);
 
   const currentWordInfo = useMemo(() => {
     const phraseParts = currentPhrase.split(' ');
-    const typedParts = normalizedTypedText.split(' ');
+    const typedParts = typedText.split(' ');
     const currentIdx = Math.min(typedParts.length - 1, phraseParts.length - 1);
 
     const currentWord = phraseParts[currentIdx] || '';
     const userTypedSlice = typedParts[typedParts.length - 1] || '';
 
     return { word: currentWord, userTypedSlice: userTypedSlice };
-  }, [currentPhrase, normalizedTypedText]);
+  }, [currentPhrase, typedText]);
 
   const targetChar = useMemo(() => {
     if (isFinished || isLoading) return '';
-    if (normalizedTypedText.length < currentPhrase.length) {
-      return currentPhrase[normalizedTypedText.length];
+    if (typedText.length < currentPhrase.length) {
+      return currentPhrase[typedText.length];
     }
     return '';
-  }, [currentPhrase, normalizedTypedText, isFinished, isLoading]);
+  }, [currentPhrase, typedText, isFinished, isLoading]);
 
   const targetKeyData = useMemo(() => {
     if (!targetChar) return null;
@@ -351,7 +395,6 @@ const App: React.FC = () => {
      const nextIndex = (currentIndex + 1) % THEMES.length;
      setCurrentTheme(THEMES[nextIndex]);
   };
-  const cyclePalette = toggleTheme;
 
   useEffect(() => {
     const keepFocus = () => {
@@ -380,79 +423,7 @@ const App: React.FC = () => {
     init();
   }, [language, focus]);
 
-  useEffect(() => {
-    const current = normalizedTypedText;
-    const previous = lastProcessedText.current.normalize('NFC');
-    if (current === previous || isComposingRef.current) return;
-    if (!startTime && current.length > 0) setStartTime(Date.now());
-
-    if (current.length > previous.length) {
-      const idx = current.length - 1;
-      const tChar = currentPhrase[idx];
-      const typedChar = current[idx];
-
-      if (idx < currentPhrase.length) {
-        if (!isInfiniteMode && typedChar !== tChar) {
-          setWordHasMistake(true); setCombo(0);
-          if (isTypingSoundsEnabled) audioSystemRef.current?.playError();
-          setStats(prev => ({
-            ...prev, mistakes: prev.mistakes + 1, totalChars: prev.totalChars + 1,
-            accuracy: Math.round(((prev.totalChars + 1 - (prev.mistakes + 1)) / (prev.totalChars + 1)) * 100)
-          }));
-        } else {
-          setStats(prev => ({
-            ...prev, totalChars: prev.totalChars + 1,
-            accuracy: Math.round(((prev.totalChars + 1 - prev.mistakes) / (prev.totalChars + 1)) * 100)
-          }));
-
-          if (typedChar === ' ' || idx === currentPhrase.length - 1) {
-            if (isInfiniteMode || !wordHasMistake) {
-              const newCombo = combo + 1;
-              setCombo(newCombo);
-              comboRef.current = newCombo;
-              if (isTypingSoundsEnabled) audioSystemRef.current?.playSuccess(newCombo, isZenMode);
-            }
-            setWordHasMistake(false);
-          } else {
-            if (isInfiniteMode && isTypingSoundsEnabled) audioSystemRef.current?.playSuccess(combo, isZenMode);
-          }
-        }
-      }
-    }
-
-    lastProcessedText.current = current;
-
-    if (current === currentPhrase && currentPhrase.length > 0) {
-      if (phraseIndex < phrases.length - 1) {
-        const delay = isInfiniteMode ? 0 : 50;
-        setTimeout(() => {
-          setPhraseIndex(prev => prev + 1);
-          setTypedText('');
-          lastProcessedText.current = '';
-          if (inputRef.current) inputRef.current.value = '';
-        }, delay);
-      } else {
-        if (isInfiniteMode) {
-          const delay = 50;
-          setTimeout(() => {
-            const randomIdx = Math.floor(Math.random() * ZEN_PHRASES.length);
-            setPhrases([ZEN_PHRASES[randomIdx]]);
-            setPhraseIndex(0);
-            
-            // Score Calculation: WPM * Accuracy% * 10
-            const earned = Math.floor(stats.wpm * (stats.accuracy / 100) * 10);
-            setScore(prev => prev + earned);
-
-            setTypedText('');
-            lastProcessedText.current = '';
-            if (inputRef.current) inputRef.current.value = '';
-          }, delay);
-        } else {
-          setIsFinished(true);
-        }
-      }
-    }
-  }, [normalizedTypedText, currentPhrase, phraseIndex, phrases.length, startTime, wordHasMistake, combo, isInfiniteMode, isGuideMode]);
+  // Removed legacy typing effect - logic moved to useTypingEngine
 
   const isFetchingMore = useRef(false);
 
@@ -526,8 +497,8 @@ const App: React.FC = () => {
       }
     }
 
-    setTypedText(val);
-  }, [isInfiniteMode, phrases, phraseIndex]);
+    processNewValue(val);
+  }, [isZenMode, phrases, phraseIndex, processNewValue]);
 
   const handleCompositionStart = useCallback(() => { isComposingRef.current = true; setIsComposingState(true); }, []);
   const handleCompositionEnd = useCallback((e: React.CompositionEvent<HTMLTextAreaElement>) => {
@@ -551,38 +522,9 @@ const App: React.FC = () => {
     audioSystemRef.current?.resume();
   }, []);
 
-  useEffect(() => {
-    if (startTime && !isFinished) {
-      const interval = setInterval(() => {
-        const timeElapsed = (Date.now() - startTime) / 60000;
-        let correctChars = 0;
-        const current = normalizedTypedText;
-        for (let i = 0; i < current.length; i++) if (current[i] === currentPhrase[i]) correctChars++;
-        setStats(prev => ({ ...prev, wpm: Math.round((correctChars / 5) / (timeElapsed || 0.001)) || 0 }));
-      }, 1000);
-      return () => clearInterval(interval);
-    }
-  }, [startTime, isFinished, normalizedTypedText, currentPhrase]);
+  // Removed legacy WPM loop - logic moved to useTypingEngine
 
-  const restart = async () => {
-    setTypedText(''); lastProcessedText.current = ''; setPhraseIndex(0); setCombo(0); setWordHasMistake(false);
-    if (inputRef.current) inputRef.current.value = '';
-    setStats({ wpm: 0, accuracy: 100, mistakes: 0, totalChars: 0 });
-    setStartTime(null); setIsFinished(false);
-
-    // If in Guide Mode, just reset state, don't fetch new phrases
-    if (isGuideMode) {
-      setIsLoading(false);
-      setTimeout(() => inputRef.current?.focus(), 10);
-      return;
-    }
-
-    setIsLoading(true);
-    const newPhrases = await generatePracticePhrases(language, focus, 10);
-    setPhrases(newPhrases.map(p => p.normalize('NFC')));
-    setIsLoading(false);
-    setTimeout(() => inputRef.current?.focus(), 10);
-  };
+  // restart is provided by useTypingEngine
 
   const getBtnClass = (active: boolean) => `w-full p-4 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] transition-all duration-300 border flex items-center justify-between group ${active ? 'bg-[var(--accent-primary)]/10 border-[var(--accent-primary)] text-[var(--accent-primary)] shadow-[0_0_15px_var(--accent-glow)]' : 'bg-transparent border-[var(--border-glass)] text-[var(--text-secondary)] hover:border-[var(--text-primary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-glass)]'}`;
 
@@ -710,6 +652,7 @@ const App: React.FC = () => {
                   frequencyBands={frequencyBands}
                   stats={stats}
                   isZenMode={isZenMode}
+                  score={score}
                   onRestart={restart}
                   onZenToggle={() => setIsZenMode(!isZenMode)}
                   audioReady={audioReady}

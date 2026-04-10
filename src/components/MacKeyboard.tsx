@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { KEY_TO_FINGER_MAP, FINGER_COLORS } from '../../constants';
 
 export interface KeyDef {
@@ -148,7 +148,7 @@ const LetterKey = ({ l, s }: { l: string, s: string }) => (
     </div>
 );
 
-const IsoEnterKey = ({ focused }: { focused: boolean }) => {
+const IsoEnterKey = React.memo(({ focused }: { focused: boolean }) => {
     let fill = "rgba(255,255,255,0.05)";
     let stroke = "rgba(255,255,255,0.12)";
     let textColor = "rgba(255,255,255,0.8)";
@@ -166,7 +166,7 @@ const IsoEnterKey = ({ focused }: { focused: boolean }) => {
                     fill={fill}
                     stroke={stroke}
                     strokeWidth="1"
-                    style={{ transition: 'all 0.15s cubic-bezier(0.4, 0, 0.2, 1)' }}
+                    style={{ transition: 'all 0.1s cubic-bezier(0.4, 0, 0.2, 1)' }}
                 />
             </svg>
 
@@ -175,11 +175,70 @@ const IsoEnterKey = ({ focused }: { focused: boolean }) => {
                 width: '44px', height: '44px',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 color: textColor, fontSize: '14px',
-                transition: 'color 0.15s'
+                transition: 'color 0.1s'
             }}>↵</div>
         </div>
     );
-};
+});
+
+interface KeyComponentProps {
+    keyDef: KeyDef;
+    active: boolean;
+    target: boolean;
+    highlighted: boolean;
+    showZones: boolean;
+    fingerColor: string | null;
+}
+
+const KeyComponent = React.memo(({ keyDef, active, target, highlighted, showZones, fingerColor }: KeyComponentProps) => {
+    if (keyDef.special === 'return') {
+        return (
+            <div
+                className={`transition-all ${active || target ? 'scale-105 -translate-y-[2px] z-20' : ''}`}
+                style={{ marginLeft: '-8px', height: '44px', zIndex: 10, position: 'relative' }}
+            >
+                <IsoEnterKey focused={active || target} />
+            </div>
+        );
+    }
+
+    let baseClass = `mac-key ${keyDef.width || 'w-[44px]'} ${keyDef.h || 'h-[44px]'} ${keyDef.className || ''} `;
+    if (active) baseClass += 'active ';
+    if (target) baseClass += 'target ';
+    if (highlighted) baseClass += 'highlighted ';
+
+    let extraStyle: any = {};
+    if (showZones && !active && !target && !highlighted) {
+        if (fingerColor) {
+            extraStyle = {
+                borderColor: fingerColor,
+                color: fingerColor,
+                backgroundColor: `${fingerColor}10`,
+                boxShadow: `0 0 8px ${fingerColor}20`
+            };
+        }
+    }
+
+    let content: React.ReactNode = keyDef.label || keyDef.base;
+    if (keyDef.id.startsWith('row1_') || keyDef.id === 'row2_11' || keyDef.id === 'row2_12' || keyDef.id === 'row3_11') {
+        content = <IsoKey top={keyDef.shift} bottom={keyDef.base} right={keyDef.alt === keyDef.base ? undefined : keyDef.alt} />;
+    } else if (keyDef.id === 'row3_12') {
+        content = <LetterKey l="Ç" s="}" />;
+    } else if (keyDef.id.match(/^[a-zñ]$/)) {
+        content = <LetterKey l={keyDef.base.toUpperCase()} s={keyDef.alt === keyDef.base ? "" : keyDef.alt} />;
+    } else if (keyDef.shift && keyDef.shift !== keyDef.base && !keyDef.special) {
+        content = <DualKey t={keyDef.shift} b={keyDef.base} />;
+    }
+
+    return (
+        <div className={baseClass.trim()} style={extraStyle}>
+            {keyDef.special === 'caps' && (
+                <div className={`w-1 h-1 rounded-full bg-green-500 absolute top-2 left-2 ${active ? 'opacity-100' : 'opacity-0'}`}></div>
+            )}
+            {content}
+        </div>
+    );
+});
 
 interface MacKeyboardProps {
     activeKey: string;
@@ -190,7 +249,7 @@ interface MacKeyboardProps {
     isWaveActive?: boolean;
 }
 
-const MacKeyboard: React.FC<MacKeyboardProps> = ({
+const MacKeyboard: React.FC<MacKeyboardProps> = React.memo(({
     activeKey,
     targetKey,
     showZones = false,
@@ -199,9 +258,9 @@ const MacKeyboard: React.FC<MacKeyboardProps> = ({
     isWaveActive = false
 }) => {
 
-    const normalize = (str: string) => str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+    const normalize = useCallback((str: string) => str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase(), []);
 
-    const isTarget = (key: KeyDef) => {
+    const isTarget = useCallback((key: KeyDef) => {
         const lowerKey = key.id.toLowerCase();
         const baseKey = key.base.toLowerCase();
         const lowerTarget = targetKey.toLowerCase();
@@ -229,9 +288,9 @@ const MacKeyboard: React.FC<MacKeyboardProps> = ({
         if (symbols[key.id]) return symbols[key.id].includes(targetKey);
 
         return false;
-    };
+    }, [targetKey, normalize]);
 
-    const isActive = (key: KeyDef) => {
+    const isActive = useCallback((key: KeyDef) => {
         const lowerKey = key.id.toLowerCase();
         const base = key.base.toLowerCase();
         const current = activeKey.toLowerCase();
@@ -241,13 +300,13 @@ const MacKeyboard: React.FC<MacKeyboardProps> = ({
         if (key.special === 'delete' && (current === 'backspace' || current === 'delete')) return true;
 
         return lowerKey === current || base === current || key.shift.toLowerCase() === current || key.label?.toLowerCase() === current;
-    };
+    }, [activeKey]);
 
-    const isHighlighted = (key: KeyDef) => {
+    const isHighlighted = useCallback((key: KeyDef) => {
         return highlightedKeys.some(k => k.toLowerCase() === key.id.toLowerCase() || k.toLowerCase() === key.base.toLowerCase());
-    };
+    }, [highlightedKeys]);
 
-    const getFingerColor = (key: KeyDef) => {
+    const getFingerColor = useCallback((key: KeyDef) => {
         let k = key.id.toLowerCase();
         if (key.special === 'tab' || key.special === 'caps' || key.special === 'shift' || key.special === 'ctrl' || key.special === 'fn') return FINGER_COLORS['left-pinky'];
         if (key.special === 'return' || key.special === 'delete') return FINGER_COLORS['right-pinky'];
@@ -256,67 +315,7 @@ const MacKeyboard: React.FC<MacKeyboardProps> = ({
         const data = KEY_TO_FINGER_MAP[k] || KEY_TO_FINGER_MAP[key.base.toLowerCase()];
         if (data) return FINGER_COLORS[data.finger];
         return null;
-    };
-
-    interface KeyComponentProps {
-        keyDef: KeyDef;
-        key?: string | number;
-    }
-
-    const KeyComponent = ({ keyDef }: KeyComponentProps) => {
-        const active = isActive(keyDef);
-        const target = isTarget(keyDef);
-        const highlighted = isHighlighted(keyDef);
-
-        if (keyDef.special === 'return') {
-            return (
-                <div
-                    className={`transition-all ${active || target ? 'scale-105 -translate-y-[2px] z-20' : ''}`}
-                    style={{ marginLeft: '-8px', height: '44px', zIndex: 10, position: 'relative' }}
-                >
-                    <IsoEnterKey focused={active || target} />
-                </div>
-            );
-        }
-
-        let baseClass = `mac-key ${keyDef.width || 'w-[44px]'} ${keyDef.h || 'h-[44px]'} ${keyDef.className || ''} `;
-        if (active) baseClass += 'active ';
-        if (target) baseClass += 'target ';
-        if (highlighted) baseClass += 'highlighted ';
-
-        let extraStyle: any = {};
-        if (showZones && !active && !target && !highlighted) {
-            const fingerColor = getFingerColor(keyDef);
-            if (fingerColor) {
-                extraStyle = {
-                    borderColor: fingerColor,
-                    color: fingerColor,
-                    backgroundColor: `${fingerColor}10`,
-                    boxShadow: `0 0 8px ${fingerColor}20`
-                };
-            }
-        }
-
-        let content: React.ReactNode = keyDef.label || keyDef.base;
-        if (keyDef.id.startsWith('row1_') || keyDef.id === 'row2_11' || keyDef.id === 'row2_12' || keyDef.id === 'row3_11') {
-            content = <IsoKey top={keyDef.shift} bottom={keyDef.base} right={keyDef.alt === keyDef.base ? undefined : keyDef.alt} />;
-        } else if (keyDef.id === 'row3_12') {
-            content = <LetterKey l="Ç" s="}" />;
-        } else if (keyDef.id.match(/^[a-zñ]$/)) {
-            content = <LetterKey l={keyDef.base.toUpperCase()} s={keyDef.alt === keyDef.base ? "" : keyDef.alt} />;
-        } else if (keyDef.shift && keyDef.shift !== keyDef.base && !keyDef.special) {
-            content = <DualKey t={keyDef.shift} b={keyDef.base} />;
-        }
-
-        return (
-            <div className={baseClass.trim()} style={extraStyle}>
-                {keyDef.special === 'caps' && (
-                    <div className={`w-1 h-1 rounded-full bg-green-500 absolute top-2 left-2 ${active ? 'opacity-100' : 'opacity-0'}`}></div>
-                )}
-                {content}
-            </div>
-        );
-    };
+    }, []);
 
     return (
         <div className="scale-[0.55] md:scale-[0.75] lg:scale-[0.85] xl:scale-[0.95] origin-center flex justify-center select-none">
@@ -329,13 +328,40 @@ const MacKeyboard: React.FC<MacKeyboardProps> = ({
                             <div key="merged-row-2-3" className="flex flex-row gap-[6px] items-start">
                                 <div className="flex flex-col gap-[6px]">
                                     <div className="flex flex-row gap-[6px]">
-                                        {row.slice(0, -1).map(key => <KeyComponent key={key.id} keyDef={key} />)}
+                                        {row.slice(0, -1).map(key => (
+                                            <KeyComponent 
+                                                key={key.id} 
+                                                keyDef={key} 
+                                                active={isActive(key)} 
+                                                target={isTarget(key)} 
+                                                highlighted={isHighlighted(key)} 
+                                                showZones={showZones} 
+                                                fingerColor={getFingerColor(key)}
+                                            />
+                                        ))}
                                     </div>
                                     <div className="flex flex-row gap-[6px]">
-                                        {KEYBOARD_GRID[3].map(key => <KeyComponent key={key.id} keyDef={key} />)}
+                                        {KEYBOARD_GRID[3].map(key => (
+                                            <KeyComponent 
+                                                key={key.id} 
+                                                keyDef={key} 
+                                                active={isActive(key)} 
+                                                target={isTarget(key)} 
+                                                highlighted={isHighlighted(key)} 
+                                                showZones={showZones} 
+                                                fingerColor={getFingerColor(key)}
+                                            />
+                                        ))}
                                     </div>
                                 </div>
-                                <KeyComponent keyDef={row[row.length - 1]} />
+                                <KeyComponent 
+                                    keyDef={row[row.length - 1]} 
+                                    active={isActive(row[row.length - 1])} 
+                                    target={isTarget(row[row.length - 1])} 
+                                    highlighted={isHighlighted(row[row.length - 1])} 
+                                    showZones={showZones} 
+                                    fingerColor={getFingerColor(row[row.length - 1])}
+                                />
                             </div>
                         );
                     }
@@ -351,19 +377,57 @@ const MacKeyboard: React.FC<MacKeyboardProps> = ({
                                     return (
                                         <React.Fragment key="arrows">
                                             <div className="flex flex-col justify-end h-[44px] w-[44px]">
-                                                <KeyComponent keyDef={row[colIndex]} />
+                                                <KeyComponent 
+                                                    keyDef={row[colIndex]} 
+                                                    active={isActive(row[colIndex])} 
+                                                    target={isTarget(row[colIndex])} 
+                                                    highlighted={isHighlighted(row[colIndex])} 
+                                                    showZones={showZones} 
+                                                    fingerColor={getFingerColor(row[colIndex])}
+                                                />
                                             </div>
                                             <div className="flex flex-col gap-[2px] w-[44px]">
-                                                <KeyComponent keyDef={row[colIndex + 1]} />
-                                                <KeyComponent keyDef={row[colIndex + 2]} />
+                                                <KeyComponent 
+                                                    keyDef={row[colIndex + 1]} 
+                                                    active={isActive(row[colIndex + 1])} 
+                                                    target={isTarget(row[colIndex + 1])} 
+                                                    highlighted={isHighlighted(row[colIndex + 1])} 
+                                                    showZones={showZones} 
+                                                    fingerColor={getFingerColor(row[colIndex + 1])}
+                                                />
+                                                <KeyComponent 
+                                                    keyDef={row[colIndex + 2]} 
+                                                    active={isActive(row[colIndex + 2])} 
+                                                    target={isTarget(row[colIndex + 2])} 
+                                                    highlighted={isHighlighted(row[colIndex + 2])} 
+                                                    showZones={showZones} 
+                                                    fingerColor={getFingerColor(row[colIndex + 2])}
+                                                />
                                             </div>
                                             <div className="flex flex-col justify-end h-[44px] w-[44px]">
-                                                <KeyComponent keyDef={row[colIndex + 3]} />
+                                                <KeyComponent 
+                                                    keyDef={row[colIndex + 3]} 
+                                                    active={isActive(row[colIndex + 3])} 
+                                                    target={isTarget(row[colIndex + 3])} 
+                                                    highlighted={isHighlighted(row[colIndex + 3])} 
+                                                    showZones={showZones} 
+                                                    fingerColor={getFingerColor(row[colIndex + 3])}
+                                                />
                                             </div>
                                         </React.Fragment>
                                     );
                                 }
-                                return <KeyComponent key={key.id} keyDef={key} />;
+                                return (
+                                    <KeyComponent 
+                                        key={key.id} 
+                                        keyDef={key} 
+                                        active={isActive(key)} 
+                                        target={isTarget(key)} 
+                                        highlighted={isHighlighted(key)} 
+                                        showZones={showZones} 
+                                        fingerColor={getFingerColor(key)}
+                                    />
+                                );
                             })}
                         </div>
                     );
@@ -371,6 +435,6 @@ const MacKeyboard: React.FC<MacKeyboardProps> = ({
             </div>
         </div>
     );
-};
+});
 
 export default MacKeyboard;
