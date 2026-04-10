@@ -1,7 +1,10 @@
 > [!NOTE]
 > Este es un proyecto **pequeño y rápido** realizado como experimento utilizando **Google Antigravity**. No pretende ser un producto profesional, sino una exploración de capacidades de desarrollo asistido por IA.
+>
+> [Leer en Español](README.es.md)
 
 # Typ_ (Type Master)
+
 
 **Typ_** is a professional-grade typing trainer designed for efficiency, speed, and precision. Built with a focus on biomechanics and auditory feedback, it provides a cinematic training experience for developers and typing enthusiasts.
 
