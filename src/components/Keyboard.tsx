@@ -16,36 +16,29 @@ const Keyboard: React.FC<KeyboardProps> = ({ activeKey, targetKey, showZones = f
     const isTarget = targetKey.toLowerCase() === keyData.key.toLowerCase() ||
       (targetKey === ' ' && keyData.key === ' ');
     const isActive = activeKey.toLowerCase() === keyData.key.toLowerCase();
-
-    // Estilos base inline/tailwind
-    let className = `relative flex items-center justify-center font-mono font-black select-none text-xs md:text-sm rounded-xl transition-all duration-100 border `;
+    // base premium key style
+    let className = `mac-key `;
     let style: any = {};
 
     // Layout sizing
     if (keyData.key === ' ') {
-      className += 'w-64 h-12 ';
+      className += 'w-[250px] h-[44px] ';
     } else {
-      className += 'w-12 h-12 md:w-14 md:h-14 ';
+      className += 'w-[44px] h-[44px] ';
     }
 
-    // Colores y Estados
-    if (isActive) {
-      // Estilo Outline con Glow para estado activo
-      className += 'bg-[var(--accent-primary)]/20 border-[var(--accent-primary)] text-[var(--accent-primary)] shadow-[0_0_20px_var(--accent-glow)] translate-y-[2px] ';
-    } else if (isTarget) {
-      className += 'border-[var(--accent-primary)] bg-[var(--key-target-bg)] text-[var(--text-primary)] shadow-[0_0_15px_var(--accent-glow)] scale-105 z-10 ';
-    } else if (showZones) {
+    if (isActive) className += 'active ';
+    if (isTarget) className += 'target ';
+
+    if (showZones && !isActive && !isTarget) {
       const fingerColor = FINGER_COLORS[keyData.finger];
-      className += `bg-opacity-10 `;
       style = {
         borderColor: fingerColor,
         color: fingerColor,
         backgroundColor: `${fingerColor}10`,
         boxShadow: `0 0 10px ${fingerColor}20`
       };
-    } else {
-      className += 'bg-[var(--key-bg)] border-[var(--border-glass)] text-[var(--key-text)] ';
-
+    } else if (!isActive && !isTarget && bands) {
       const xRatio = keyIndex / (rowLength || 1);
       const bassWeight = Math.max(0, 1 - xRatio * 2);
       const midWeight = Math.max(0, 1 - Math.abs(xRatio - 0.5) * 4);

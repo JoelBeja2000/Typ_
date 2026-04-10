@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import FingerGuide from './src/components/FingerGuide';
-
 import { WordPanel } from './src/components/WordPanel';
 import { KeyboardSection } from './src/components/KeyboardSection';
 import LeftSidebar from './src/components/ui/LeftSidebar';
@@ -14,12 +13,9 @@ import { Language, TypingStats } from './types';
 import { generatePracticePhrases } from './services/geminiService';
 import { VisualsConfig, DEFAULT_VISUALS_CONFIG } from './src/types/visuals';
 import { GUIDE_PHASES } from './src/data/GuideData';
-
-// ... (existing imports)
-
-// ... (existing imports)
-
-// Inside App component:
+import { BrowserThemeManager } from './src/infrastructure/ui/BrowserThemeManager';
+import { THEMES } from './src/domain/models/Theme';
+import './src/infrastructure/ui/styles/Keyboard.css';
 
 const HiddenInput = React.memo(({
   inputRef,
@@ -68,20 +64,10 @@ const hexToRgba = (hex: string, alpha: number) => {
   return `rgba(162, 173, 145, ${alpha})`;
 }
 
-type Palette = 'alpine' | 'ocean' | 'sunset' | 'amethyst' | 'custom';
-
-const PALETTE_COLORS: Record<string, string> = {
-  alpine: '#A2AD91',
-  ocean: '#22d3ee',
-  sunset: '#fb923c',
-  amethyst: '#c084fc',
-};
+const themeManager = new BrowserThemeManager();
 
 const App: React.FC = () => {
-  const [theme, setTheme] = useState<'dark' | 'light'>('dark');
-  const [palette, setPalette] = useState<Palette>('alpine');
-  const [customColor, setCustomColor] = useState('#A2AD91');
-
+  const [currentTheme, setCurrentTheme] = useState(THEMES[0]);
   const [language, setLanguage] = useState<Language>('es');
   const [focus, setFocus] = useState('Básico');
   const [phrases, setPhrases] = useState<string[]>([]);
@@ -98,6 +84,16 @@ const App: React.FC = () => {
   const [showLeftSidebar, setShowLeftSidebar] = useState(false);
   const [showRightSidebar, setShowRightSidebar] = useState(false);
   const [keyboardType, setKeyboardType] = useState<'standard' | 'mac'>('mac');
+
+  useEffect(() => {
+    themeManager.applyThemeToDocument(currentTheme);
+  }, [currentTheme]);
+
+  const setPalette = (id: string) => {
+    const theme = THEMES.find(t => t.id === id);
+    if (theme) setCurrentTheme(theme);
+  };
+
   const [expandedLeftCat, setExpandedLeftCat] = useState<string | null>('config');
   const [showZones, setShowZones] = useState(false);
   const [isMusicEnabled, setIsMusicEnabled] = useState(false);
@@ -317,24 +313,18 @@ const App: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    document.documentElement.setAttribute('data-theme', theme);
-    document.documentElement.setAttribute('data-palette', palette);
+    document.documentElement.setAttribute('data-theme', 'dark');
     document.documentElement.style.setProperty('--ui-scale', uiScale.toString());
+    themeManager.applyThemeToDocument(currentTheme);
+  }, [currentTheme, uiScale]);
 
-    if (palette === 'custom') {
-      document.documentElement.style.setProperty('--accent-primary', customColor);
-      document.documentElement.style.setProperty('--accent-glow', hexToRgba(customColor, 0.4));
-    } else {
-      document.documentElement.style.removeProperty('--accent-primary');
-      document.documentElement.style.removeProperty('--accent-glow');
-    }
-  }, [theme, palette, customColor, uiScale]);
-
-  const toggleTheme = () => setTheme(prev => prev === 'dark' ? 'light' : 'dark');
-  const cyclePalette = () => {
-    const palettes: Palette[] = ['alpine', 'ocean', 'sunset', 'amethyst'];
-    setPalette(prev => prev === 'custom' ? palettes[0] : palettes[(palettes.indexOf(prev) + 1) % palettes.length]);
+  const toggleTheme = () => {
+     // Simple toggle or cycle through THEMES
+     const currentIndex = THEMES.indexOf(currentTheme);
+     const nextIndex = (currentIndex + 1) % THEMES.length;
+     setCurrentTheme(THEMES[nextIndex]);
   };
+  const cyclePalette = toggleTheme;
 
   useEffect(() => {
     const keepFocus = () => {
@@ -600,7 +590,13 @@ const App: React.FC = () => {
     >
 
       <HiddenInput inputRef={inputRef} onInput={handleInput} onCompositionStart={handleCompositionStart} onCompositionEnd={handleCompositionEnd} onKeyDown={handleKeyDown} onBlur={() => setIsComposingState(false)} />
-      <input type="color" ref={colorInputRef} onChange={(e) => { setCustomColor(e.target.value); setPalette('custom'); }} value={customColor} className="fixed opacity-0 pointer-events-none -z-10" />
+      <input type="color" ref={colorInputRef} onChange={(e) => { 
+        const hex = e.target.value;
+        const r = parseInt(hex.slice(1, 3), 16);
+        const g = parseInt(hex.slice(3, 5), 16);
+        const b = parseInt(hex.slice(5, 7), 16);
+        setCurrentTheme({ id: 'custom', name: 'Custom', r, g, b });
+      }} className="fixed opacity-0 pointer-events-none -z-10" />
 
       {/* SIDEBARS TOGGLES */}
       <button onClick={() => setShowLeftSidebar(true)} className={`fixed left-0 top-1/2 -translate-y-1/2 z-[1000] h-16 w-8 flex items-center justify-center bg-[var(--bg-glass)] backdrop-blur-xl border border-[var(--border-glass)] border-l-0 rounded-r-2xl transition-all duration-500 group ${showLeftSidebar ? 'translate-x-[-100%] opacity-0' : 'opacity-100'}`}><i className="fa fa-chevron-right text-[10px] text-[var(--text-secondary)]"></i></button>
@@ -661,8 +657,8 @@ const App: React.FC = () => {
                   normalizedTypedText={normalizedTypedText}
                   currentWordInfo={currentWordInfo}
                   isComposingState={isComposingState}
-                  palette={palette}
-                  customColor={customColor}
+                  palette={currentTheme.id}
+                  customColor={`rgb(${currentTheme.r}, ${currentTheme.g}, ${currentTheme.b})`}
                   frequencyBands={frequencyBands}
                   birdRotation={birdRotation}
                   birdPos3D={birdPos3D}
@@ -672,7 +668,7 @@ const App: React.FC = () => {
                   comboMultiplier={comboMultiplier}
                   isMusicLightingEnabled={isMusicLightingEnabled}
                   onDimensionalMenu={(e) => { setShowDimensionalSettings(!showDimensionalSettings); }}
-                  PALETTE_COLORS={PALETTE_COLORS}
+                  PALETTE_COLORS={{}}
                   isCircuitMode={isCircuitMode}
                   circuitTimer={circuitTimer}
                   circuitTitle={currentCircuitTitle}
@@ -698,8 +694,8 @@ const App: React.FC = () => {
                   combo={combo}
                   comboMultiplier={comboMultiplier}
                   onDimensionalMenu={(e) => { setShowDimensionalSettings(!showDimensionalSettings); }}
-                  hexToRgba={hexToRgba}
-                  customColor={customColor}
+                  hexToRgba={(hex, a) => `rgba(${currentTheme.r}, ${currentTheme.g}, ${currentTheme.b}, ${a})`}
+                  customColor={`rgb(${currentTheme.r}, ${currentTheme.g}, ${currentTheme.b})`}
                   highlightedKeys={highlightedKeys}
                   isWaveActive={isWaveActive}
                 />
@@ -732,8 +728,8 @@ const App: React.FC = () => {
                 <span>Luces</span>
               </button>
               <button onClick={() => { toggleTheme(); }} className={`w-full px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wider flex items-center gap-3 transition-all text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-white/5`}>
-                <i className={`fa ${theme === 'dark' ? 'fa-sun-o' : 'fa-moon-o'} w-4`}></i>
-                <span>{theme === 'dark' ? 'Light' : 'Dark'}</span>
+                <i className="fa fa-paint-brush w-4"></i>
+                <span>TEMA: {currentTheme.name}</span>
               </button>
               <button onClick={() => { cyclePalette(); }} className={`w-full px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wider flex items-center gap-3 transition-all text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-white/5`}>
                 <i className="fa fa-paint-brush w-4"></i>
