@@ -8,15 +8,14 @@ interface RightSidebarProps {
   targetKeyData: any;
   onSelectLevel?: (keys: string[]) => void;
   onSelectPhrases?: (phrases: string[]) => void;
-  onWaveMode?: (active: boolean) => void;
-  isCircuitMode: boolean;
-  onToggleCircuitMode: () => void;
-  circuitTimer?: number;
-  circuitDuration?: number;
-  onDurationChange?: (val: number) => void;
-  isRandomCircuit?: boolean;
-  onToggleRandomCircuit?: () => void;
-  onCircuitCycle?: () => void;
+  focus: string;
+  onFocusChange: (focus: string) => void;
+  getBtnClass: (active: boolean) => string;
+  currentMusicStyle: any;
+  onMusicStyleChange: (style: any) => void;
+  TECHNO_STYLE: any;
+  AMBIENT_STYLE: any;
+  ACID_HOUSE_STYLE: any;
 }
 
 export const RightSidebar: React.FC<RightSidebarProps> = ({
@@ -25,74 +24,78 @@ export const RightSidebar: React.FC<RightSidebarProps> = ({
   targetKeyData,
   onSelectLevel,
   onSelectPhrases,
-  onWaveMode,
-  isCircuitMode,
-  onToggleCircuitMode,
-  circuitTimer,
-  circuitDuration,
-  onDurationChange,
-  isRandomCircuit,
-  onToggleRandomCircuit,
-  onCircuitCycle,
+  focus,
+  onFocusChange,
+  getBtnClass,
+  currentMusicStyle,
+  onMusicStyleChange,
+  TECHNO_STYLE,
+  AMBIENT_STYLE,
+  ACID_HOUSE_STYLE,
 }) => {
   return (
     <aside
-      className={`fixed top-0 right-0 h-full w-[450px] z-[2001] bg-[var(--bg-glass-strong)] backdrop-blur-3xl border-l border-[var(--border-glass)] p-8 transition-all duration-500 transform flex flex-col ${isOpen ? 'translate-x-0' : 'translate-x-full'
+      className={`fixed top-0 right-0 h-full w-[450px] z-[2001] theme-glass backdrop-blur-3xl border-l border-[var(--border-glass)] p-8 transition-all duration-500 transform flex flex-col ${isOpen ? 'translate-x-0' : 'translate-x-full'
         }`}
     >
-      <div className="flex flex-col gap-4 mb-8 shrink-0">
-        <div className="flex items-center justify-between">
-          <h2 className="text-[10px] font-black uppercase tracking-[0.5em] text-[var(--accent-primary)]">
-            Guía Técnica
-          </h2>
-          <div className="flex items-center gap-4">
+      <div className="flex flex-col gap-8 mb-8 shrink-0">
+        <div>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-[10px] font-black uppercase tracking-[0.5em] text-[var(--accent-primary)]">
+              Modos de Práctica
+            </h2>
             <button
               onClick={onClose}
-              className="w-10 h-10 flex items-center justify-center rounded-full bg-[var(--bg-glass)] text-[var(--text-secondary)]"
+              className="w-8 h-8 flex items-center justify-center rounded-full bg-[var(--bg-glass)] text-[var(--text-secondary)]"
             >
               <i className="fa fa-close"></i>
             </button>
           </div>
+          <div className="grid grid-cols-2 gap-3">
+            {['Básico', 'Programación', 'Acentuación'].map((m) => (
+              <button
+                key={m}
+                onClick={() => onFocusChange(m)}
+                className={getBtnClass(focus === m)}
+              >
+                <span>{m}</span>
+              </button>
+            ))}
+          </div>
         </div>
 
-        {/* CIRCUIT CONTROLS */}
-        <div className="flex items-center gap-2 flex-wrap">
-          <button
-            onClick={onToggleCircuitMode}
-            className={`flex-grow flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-[10px] uppercase font-bold tracking-widest transition-all ${isCircuitMode ? 'bg-[var(--accent-primary)] text-black' : 'bg-[var(--bg-glass)] text-[var(--text-secondary)] border border-[var(--border-glass)]'}`}
-          >
-            <i className={`fa ${isCircuitMode ? 'fa-refresh fa-spin' : 'fa-circle-o-notch'}`}></i>
-            <span>
-              {isCircuitMode && circuitTimer !== undefined ? `CIRCUITO (${circuitTimer}s)` : 'MODO CIRCUITO'}
-            </span>
-          </button>
-
-          {/* CONFIG TOGGLES (Only show if requested or always?) User asked for controls. */}
-          <div className="flex items-center gap-2 bg-[var(--bg-glass)] p-1 rounded-lg border border-[var(--border-glass)]">
-            <input
-              type="number"
-              value={circuitDuration || 30}
-              onChange={(e) => onDurationChange && onDurationChange(parseInt(e.target.value) || 30)}
-              className="w-12 bg-transparent text-[10px] font-bold text-center text-[var(--text-primary)] outline-none border-r border-[var(--border-glass)]"
-              title="Duración (segundos)"
-            />
+        <div>
+          <h2 className="text-[10px] font-black uppercase tracking-[0.5em] text-[var(--accent-primary)] mb-4">
+            Estilos de Música
+          </h2>
+          <div className="grid grid-cols-1 gap-2">
             <button
-              onClick={onToggleRandomCircuit}
-              className={`px-2 py-1 rounded text-[10px] uppercase font-bold transition-all ${isRandomCircuit ? 'bg-[var(--accent-primary)]/20 text-[var(--accent-primary)]' : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'}`}
-              title="Modo Aleatorio"
+              onClick={() => onMusicStyleChange(TECHNO_STYLE)}
+              className={getBtnClass(currentMusicStyle === TECHNO_STYLE)}
             >
-              <i className="fa fa-random"></i>
+              <span>{TECHNO_STYLE.name}</span> <i className="fa fa-bolt"></i>
+            </button>
+            <button
+              onClick={() => onMusicStyleChange(AMBIENT_STYLE)}
+              className={getBtnClass(currentMusicStyle === AMBIENT_STYLE)}
+            >
+              <span>{AMBIENT_STYLE.name}</span> <i className="fa fa-leaf"></i>
+            </button>
+            <button
+              onClick={() => onMusicStyleChange(ACID_HOUSE_STYLE)}
+              className={getBtnClass(currentMusicStyle === ACID_HOUSE_STYLE)}
+            >
+              <span>{ACID_HOUSE_STYLE.name}</span> <i className="fa fa-flask"></i>
             </button>
           </div>
         </div>
       </div>
+
       <div className="flex-1 min-h-0">
         <FingerGuide
           targetKeyData={targetKeyData}
           onSelectLevel={onSelectLevel}
           onSelectPhrases={onSelectPhrases}
-          onWaveMode={onWaveMode}
-          onCircuitCycle={onCircuitCycle}
         />
       </div>
     </aside>

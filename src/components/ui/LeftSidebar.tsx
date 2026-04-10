@@ -1,47 +1,51 @@
 import React from 'react';
 import { AccordionItem } from './AccordionItem';
 import { MusicStyle } from '../../domain/models/MusicStyles';
+import { FINGER_NAMES, FINGER_COLORS, KEYBOARD_LAYOUT } from '../../../constants';
 
 interface LeftSidebarProps {
   isOpen: boolean;
   onClose: () => void;
   language: string;
-  focus: string;
-  expandedCategory: string | null;
-  onExpandCategory: (id: string | null) => void;
   onLanguageChange: (lang: string) => void;
-  onFocusChange: (focus: string) => void;
   currentMusicStyle: MusicStyle;
   onMusicStyleChange: (style: MusicStyle) => void;
   TECHNO_STYLE: MusicStyle;
   AMBIENT_STYLE: MusicStyle;
   ACID_HOUSE_STYLE: MusicStyle;
   getBtnClass: (active: boolean) => string;
-  uiScale: number;
-  onUiScaleChange: (scale: number) => void;
+  themes: any[];
+  currentTheme: any;
+  onThemeChange: (theme: any) => void;
 }
 
 export const LeftSidebar: React.FC<LeftSidebarProps> = ({
   isOpen,
   onClose,
   language,
-  focus,
-  expandedCategory,
-  onExpandCategory,
   onLanguageChange,
-  onFocusChange,
   currentMusicStyle,
   onMusicStyleChange,
   TECHNO_STYLE,
   AMBIENT_STYLE,
   ACID_HOUSE_STYLE,
   getBtnClass,
-  uiScale,
-  onUiScaleChange,
+  themes,
+  currentTheme,
+  onThemeChange,
 }) => {
+  const fingerKeys = React.useMemo(() => {
+    const map: Record<string, string[]> = {};
+    KEYBOARD_LAYOUT.flat().forEach(k => {
+      if (!map[k.finger]) map[k.finger] = [];
+      if (!map[k.finger].includes(k.label)) map[k.finger].push(k.label);
+    });
+    return map;
+  }, []);
+
   return (
     <aside
-      className={`fixed top-0 left-0 h-full w-[400px] z-[2001] bg-[var(--bg-glass-strong)] backdrop-blur-3xl border-r border-[var(--border-glass)] p-8 transition-all duration-500 transform ${isOpen ? 'translate-x-0' : '-translate-x-full'
+      className={`fixed top-0 left-0 h-full w-[400px] z-[2001] theme-glass backdrop-blur-3xl border-r border-[var(--border-glass)] p-8 transition-all duration-500 transform ${isOpen ? 'translate-x-0' : '-translate-x-full'
         } overflow-y-auto custom-scrollbar`}
     >
       <div className="flex items-center justify-between mb-12">
@@ -61,14 +65,11 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
         </button>
       </div>
 
-      <AccordionItem
-        id="config"
-        title="Configuración"
-        icon="fa-sliders"
-        isExpanded={expandedCategory === 'config'}
-        onToggle={onExpandCategory}
-      >
-        <div className="space-y-4">
+      <div className="space-y-4 mb-12">
+        <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-[var(--text-secondary)] mb-6">
+          Idioma del Sistema
+        </h3>
+        <div className="grid grid-cols-2 gap-4">
           {/* Idiomas */}
           <button
             onClick={() => onLanguageChange('es')}
@@ -82,79 +83,44 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
           >
             <span>English</span> <span>🇺🇸</span>
           </button>
+        </div>
+      </div>
 
-          <div className="h-[1px] bg-[var(--border-glass)] my-2" />
+      <div className="mt-12 space-y-6">
+        <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-[var(--text-secondary)] mb-6">
+          Mapeo de Dedos
+        </h3>
+        <div className="grid grid-cols-2 gap-4">
+          {Object.entries(FINGER_NAMES).filter(([f]) => f !== 'thumb').map(([finger, name]) => (
+            <div
+              key={finger}
+              className="p-3 rounded-xl bg-[var(--bg-glass)] border border-[var(--border-glass)] hover:border-[var(--accent-primary)]/30 transition-all duration-300 group"
+            >
+              <div className="flex items-center gap-2 mb-2">
+                <span
+                  className="w-2 h-2 rounded-full shadow-[0_0_8px]"
+                  style={{
+                    backgroundColor: (FINGER_COLORS as any)[finger],
+                    boxShadow: `0 0 10px ${(FINGER_COLORS as any)[finger]}`
+                  }}
+                />
+                <span className="text-[10px] font-bold text-[var(--text-primary)] group-hover:text-[var(--accent-primary)] transition-colors truncate">
+                  {name}
+                </span>
+              </div>
 
-          {/* Modos de Práctica */}
-          <button
-            onClick={() => onFocusChange('Básico')}
-            className={getBtnClass(focus === 'Básico')}
-          >
-            <span>Básico</span>
-          </button>
-          <button
-            onClick={() => onFocusChange('Programación')}
-            className={getBtnClass(focus === 'Programación')}
-          >
-            <span>Programación</span>
-          </button>
-          {/* Nueva opción de Acentuación */}
-          <button
-            onClick={() => onFocusChange('Acentuación')}
-            className={getBtnClass(focus === 'Acentuación')}
-          >
-            <span>Acentuación</span>
-          </button>
-
-          <div className="h-[1px] bg-[var(--border-glass)] my-2" />
-
-          {/* Escala de Interfaz */}
-          <div className="flex flex-col gap-2">
-            <div className="flex justify-between items-center text-[10px] uppercase font-bold text-[var(--text-secondary)] tracking-wider">
-              <span>Zoom Interfaz</span>
-              <span className="text-[var(--accent-primary)]">{Math.round(uiScale * 100)}%</span>
+              <div className="flex flex-wrap gap-1">
+                {(fingerKeys[finger] || []).sort().map(label => (
+                  <span key={label} className="px-1.5 py-0.5 text-[9px] font-mono rounded bg-[var(--bg-app)]/50 border border-[var(--border-glass)] text-[var(--text-secondary)]">
+                    {label}
+                  </span>
+                ))}
+              </div>
             </div>
-            <input
-              type="range"
-              min="0.7"
-              max="1.3"
-              step="0.05"
-              value={uiScale}
-              onChange={(e) => onUiScaleChange(parseFloat(e.target.value))}
-              className="w-full h-1 bg-[var(--bg-glass)] rounded-lg appearance-none cursor-pointer accent-[var(--accent-primary)] hover:accent-[var(--accent-bright)] transition-all"
-            />
-          </div>
+          ))}
         </div>
-      </AccordionItem>
+      </div>
 
-      <AccordionItem
-        id="music"
-        title="Estilo Musical"
-        icon="fa-music"
-        isExpanded={expandedCategory === 'music'}
-        onToggle={onExpandCategory}
-      >
-        <div className="space-y-4">
-          <button
-            onClick={() => onMusicStyleChange(TECHNO_STYLE)}
-            className={getBtnClass(currentMusicStyle.name === TECHNO_STYLE.name)}
-          >
-            <span>Berlín Techno</span> <i className="fa fa-circle"></i>
-          </button>
-          <button
-            onClick={() => onMusicStyleChange(AMBIENT_STYLE)}
-            className={getBtnClass(currentMusicStyle.name === AMBIENT_STYLE.name)}
-          >
-            <span>Cyber Ambient</span> <i className="fa fa-cloud"></i>
-          </button>
-          <button
-            onClick={() => onMusicStyleChange(ACID_HOUSE_STYLE)}
-            className={getBtnClass(currentMusicStyle.name === ACID_HOUSE_STYLE.name)}
-          >
-            <span>Acid House 303</span> <i className="fa fa-flask"></i>
-          </button>
-        </div>
-      </AccordionItem>
     </aside >
   );
 };

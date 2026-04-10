@@ -8,14 +8,25 @@
     --bg-app: #020202;
     --text-primary: #ffffff;
     --text-secondary: #9ca3af;
-    /* Theme variables set dynamically by BrowserThemeManager */
+    --bg-glass: rgba(0, 0, 0, 0.4);
+    --bg-glass-strong: rgba(0, 0, 0, 0.7);
+    --border-glass: rgba(255, 255, 255, 0.1);
     --theme-r: 162;
     --theme-g: 173;
     --theme-b: 145;
     --accent-primary: rgb(var(--theme-r), var(--theme-g), var(--theme-b));
     --accent-glow: rgba(var(--theme-r), var(--theme-g), var(--theme-b), 0.4);
+    --bg-tint: rgba(var(--theme-r), var(--theme-g), var(--theme-b), 0.05);
     --radius-key: 6px;
-    --border-glass: rgba(255, 255, 255, 0.1);
+}
+
+[data-color-scheme="light"] {
+    --bg-app: #f0f2f5;
+    --text-primary: #1a1a1b;
+    --text-secondary: #4b5563;
+    --bg-glass: rgba(255, 255, 255, 0.7);
+    --bg-glass-strong: rgba(255, 255, 255, 0.85);
+    --border-glass: rgba(0, 0, 0, 0.1);
 }
 
 /* Glass Keyboard Container */
@@ -24,9 +35,20 @@
     display: flex;
     flex-direction: column;
     gap: 6px;
-    padding: 1px;
-    background: transparent !important;
+    /* Subtly mix theme tint into the glass background */
+    background: linear-gradient(var(--bg-tint), var(--bg-tint)), var(--bg-glass) !important;
+    backdrop-filter: blur(28px) saturate(180%);
+    -webkit-backdrop-filter: blur(24px) saturate(180%);
+    border: 1px solid var(--border-glass);
+    border-radius: 14px;
+    width: fit-content;
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.05);
     user-select: none;
+}
+
+/* Tinted Background for Global Theme Container & Sidebars */
+.mac-keyboard.bg-theme, .theme-glass {
+    background: linear-gradient(var(--bg-tint), var(--bg-tint)), var(--bg-glass-strong) !important;
 }
 
 /* Base Key Style - Glassmorphism */

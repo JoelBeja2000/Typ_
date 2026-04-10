@@ -68,6 +68,9 @@ const themeManager = new BrowserThemeManager();
 
 const App: React.FC = () => {
   const [currentTheme, setCurrentTheme] = useState(THEMES[0]);
+  const [isPureBlack, setIsPureBlack] = useState(false);
+  const [forceScheme, setForceScheme] = useState<'dark' | 'light' | null>(null);
+
   const [language, setLanguage] = useState<Language>('es');
   const [focus, setFocus] = useState('Básico');
   const [phrases, setPhrases] = useState<string[]>([]);
@@ -81,13 +84,18 @@ const App: React.FC = () => {
   const [startTime, setStartTime] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isFinished, setIsFinished] = useState(false);
+  const [uiScale, setUiScale] = useState(1);
   const [showLeftSidebar, setShowLeftSidebar] = useState(false);
   const [showRightSidebar, setShowRightSidebar] = useState(false);
   const [keyboardType, setKeyboardType] = useState<'standard' | 'mac'>('mac');
 
   useEffect(() => {
-    themeManager.applyThemeToDocument(currentTheme);
-  }, [currentTheme]);
+    document.documentElement.style.setProperty('--ui-scale', uiScale.toString());
+    themeManager.applyThemeToDocument(currentTheme, {
+      isPureBlack,
+      forceScheme: forceScheme || undefined
+    });
+  }, [currentTheme, uiScale, isPureBlack, forceScheme]);
 
   const setPalette = (id: string) => {
     const theme = THEMES.find(t => t.id === id);
@@ -116,7 +124,6 @@ const App: React.FC = () => {
   const [birdSize, setBirdSize] = useState(180);
   const [visualsConfig, setVisualsConfig] = useState<VisualsConfig>({ ...DEFAULT_VISUALS_CONFIG, type: 'circle' });
   const [showDimensionalSettings, setShowDimensionalSettings] = useState(false);
-  const [uiScale, setUiScale] = useState(1);
 
   // GUIDE STATE
   const [highlightedKeys, setHighlightedKeys] = useState<string[]>([]);
@@ -313,10 +320,12 @@ const App: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    document.documentElement.setAttribute('data-theme', 'dark');
     document.documentElement.style.setProperty('--ui-scale', uiScale.toString());
-    themeManager.applyThemeToDocument(currentTheme);
-  }, [currentTheme, uiScale]);
+    themeManager.applyThemeToDocument(currentTheme, {
+      isPureBlack,
+      forceScheme: forceScheme || undefined
+    });
+  }, [currentTheme, uiScale, isPureBlack, forceScheme]);
 
   const toggleTheme = () => {
      // Simple toggle or cycle through THEMES
@@ -580,7 +589,7 @@ const App: React.FC = () => {
 
   return (
     <div
-      className="min-h-screen relative flex flex-row items-stretch overflow-hidden bg-[var(--bg-app)] transition-colors duration-500"
+      className="min-h-screen relative flex flex-row items-stretch overflow-hidden transition-colors duration-500"
       style={{
         transform: `scale(${uiScale})`,
         transformOrigin: 'center center',
@@ -609,19 +618,16 @@ const App: React.FC = () => {
         isOpen={showLeftSidebar}
         onClose={() => setShowLeftSidebar(false)}
         language={language}
-        focus={focus}
-        expandedCategory={expandedLeftCat}
-        onExpandCategory={setExpandedLeftCat}
         onLanguageChange={setLanguage}
-        onFocusChange={setFocus}
         currentMusicStyle={currentMusicStyle}
         onMusicStyleChange={setCurrentMusicStyle}
         TECHNO_STYLE={TECHNO_STYLE}
         AMBIENT_STYLE={AMBIENT_STYLE}
         ACID_HOUSE_STYLE={ACID_HOUSE_STYLE}
         getBtnClass={getBtnClass}
-        uiScale={uiScale}
-        onUiScaleChange={setUiScale}
+        themes={THEMES}
+        currentTheme={currentTheme}
+        onThemeChange={setCurrentTheme}
       />
 
       {/* RIGHT SIDEBAR */}
@@ -631,15 +637,17 @@ const App: React.FC = () => {
         targetKeyData={targetKeyData}
         onSelectLevel={setHighlightedKeys}
         onSelectPhrases={handleSelectPhrases}
-        onWaveMode={setIsWaveActive}
-        isCircuitMode={isCircuitMode}
-        onToggleCircuitMode={() => setIsCircuitMode(!isCircuitMode)}
-        circuitTimer={circuitTimer}
-        circuitDuration={circuitDuration}
-        onDurationChange={setCircuitDuration}
-        isRandomCircuit={isRandomCircuit}
-        onToggleRandomCircuit={() => setIsRandomCircuit(!isRandomCircuit)}
-        onCircuitCycle={handleManualCircuitCycle}
+        themes={THEMES}
+        currentTheme={currentTheme}
+        onThemeChange={setCurrentTheme}
+        focus={focus}
+        onFocusChange={setFocus}
+        getBtnClass={getBtnClass}
+        currentMusicStyle={currentMusicStyle}
+        onMusicStyleChange={setCurrentMusicStyle}
+        TECHNO_STYLE={TECHNO_STYLE}
+        AMBIENT_STYLE={AMBIENT_STYLE}
+        ACID_HOUSE_STYLE={ACID_HOUSE_STYLE}
       />
 
       {/* MAIN VIEWPORT */}
@@ -650,7 +658,7 @@ const App: React.FC = () => {
             <div className="w-full relative group flex justify-center">
 
               {/* CENTRAL CINEMATIC BOX */}
-              <div className="w-full bg-[var(--bg-glass)] backdrop-blur-xl border border-[var(--border-glass)] rounded-[2.5rem] p-6 pt-6 flex flex-col items-center shadow-2xl relative" style={{ overflow: 'visible' }}>
+              <div className="w-full theme-glass backdrop-blur-xl border border-[var(--border-glass)] rounded-[2.5rem] p-6 pt-6 flex flex-col items-center shadow-2xl relative" style={{ overflow: 'visible' }}>
 
                 <WordPanel
                   currentPhrase={currentPhrase}
@@ -667,12 +675,12 @@ const App: React.FC = () => {
                   combo={combo}
                   comboMultiplier={comboMultiplier}
                   isMusicLightingEnabled={isMusicLightingEnabled}
-                  onDimensionalMenu={(e) => { setShowDimensionalSettings(!showDimensionalSettings); }}
                   PALETTE_COLORS={{}}
                   isCircuitMode={isCircuitMode}
                   circuitTimer={circuitTimer}
                   circuitTitle={currentCircuitTitle}
                   onCircuitCycle={handleManualCircuitCycle}
+                  onDimensionalMenu={(e) => { setShowDimensionalSettings(!showDimensionalSettings); }}
                 />
 
                 <KeyboardSection
@@ -704,8 +712,10 @@ const App: React.FC = () => {
             </div>
           )}
 
+
+
           {/* PREFERENCES DROPDOWN MENU */}
-          <div className={`fixed bg-[var(--bg-glass-strong)] backdrop-blur-3xl border border-[var(--border-glass)] rounded-lg shadow-2xl z-[2000] transition-all duration-300 origin-top-right ${showDimensionalSettings ? 'opacity-100 scale-y-100 pointer-events-auto' : 'opacity-0 scale-y-95 pointer-events-none'}`}
+          <div className={`fixed theme-glass backdrop-blur-3xl border border-[var(--border-glass)] rounded-lg shadow-2xl z-[2000] transition-all duration-300 origin-top-right ${showDimensionalSettings ? 'opacity-100 scale-y-100 pointer-events-auto' : 'opacity-0 scale-y-95 pointer-events-none'}`}
             style={{
               right: '4.5rem',
               bottom: '6.5rem',
@@ -714,7 +724,67 @@ const App: React.FC = () => {
             }}>
 
             {/* DROPDOWN ITEMS */}
-            <div className="flex flex-col divide-y divide-[var(--border-glass)]">
+            <div className="flex flex-col divide-y divide-[var(--border-glass)] max-h-[400px] overflow-y-auto custom-scrollbar">
+              <div className="p-4">
+                <div className="text-[10px] font-black uppercase tracking-[0.2em] text-[var(--text-secondary)] mb-4 flex items-center gap-2">
+                  <i className="fa fa-paint-brush"></i>
+                  <span>Personalización</span>
+                </div>
+                <div className="grid grid-cols-4 gap-2">
+                  {THEMES.map((theme) => (
+                     <button
+                       key={theme.id}
+                       onClick={() => setCurrentTheme(theme)}
+                       className={`w-full aspect-square rounded-full border-2 transition-all duration-300 flex items-center justify-center ${currentTheme.id === theme.id ? 'border-[var(--accent-primary)] ring-2 ring-[var(--accent-glow)]' : 'border-white/10 hover:border-white/40'}`}
+                       style={{ backgroundColor: `rgb(${theme.r}, ${theme.g}, ${theme.b})` }}
+                       title={theme.name}
+                     >
+                       {currentTheme.id === theme.id && <i className="fa fa-check text-[10px] text-white mix-blend-difference"></i>}
+                     </button>
+                  ))}
+                  <button 
+                    onClick={() => colorInputRef.current?.click()}
+                    className="w-full aspect-square rounded-full border-2 border-dashed border-white/20 flex items-center justify-center hover:border-white/40 transition-all font-bold text-[18px] text-[var(--text-secondary)]"
+                    title="Color Personalizado"
+                  >
+                    +
+                  </button>
+                </div>
+              </div>
+
+              <div className="px-4 py-3 space-y-3">
+                <div 
+                  onClick={() => setIsPureBlack(!isPureBlack)}
+                  className="flex items-center justify-between cursor-pointer group"
+                >
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--text-secondary)] group-hover:text-[var(--text-primary)] transition-colors">Modo Negro Puro</span>
+                  <div className={`w-8 h-4 rounded-full relative transition-colors ${isPureBlack ? 'bg-[var(--accent-primary)]' : 'bg-white/10'}`}>
+                    <div className={`absolute top-0.5 w-3 h-3 rounded-full bg-white transition-all ${isPureBlack ? 'left-4.5' : 'left-0.5'}`} />
+                  </div>
+                </div>
+
+                <div 
+                  onClick={() => {
+                    const effectiveIsLight = forceScheme === 'light' || (currentTheme.scheme === 'light' && forceScheme === null);
+                    setForceScheme(effectiveIsLight ? 'dark' : 'light');
+                  }}
+                  className="flex items-center justify-between cursor-pointer group"
+                >
+                  {/* Effective light mode state logic */}
+                  {(() => {
+                    const activeLight = forceScheme === 'light' || (currentTheme.scheme === 'light' && !forceScheme);
+                    return (
+                      <>
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--text-secondary)] group-hover:text-[var(--text-primary)] transition-colors">Modo Día</span>
+                        <div className={`w-8 h-4 rounded-full relative transition-colors ${activeLight ? 'bg-orange-400 shadow-[0_0_8px_rgba(251,146,60,0.4)]' : 'bg-white/10'}`}>
+                          <div className={`absolute top-0.5 w-3 h-3 rounded-full bg-white transition-all ${activeLight ? 'left-4.5' : 'left-0.5'}`} />
+                        </div>
+                      </>
+                    );
+                  })()}
+                </div>
+              </div>
+
               <button onClick={() => { setIsTypingSoundsEnabled(!isTypingSoundsEnabled); }} className={`w-full px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wider flex items-center gap-3 transition-all ${isTypingSoundsEnabled ? 'text-[var(--accent-primary)] bg-[var(--accent-primary)]/10' : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-white/5'}`}>
                 <i className="fa fa-keyboard-o w-4"></i>
                 <span>Sonido</span>
@@ -727,18 +797,6 @@ const App: React.FC = () => {
                 <i className="fa fa-lightbulb-o w-4"></i>
                 <span>Luces</span>
               </button>
-              <button onClick={() => { toggleTheme(); }} className={`w-full px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wider flex items-center gap-3 transition-all text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-white/5`}>
-                <i className="fa fa-paint-brush w-4"></i>
-                <span>TEMA: {currentTheme.name}</span>
-              </button>
-              <button onClick={() => { cyclePalette(); }} className={`w-full px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wider flex items-center gap-3 transition-all text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-white/5`}>
-                <i className="fa fa-paint-brush w-4"></i>
-                <span>Paleta</span>
-              </button>
-              <button onClick={() => { colorInputRef.current?.click(); }} className={`w-full px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wider flex items-center gap-3 transition-all text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-white/5`}>
-                <i className="fa fa-eyedropper w-4"></i>
-                <span>Color</span>
-              </button>
               <button onClick={() => { setShowZones(!showZones); }} className={`w-full px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wider flex items-center gap-3 transition-all ${showZones ? 'text-[var(--accent-primary)] bg-[var(--accent-primary)]/10' : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-white/5'}`}>
                 <i className="fa fa-hand-paper-o w-4"></i>
                 <span>Guía</span>
@@ -746,7 +804,6 @@ const App: React.FC = () => {
             </div>
 
           </div>
-
         </div>
       </main>
 

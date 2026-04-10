@@ -5,7 +5,7 @@
 
 /* --- LAYER 1: DESIGN TOKENS --- */
 :root {
-  /* Palette: Alpine Ecodecor (DEFAULT / DARK) */
+  /* Default Design Tokens */
   --bg-app: #020202;
   --bg-glass: rgba(0, 0, 0, 0.4);
   --bg-glass-strong: rgba(5, 5, 5, 0.95);
@@ -15,84 +15,19 @@
   --border-strong: rgba(255, 255, 255, 0.08);
 
   --text-primary: #ffffff;
-  --text-secondary: #9ca3af; /* gray-400 */
+  --text-secondary: #9ca3af; 
   --text-muted: rgba(255, 255, 255, 0.15); 
   --text-ghost: rgba(255, 255, 255, 0.3);
 
-  --key-bg: #111111;
-  --key-target-bg: #1a1a1a;
-  --key-text: #9ca3af;
-  --key-shadow: rgba(0,0,0,0.8);
-
-  /* Default Accent (Alpine) */
   --accent-primary: #A2AD91; 
   --accent-glow: rgba(162, 173, 145, 0.4);
+  --bg-tint: rgba(162, 173, 145, 0.05);
   
-  --state-error: #ef4444;
-  --state-error-bg: rgba(239, 68, 68, 0.1);
-  --state-warning: #facc15; 
-
-  /* Compatibility Alias */
-  --alpine-sap: var(--accent-primary);
-
-  /* Shapes & Borders */
-  --radius-sm: 8px;
-  --radius-md: 12px;
   --radius-lg: 1.5rem;
-  --radius-full: 9999px;
   --border-width: 1px;
 }
 
-/* --- COLOR PALETTES --- */
-
-/* 1. Alpine (Default) - Green/Beige */
-[data-palette="alpine"] {
-  --accent-primary: #A2AD91;
-  --accent-glow: rgba(162, 173, 145, 0.4);
-}
-[data-palette="alpine"][data-theme="light"] {
-  --accent-primary: #7d8a6b;
-  --accent-glow: rgba(125, 138, 107, 0.3);
-}
-
-/* 2. Ocean - Cyan/Blue */
-[data-palette="ocean"] {
-  --accent-primary: #22d3ee; /* Cyan 400 */
-  --accent-glow: rgba(34, 211, 238, 0.4);
-}
-[data-palette="ocean"][data-theme="light"] {
-  --accent-primary: #0891b2; /* Cyan 600 (Darker for contrast) */
-  --accent-glow: rgba(8, 145, 178, 0.3);
-}
-
-/* 3. Sunset - Orange/Red */
-[data-palette="sunset"] {
-  --accent-primary: #fb923c; /* Orange 400 */
-  --accent-glow: rgba(251, 146, 60, 0.4);
-}
-[data-palette="sunset"][data-theme="light"] {
-  --accent-primary: #ea580c; /* Orange 600 */
-  --accent-glow: rgba(234, 88, 12, 0.3);
-}
-
-/* 4. Amethyst - Purple */
-[data-palette="amethyst"] {
-  --accent-primary: #c084fc; /* Purple 400 */
-  --accent-glow: rgba(192, 132, 252, 0.4);
-}
-[data-palette="amethyst"][data-theme="light"] {
-  --accent-primary: #9333ea; /* Purple 600 */
-  --accent-glow: rgba(147, 51, 234, 0.3);
-}
-
-/* 5. Custom - User Defined */
-[data-palette="custom"] {
-  /* Variables are set via inline styles in JS */
-}
-
-
-/* --- LIGHT THEME BASE OVERRIDES --- */
-[data-theme="light"] {
+[data-color-scheme="light"] {
   --bg-app: #f2f2f2;
   --bg-glass: rgba(255, 255, 255, 0.6);
   --bg-glass-strong: rgba(255, 255, 255, 0.9);
@@ -104,17 +39,15 @@
   --text-primary: #1a1a1a;
   --text-secondary: #525252;
   --text-muted: rgba(0, 0, 0, 0.2);
-  --text-ghost: rgba(0, 0, 0, 0.2);
-
-  --key-bg: #ffffff;
-  --key-target-bg: #f0f0f0;
-  --key-text: #525252;
-  --key-shadow: rgba(0,0,0,0.1);
+  --text-ghost: rgba(0, 0, 0, 0.3);
 }
+
+/* Palettes and logic are now primarily handled by BrowserThemeManager via --theme-r, --theme-g, --theme-b */
 
 /* --- LAYER 2: BASE --- */
 body {
   background-color: var(--bg-app);
+  background: radial-gradient(circle at center top, var(--bg-tint) 0%, transparent 100%), var(--bg-app);
   color: var(--text-primary);
   font-family: 'JetBrains Mono', monospace;
   margin: 0;
