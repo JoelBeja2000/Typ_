@@ -4,6 +4,7 @@ import { WordPanel } from './src/components/WordPanel';
 import { KeyboardSection } from './src/components/KeyboardSection';
 import LeftSidebar from './src/components/ui/LeftSidebar';
 import RightSidebar from './src/components/ui/RightSidebar';
+import { WordCurtain } from './src/components/ui/WordCurtain';
 import BirdAnimation from './src/components/BirdAnimation';
 import { WebAudioSystem } from './src/infrastructure/audio/WebAudioSystem';
 import { MusicSequencer } from './src/domain/services/MusicSequencer';
@@ -56,6 +57,26 @@ const HiddenInput = React.memo(({
 });
 HiddenInput.displayName = 'HiddenInput';
 
+const LightOffStyles = () => (
+  <style>{`
+    @keyframes light-on-pop {
+      0% { filter: brightness(0.2); }
+      15% { filter: brightness(1.4) contrast(1.1); }
+      30% { filter: brightness(0.6); }
+      45% { filter: brightness(1.2); }
+      60% { filter: brightness(0.9); }
+      100% { filter: brightness(1); }
+    }
+    }
+    .light-off-transition {
+      transition: background-color 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .light-on-anim {
+      animation: light-on-pop 0.6s ease-out;
+    }
+  `}</style>
+);
+
 const hexToRgba = (hex: string, alpha: number) => {
   let c: any;
   if (/^#([A-Fa-f0-9]{3}){1,2}$/.test(hex)) {
@@ -69,15 +90,22 @@ const hexToRgba = (hex: string, alpha: number) => {
   return `rgba(162, 173, 145, ${alpha})`;
 }
 
+const lightenColor = (r: number, g: number, b: number, amount: number) => {
+  return `rgb(${Math.min(255, r + amount)}, ${Math.min(255, g + amount)}, ${Math.min(255, b + amount)})`;
+}
+
 const themeManager = new BrowserThemeManager();
 
 const App: React.FC = () => {
-  const [currentTheme, setCurrentTheme] = useState(THEMES[0]);
+  const [currentTheme, setCurrentTheme] = useState(THEMES.find(t => t.id === 'emerald') || THEMES[0]);
   const [isPureBlack, setIsPureBlack] = useState(false);
   const [forceScheme, setForceScheme] = useState<'dark' | 'light' | null>(null);
 
   const [language, setLanguage] = useState<Language>('es');
   const [focus, setFocus] = useState('Básico');
+
+  const [solvedWords, setSolvedWords] = useState<string[]>([]);
+  const typedTextRef = useRef('');
 
   // HEXAGONAL ARCHITECTURE: Dependencies
   const phraseProvider = useMemo(() => new BrowserPhraseProvider(), []);
@@ -108,9 +136,19 @@ const App: React.FC = () => {
     restart
   } = useTypingEngine(phraseProvider, storageProvider, typingService, {
     onCorrectChar: (char, combo) => {
-      if (isTypingSoundsEnabled) {
-        if (char === ' ') {
-          audioSystemRef.current?.playSuccess(combo, false);
+      if (isTypingSoundsEnabled && char === ' ') {
+        audioSystemRef.current?.playSuccess(combo, false);
+      }
+      
+      if (char === ' ') {
+        // Add the completed word to the curtain
+        const words = typedTextRef.current.trim().split(/\s+/);
+        const lastWord = words[words.length - 1];
+        if (lastWord) {
+          setSolvedWords(prev => {
+            const next = [...prev, lastWord];
+            return next.slice(-100); // More room for individual words
+          });
         }
       }
     },
@@ -118,11 +156,27 @@ const App: React.FC = () => {
       if (isTypingSoundsEnabled) audioSystemRef.current?.playError();
       setWordHasMistake(true);
     },
-    onPhraseComplete: () => {
+    onPhraseComplete: (phrase) => {
       setWordHasMistake(false);
       if (inputRef.current) inputRef.current.value = '';
+      
+      // Add the final word of the phrase if it wasn't added by space
+      const words = phrase.trim().split(/\s+/);
+      const lastWord = words[words.length - 1];
+      if (lastWord) {
+        setSolvedWords(prev => {
+          if (prev[prev.length - 1] === lastWord) return prev;
+          const next = [...prev, lastWord];
+          return next.slice(-100);
+        });
+      }
     }
   });
+
+  // Keep ref in sync
+  useEffect(() => {
+    typedTextRef.current = typedText;
+  }, [typedText]);
 
   const [activeKey, setActiveKey] = useState('');
   const [isLevelActive, setIsLevelActive] = useState(false);
@@ -140,6 +194,29 @@ const App: React.FC = () => {
       forceScheme: forceScheme || undefined
     });
   }, [currentTheme, uiScale, isPureBlack, forceScheme]);
+
+  // AUTO-FIT UI SCALE LOGIC
+  useEffect(() => {
+    const handleResize = () => {
+      // Standard target height where everything fits comfortably at 1.0 scale
+      // WordPanel (~550px) + Gap (~50px) + KeyboardStats (~50px) + Keyboard (~250px) + Padding (~80px)
+      const targetHeight = 980; 
+      const availableHeight = window.innerHeight;
+      
+      if (availableHeight < targetHeight) {
+        // Calculate required scale but don't go too small (limit at 0.7)
+        const newScale = Math.max(0.7, availableHeight / targetHeight);
+        setUiScale(newScale);
+      } else {
+        // If there's plenty of space, stay at 1.0 or user default
+        setUiScale(1);
+      }
+    };
+
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
 
   const setPalette = (id: string) => {
@@ -352,7 +429,8 @@ const App: React.FC = () => {
   useEffect(() => {
     let frameId: number;
     const pollEnergy = () => {
-      if (audioSystemRef.current) {
+      const isActuallyPlaying = isLevelActive && !isFinished && !wordHasMistake;
+      if (audioSystemRef.current && isMusicEnabled && isActuallyPlaying) {
         setFrequencyBands(audioSystemRef.current.getFrequencyBands());
       } else {
         setFrequencyBands({ bass: 0, mid: 0, high: 0 });
@@ -361,7 +439,7 @@ const App: React.FC = () => {
     };
     frameId = requestAnimationFrame(pollEnergy);
     return () => cancelAnimationFrame(frameId);
-  }, []);
+  }, [isMusicEnabled, isLevelActive, isFinished, wordHasMistake]);
 
   useEffect(() => {
     document.documentElement.style.setProperty('--ui-scale', uiScale.toString());
@@ -483,6 +561,8 @@ const App: React.FC = () => {
     lastProcessedText.current = '';
     setPhraseIndex(0);
     setCombo(0);
+    setSolvedWords([]); // Reset curtain
+    setIsPureBlack(true); // Cinematic mode
     setWordHasMistake(false);
     if (inputRef.current) inputRef.current.value = '';
     setStartTime(null);
@@ -492,27 +572,31 @@ const App: React.FC = () => {
     setTimeout(() => inputRef.current?.focus(), 10);
   }, [setCurrentLevelId, setPhrases, setTypedText, setPhraseIndex, setCombo, setStartTime, setIsFinished, setIsLoading]);
 
+  const handleRestart = useCallback(() => {
+    restart();
+    setPhraseIndex(0);
+    setWordHasMistake(false);
+    setSolvedWords([]);
+    if (inputRef.current) inputRef.current.value = '';
+  }, [restart, setPhraseIndex]);
+
+  const handleGoHome = useCallback(() => {
+    setIsLevelActive(false);
+    setIsPureBlack(false);
+    setSolvedWords([]);
+  }, []);
+
 
   return (
     <div
-      className="min-h-screen relative flex flex-row items-stretch overflow-hidden transition-colors duration-500"
+      className={`min-h-screen relative flex flex-col items-center overflow-y-auto overflow-x-hidden light-off-transition ${isPureBlack ? 'light-off-anim' : 'light-on-anim'}`}
       style={{
-        transform: `scale(${uiScale})`,
-        transformOrigin: 'center center',
         width: '100%',
-        height: '100%'
+        backgroundColor: isPureBlack ? '#000000' : 'transparent',
+        transition: 'background-color 0.6s ease-in-out'
       }}
     >
-      <div
-        className="fixed left-[2vw] top-0 h-full bg-[#ff00ff] z-0"
-        style={{ width: '18vw' }}
-      />
-      <div
-        className="fixed right-[2vw] top-0 h-full bg-[#ff00ff] z-0"
-        style={{ width: '18vw' }}
-      />
-
-
+      <LightOffStyles />
       <HiddenInput inputRef={inputRef} onInput={handleInput} onCompositionStart={handleCompositionStart} onCompositionEnd={handleCompositionEnd} onKeyDown={handleKeyDown} onBlur={() => setIsComposingState(false)} />
       <input type="color" ref={colorInputRef} onChange={(e) => {
         const hex = e.target.value;
@@ -568,15 +652,39 @@ const App: React.FC = () => {
         score={score}
       />
 
-      {/* MAIN VIEWPORT */}
-      <main className="flex-grow flex flex-col items-center justify-center p-4 pt-2 relative transition-all duration-500" style={{ opacity: (showLeftSidebar || showRightSidebar) ? 0.3 : 1 }}>
-        <div className="w-full max-w-5xl flex flex-col items-center gap-4 relative">
+      {/* SCALE WRAPPER: Ensures content fits the viewport height */}
+      <div 
+        className="w-full h-full flex flex-col items-center"
+        style={{
+          transform: `scale(${uiScale})`,
+          transformOrigin: 'top center',
+          flexShrink: 0
+        }}
+      >
+        {/* MAIN VIEWPORT */}
+        <main className="flex-grow flex flex-col items-center justify-start py-8 xl:py-12 px-4 relative transition-all duration-500" style={{ opacity: (showLeftSidebar || showRightSidebar) ? 0.3 : 1 }}>
+        
+        <div className="flex flex-row items-stretch justify-center gap-4 xl:gap-12 relative w-full px-4 overflow-visible">
+          
+          {/* LEFT CURTAIN */}
+          <div 
+            className="hidden xl:flex w-[250px] shrink-0 z-0 overflow-hidden relative"
+          >
+            <WordCurtain 
+              text={solvedWords.join('  ')} 
+              color={`rgb(${currentTheme.r}, ${currentTheme.g}, ${currentTheme.b})`} 
+              frequencyBands={frequencyBands}
+            />
+          </div>
 
-          {!isLoading && !isFinished && (
-            <div className="w-full relative group flex justify-center">
+          <div className="w-full max-w-5xl flex flex-col items-center gap-4 relative">
 
-              {/* CENTRAL CINEMATIC BOX */}
-              <div className="w-full theme-glass backdrop-blur-xl border border-[var(--border-glass)] rounded-[2.5rem] p-6 pt-6 flex flex-col items-center shadow-2xl relative" style={{ overflow: 'visible' }}>
+            {!isLoading && !isFinished && (
+              <div className="w-full relative group flex justify-center">
+
+                {/* CENTRAL CINEMATIC BOX */}
+                <div className="w-full theme-glass backdrop-blur-xl border border-[var(--border-glass)] rounded-[2.5rem] p-6 pt-6 flex flex-col items-center shadow-2xl relative" style={{ overflow: 'visible' }}>
+
 
                 <WordPanel
                   currentPhrase={currentPhrase}
@@ -609,16 +717,7 @@ const App: React.FC = () => {
                   currentLevelAccuracy={stats.accuracy}
                 />
 
-                {isLevelActive && (
-                  <button
-                    onClick={() => setIsLevelActive(false)}
-                    className="absolute right-[-80px] top-1/2 -translate-y-1/2 w-14 h-14 rounded-full bg-[var(--bg-glass)] border border-[var(--border-glass)] flex items-center justify-center text-[var(--text-secondary)] hover:text-[var(--accent-primary)] hover:border-[var(--accent-primary)] transition-all hover:scale-110 active:scale-95 group shadow-2xl backdrop-blur-xl"
-                    title="Volver al Selector"
-                  >
-                    <i className="fa fa-home text-xl transition-transform group-hover:rotate-12"></i>
-                    <div className="absolute top-[-30px] right-0 bg-[var(--bg-floating)] px-2 py-1 rounded text-[8px] font-black uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity">Volver</div>
-                  </button>
-                )}
+
 
                 <KeyboardSection
                   keyboardType={keyboardType}
@@ -630,7 +729,7 @@ const App: React.FC = () => {
                   stats={stats}
                   isZenMode={false}
                   score={score}
-                  onRestart={restart}
+                  onRestart={handleRestart}
                   onZenToggle={() => { }}
                   audioReady={audioReady}
                   audioSystem={audioSystemRef.current}
@@ -644,6 +743,8 @@ const App: React.FC = () => {
                   customColor={`rgb(${currentTheme.r}, ${currentTheme.g}, ${currentTheme.b})`}
                   highlightedKeys={highlightedKeys}
                   isWaveActive={isWaveActive}
+                  isLevelActive={isLevelActive}
+                  onGoHome={handleGoHome}
                 />
 
               </div>
@@ -748,8 +849,22 @@ const App: React.FC = () => {
             </div>
 
           </div>
+          </div>
+
+          {/* RIGHT CURTAIN */}
+          <div 
+            className="hidden xl:flex w-[250px] shrink-0 z-0 overflow-hidden relative"
+          >
+            <WordCurtain 
+              text={solvedWords.join('  ')} 
+              color={`rgb(${currentTheme.r}, ${currentTheme.g}, ${currentTheme.b})`} 
+              frequencyBands={frequencyBands}
+            />
+          </div>
+
         </div>
-      </main>
+        </main>
+      </div>
 
       <footer className="fixed bottom-6 right-8 text-[var(--text-secondary)] text-[8px] font-black uppercase tracking-[0.5em] font-mono opacity-20 select-none">ALPINE_ECODECOR_PRO // 2025</footer>
     </div>

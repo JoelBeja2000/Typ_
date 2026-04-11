@@ -33,6 +33,8 @@ interface KeyboardSectionProps {
     // Guide Integration
     highlightedKeys?: string[];
     isWaveActive?: boolean;
+    isLevelActive?: boolean;
+    onGoHome?: () => void;
 }
 
 export const KeyboardSection: React.FC<KeyboardSectionProps> = React.memo(({
@@ -59,6 +61,8 @@ export const KeyboardSection: React.FC<KeyboardSectionProps> = React.memo(({
     customColor,
     highlightedKeys = [],
     isWaveActive = false,
+    isLevelActive = false,
+    onGoHome,
 }) => {
     const bands = isMusicLightingEnabled ? frequencyBands : { bass: 0, mid: 0, high: 0 };
 
@@ -89,17 +93,25 @@ export const KeyboardSection: React.FC<KeyboardSectionProps> = React.memo(({
                     </div>
                 </div>
 
-                {/* GEAR BUTTON (RIGHT) */}
-                <div className="flex gap-2">
-
-
+                {/* SIDE ACTIONS (RIGHT) */}
+                <div className="flex flex-col gap-2 relative">
                     <button 
                         onClick={onDimensionalMenu} 
-                        className={`h-11 w-11 flex items-center justify-center backdrop-blur-xl border rounded-2xl transition-all duration-500 bg-[var(--bg-glass)] border-[var(--border-strong)] text-[var(--text-secondary)] hover:bg-[var(--accent-primary)]/10 hover:text-[var(--accent-primary)] shadow-lg`} 
+                        className={`h-11 w-11 flex items-center justify-center backdrop-blur-xl border rounded-2xl transition-all duration-500 bg-[var(--bg-glass)] border-[var(--border-strong)] text-[var(--text-secondary)] hover:bg-[var(--accent-primary)]/10 hover:text-[var(--accent-primary)] shadow-lg hover:scale-105 active:scale-95`} 
                         title="Control Center"
                     >
                         <i className="fa fa-gear"></i>
                     </button>
+
+                    {isLevelActive && (
+                        <button 
+                            onClick={onGoHome} 
+                            className={`h-11 w-11 flex items-center justify-center backdrop-blur-xl border rounded-2xl transition-all duration-500 bg-[var(--bg-glass)] border-[var(--border-strong)] text-[var(--text-secondary)] hover:bg-[var(--accent-primary)]/10 hover:text-[var(--accent-primary)] shadow-lg hover:scale-105 active:scale-95 animate-in fade-in slide-in-from-top-2 duration-300`} 
+                            title="Volver al Selector"
+                        >
+                            <i className="fa fa-home"></i>
+                        </button>
+                    )}
                 </div>
             </div>
 
