@@ -462,11 +462,11 @@ export const WordPanel: React.FC<WordPanelProps> = ({
                         <div className="relative overflow-visible flex items-center justify-center gap-8" style={{ height: `${birdSize * 0.8}px` }}>
                             <div className="bg-[var(--bg-floating)] backdrop-blur-3xl border border-[var(--border-strong)] rounded-[2.5rem] px-14 h-24 flex items-center justify-center min-w-[400px] shadow-3xl scale-110 z-30 relative overflow-visible">
                                 <div className="relative font-mono text-4xl flex items-center h-full min-w-[200px]">
-                                    <div className="absolute inset-0 text-white/40 whitespace-pre flex items-center justify-start pointer-events-none">{currentWordInfo.word}</div>
+                                    <div className="absolute inset-0 text-white whitespace-pre flex items-center justify-start pointer-events-none">{currentWordInfo.word}</div>
                                     <div className="relative flex items-center whitespace-pre h-full">
                                         {currentWordInfo.userTypedSlice.split('').map((userChar, idx) => {
                                             const correct = userChar === (currentWordInfo.word[idx] || '');
-                                            const color = (isComposingState && idx === currentWordInfo.userTypedSlice.length - 1) ? "text-yellow-400" : (correct ? 'text-white' : 'text-red-400 bg-red-500/10 border-b-2 border-red-500/30');
+                                            const color = (isComposingState && idx === currentWordInfo.userTypedSlice.length - 1) ? "text-yellow-400" : (correct ? 'text-[var(--accent-primary)]' : 'text-red-400 bg-red-500/10 border-b-2 border-red-500/30');
                                             return <span key={idx} className={`relative inline-block ${color}`}>{userChar === ' ' ? '\u00A0' : userChar}</span>;
                                         })}
                                         <span className="inline-block w-0.5 h-10 bg-[var(--accent-primary)] shadow-[0_0_15px_var(--accent-primary)] animate-pulse rounded-full ml-1" />
