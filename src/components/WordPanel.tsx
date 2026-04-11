@@ -349,20 +349,20 @@ export const WordPanel: React.FC<WordPanelProps> = ({
                             );
                         })}
                     </div>
-                    {/* Level Stats Display */}
-                    {isLevelActive && (currentLevelProgress > 0 || currentLevelScore > 0) && (
+                    {/* Level Stats Display - Only show when level is finished */}
+                    {isLevelActive && currentLevelProgress >= 100 && (
                         <div className="flex items-center justify-center gap-4 mt-4">
-                            <div className="bg-[var(--bg-floating)]/80 backdrop-blur-sm border border-[var(--border-glass)] rounded-full px-3 py-1.5 flex items-center gap-2">
-                                <span className="text-[9px] font-black uppercase tracking-widest text-[var(--text-ghost)]">PTS</span>
-                                <span className="text-[14px] font-bold text-white">{currentLevelScore.toLocaleString()}</span>
+                            <div className="bg-[var(--bg-floating)]/80 backdrop-blur-sm border border-green-500/50 rounded-full px-3 py-1.5 flex items-center gap-2 animate-pulse">
+                                <span className="text-[9px] font-black uppercase tracking-widest text-green-400">PTS</span>
+                                <span className="text-[14px] font-bold text-green-400">{currentLevelScore.toLocaleString()}</span>
                             </div>
-                            <div className="bg-[var(--bg-floating)]/80 backdrop-blur-sm border border-[var(--border-glass)] rounded-full px-3 py-1.5 flex items-center gap-2">
-                                <span className="text-[9px] font-black uppercase tracking-widest text-[var(--text-ghost)]">%</span>
-                                <span className="text-[14px] font-bold text-white">{currentLevelProgress}%</span>
+                            <div className="bg-[var(--bg-floating)]/80 backdrop-blur-sm border border-green-500/50 rounded-full px-3 py-1.5 flex items-center gap-2 animate-pulse">
+                                <span className="text-[9px] font-black uppercase tracking-widest text-green-400">%</span>
+                                <span className="text-[14px] font-bold text-green-400">{currentLevelProgress}%</span>
                             </div>
-                            <div className="bg-[var(--bg-floating)]/80 backdrop-blur-sm border border-[var(--border-glass)] rounded-full px-3 py-1.5 flex items-center gap-2">
-                                <span className="text-[9px] font-black uppercase tracking-widest text-[var(--text-ghost)]">ACC</span>
-                                <span className="text-[14px] font-bold text-white">{currentLevelAccuracy}%</span>
+                            <div className="bg-[var(--bg-floating)]/80 backdrop-blur-sm border border-green-500/50 rounded-full px-3 py-1.5 flex items-center gap-2 animate-pulse">
+                                <span className="text-[9px] font-black uppercase tracking-widest text-green-400">ACC</span>
+                                <span className="text-[14px] font-bold text-green-400">{currentLevelAccuracy}%</span>
                             </div>
                         </div>
                     )}
