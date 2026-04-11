@@ -143,8 +143,8 @@ export const WordPanel: React.FC<WordPanelProps> = ({
 
                                 <div className={`grid transition-all duration-500 ease-in-out ${isExpanded ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}>
                                     <div className="overflow-hidden">
-                                        <div className="p-3 bg-[var(--bg-app)]/20 border-t border-[var(--border-glass)] grid grid-cols-1 md:grid-cols-2 gap-2">
-                                            {levels.map((level) => (
+                                        <div className="p-3 bg-[var(--bg-app)]/20 border-t border-[var(--border-glass)] grid grid-cols-2 gap-2">
+                                            {levels.slice(0, 4).map((level) => (
                                                 <button
                                                     key={level.id}
                                                     onClick={() => onSelectLevel && onSelectLevel(level)}
