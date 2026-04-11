@@ -14,7 +14,7 @@ import { generateLocalPhrases } from './src/utils/phraseUtils';
 import { VisualsConfig, DEFAULT_VISUALS_CONFIG } from './src/types/visuals';
 import { GUIDE_PHASES } from './src/data/GuideData';
 import { BrowserThemeManager } from './src/infrastructure/ui/BrowserThemeManager';
-import { ZEN_PHRASES } from './src/data/ZenPhrases';
+import { ZEN_PHRASES, PHRASE_CATEGORIES } from './src/data/ZenPhrases';
 import { THEMES } from './src/domain/models/Theme';
 import { TypingService } from './src/domain/services/TypingService';
 import { BrowserPhraseProvider, BrowserStorageProvider } from './src/infrastructure/adapters/BrowserAdapters';
@@ -104,19 +104,13 @@ const App: React.FC = () => {
     setIsFinished,
     startTime,
     setStartTime,
-    isInfiniteMode,
-    setIsInfiniteMode,
+    setCurrentLevelId,
     restart
   } = useTypingEngine(phraseProvider, storageProvider, typingService, {
     onCorrectChar: (char, combo) => {
       if (isTypingSoundsEnabled) {
         if (char === ' ') {
-          audioSystemRef.current?.playSuccess(combo, isZenMode);
-        } else {
-          // Play a subtle high-pitch click or the success sound based on mode
-          if (isInfiniteMode) {
-             audioSystemRef.current?.playSuccess(combo, isZenMode);
-          }
+          audioSystemRef.current?.playSuccess(combo, false);
         }
       }
     },
@@ -131,6 +125,7 @@ const App: React.FC = () => {
   });
 
   const [activeKey, setActiveKey] = useState('');
+  const [isLevelActive, setIsLevelActive] = useState(false);
   const [wordHasMistake, setWordHasMistake] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [uiScale, setUiScale] = useState(1);
@@ -146,18 +141,6 @@ const App: React.FC = () => {
     });
   }, [currentTheme, uiScale, isPureBlack, forceScheme]);
 
-  const toggleInfiniteMode = () => {
-    if (!isInfiniteMode) {
-      const randomIdx = Math.floor(Math.random() * ZEN_PHRASES.length);
-      setPhrases([ZEN_PHRASES[randomIdx]]);
-      setPhraseIndex(0);
-      setIsFinished(false);
-      setIsGuideMode(false);
-      setIsInfiniteMode(true);
-    } else {
-      setIsInfiniteMode(false);
-    }
-  };
 
   const setPalette = (id: string) => {
     const theme = THEMES.find(t => t.id === id);
@@ -166,9 +149,8 @@ const App: React.FC = () => {
 
   const [expandedLeftCat, setExpandedLeftCat] = useState<string | null>('config');
   const [showZones, setShowZones] = useState(false);
-  const [isMusicEnabled, setIsMusicEnabled] = useState(false);
+  const [isMusicEnabled, setIsMusicEnabled] = useState(true);
   const [currentMusicStyle, setCurrentMusicStyle] = useState<MusicStyle>(TECHNO_STYLE);
-  const [isZenMode, setIsZenMode] = useState(false);
   const [isTypingSoundsEnabled, setIsTypingSoundsEnabled] = useState(true);
   const [comboMultiplier, setComboMultiplier] = useState(1.0);
   const [isMusicLightingEnabled, setIsMusicLightingEnabled] = useState(false);
@@ -419,6 +401,7 @@ const App: React.FC = () => {
       setTypedText(''); lastProcessedText.current = ''; setPhraseIndex(0); setCombo(0); setWordHasMistake(false);
       if (inputRef.current) inputRef.current.value = '';
       setIsLoading(false);
+      if (focus === 'Básico') setCurrentLevelId(null); // Reset if going back to basic generator
     };
     init();
   }, [language, focus]);
@@ -463,58 +446,20 @@ const App: React.FC = () => {
   // This step is just to update the Sidebar prop.
 
   useEffect(() => {
-    // Disable fetching more in Guide Mode (drills are fixed set)
-    if (isInfiniteMode && !isLoading && !isFetchingMore.current && phraseIndex >= phrases.length - 5 && !isGuideMode) {
-      const fetchMore = async () => {
-        isFetchingMore.current = true;
-        try {
-          const more = generateLocalPhrases(language, focus, 10);
-          if (more && more.length > 0) {
-            const normalized = more.map(p => p.normalize('NFC'));
-            setPhrases(prev => [...prev, ...normalized]);
-          }
-        } catch (err) {
-          console.error("Failed to fetch more Zen phrases:", err);
-        } finally {
-          isFetchingMore.current = false;
-        }
-      };
-      fetchMore();
-    }
-  }, [isInfiniteMode, phraseIndex, phrases.length, language, focus, isLoading, isGuideMode]);
+    // Legacy fetching logic removed as infinite mode is deleted
+  }, [phraseIndex, phrases.length, language, focus, isLoading, isGuideMode]);
 
   const handleInput = useCallback((e: React.FormEvent<HTMLTextAreaElement>) => {
-    let val = e.currentTarget.value.normalize('NFC');
-
-    if (isZenMode) {
-      const phrase = phrases[phraseIndex] || '';
-      if (val.length <= phrase.length) {
-        val = phrase.substring(0, val.length);
-        e.currentTarget.value = val;
-      } else {
-        val = phrase;
-        e.currentTarget.value = val;
-      }
-    }
-
+    const val = e.currentTarget.value.normalize('NFC');
     processNewValue(val);
-  }, [isZenMode, phrases, phraseIndex, processNewValue]);
+  }, [processNewValue]);
 
   const handleCompositionStart = useCallback(() => { isComposingRef.current = true; setIsComposingState(true); }, []);
   const handleCompositionEnd = useCallback((e: React.CompositionEvent<HTMLTextAreaElement>) => {
     isComposingRef.current = false; setIsComposingState(false);
-    let val = e.currentTarget.value.normalize('NFC');
-
-    if (isZenMode) {
-      const phrase = phrases[phraseIndex] || '';
-      if (val.length <= phrase.length) {
-        val = phrase.substring(0, val.length);
-        e.currentTarget.value = val;
-      }
-    }
-
+    const val = e.currentTarget.value.normalize('NFC');
     setTypedText(val);
-  }, [isInfiniteMode, phrases, phraseIndex]);
+  }, []);
 
   const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
     setActiveKey(e.key);
@@ -528,9 +473,11 @@ const App: React.FC = () => {
 
   const getBtnClass = (active: boolean) => `w-full p-4 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] transition-all duration-300 border flex items-center justify-between group ${active ? 'bg-[var(--accent-primary)]/10 border-[var(--accent-primary)] text-[var(--accent-primary)] shadow-[0_0_15px_var(--accent-glow)]' : 'bg-transparent border-[var(--border-glass)] text-[var(--text-secondary)] hover:border-[var(--text-primary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-glass)]'}`;
 
-  const handleSelectPhrases = useCallback((newPhrases: string[]) => {
+  const handleSelectPhrases = useCallback((newPhrases: string[], levelId?: string) => {
     if (!newPhrases || newPhrases.length === 0) return;
     setIsGuideMode(true); // Enable Guide Mode
+    if (levelId) setCurrentLevelId(levelId);
+    
     setPhrases(newPhrases.map(p => p.normalize('NFC')));
     setTypedText('');
     lastProcessedText.current = '';
@@ -541,8 +488,10 @@ const App: React.FC = () => {
     setStartTime(null);
     setIsFinished(false);
     setIsLoading(false);
+    setIsLevelActive(true);
     setTimeout(() => inputRef.current?.focus(), 10);
-  }, []);
+  }, [setCurrentLevelId, setPhrases, setTypedText, setPhraseIndex, setCombo, setStartTime, setIsFinished, setIsLoading]);
+
 
   return (
     <div
@@ -605,8 +554,8 @@ const App: React.FC = () => {
         TECHNO_STYLE={TECHNO_STYLE}
         AMBIENT_STYLE={AMBIENT_STYLE}
         ACID_HOUSE_STYLE={ACID_HOUSE_STYLE}
-        isInfiniteMode={isInfiniteMode}
-        onToggleZenMode={toggleInfiniteMode}
+        isInfiniteMode={false}
+        onToggleZenMode={() => {}}
         score={score}
       />
 
@@ -641,7 +590,21 @@ const App: React.FC = () => {
                   circuitTitle={currentCircuitTitle}
                   onCircuitCycle={handleManualCircuitCycle}
                   onDimensionalMenu={(e) => { setShowDimensionalSettings(!showDimensionalSettings); }}
+                  isLevelActive={isLevelActive}
+                  onSelectLevel={(level: any) => handleSelectPhrases(level.phrases, level.id)}
+                  themeScheme={currentTheme.scheme}
                 />
+
+                {isLevelActive && (
+                  <button 
+                    onClick={() => setIsLevelActive(false)}
+                    className="absolute right-[-80px] top-1/2 -translate-y-1/2 w-14 h-14 rounded-full bg-[var(--bg-glass)] border border-[var(--border-glass)] flex items-center justify-center text-[var(--text-secondary)] hover:text-[var(--accent-primary)] hover:border-[var(--accent-primary)] transition-all hover:scale-110 active:scale-95 group shadow-2xl backdrop-blur-xl"
+                    title="Volver al Selector"
+                  >
+                    <i className="fa fa-home text-xl transition-transform group-hover:rotate-12"></i>
+                    <div className="absolute top-[-30px] right-0 bg-[var(--bg-floating)] px-2 py-1 rounded text-[8px] font-black uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity">Volver</div>
+                  </button>
+                )}
 
                 <KeyboardSection
                   keyboardType={keyboardType}
@@ -651,10 +614,10 @@ const App: React.FC = () => {
                   isMusicLightingEnabled={isMusicLightingEnabled}
                   frequencyBands={frequencyBands}
                   stats={stats}
-                  isZenMode={isZenMode}
+                  isZenMode={false}
                   score={score}
                   onRestart={restart}
-                  onZenToggle={() => setIsZenMode(!isZenMode)}
+                  onZenToggle={() => {}}
                   audioReady={audioReady}
                   audioSystem={audioSystemRef.current}
                   currentMusicStyle={currentMusicStyle}
