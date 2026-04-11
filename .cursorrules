@@ -46,3 +46,15 @@
 - **Bugs to Issues**: Every entry in `BUGS.md` should have a corresponding GitHub Issue.
 - **Dev Status Issue**: Maintain a single "GHS Development Status" issue (Issue #1 by default) updated with active branches and stashes.
 - **Safety**: Never upload local vector stores (`.ai-index/`) or local environment variables (`.env`) to GitHub.
+
+#### 📝 Rule [Python Environment]
+
+# 🐍 Python Environment Rules
+
+- **Virtual Environment**: Always activate `.venv` before running Python scripts: `source .venv/bin/activate`
+- **GHS Tools Usage**:
+  - `python3 tools/search.py "query"` - Search in codebase
+  - `python3 tools/search.py "query" --json` - AI-agent output
+  - `python3 tools/indexer.py` - Re-index after code changes
+- **Dependencies**: Install with pip inside `.venv`, never globally
+- **No Commit Vector Data**: Never commit `.ai-index/` directory (already in .gitignore)
