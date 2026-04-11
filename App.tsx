@@ -168,6 +168,7 @@ const App: React.FC = () => {
   const [birdSize, setBirdSize] = useState(180);
   const [visualsConfig, setVisualsConfig] = useState<VisualsConfig>({ ...DEFAULT_VISUALS_CONFIG, type: 'circle' });
   const [showDimensionalSettings, setShowDimensionalSettings] = useState(false);
+  const [showSpheres, setShowSpheres] = useState(true);
 
   // GUIDE STATE
   const [highlightedKeys, setHighlightedKeys] = useState<string[]>([]);
@@ -590,6 +591,7 @@ const App: React.FC = () => {
                   circuitTitle={currentCircuitTitle}
                   onCircuitCycle={handleManualCircuitCycle}
                   onDimensionalMenu={(e) => { setShowDimensionalSettings(!showDimensionalSettings); }}
+                  showSpheres={showSpheres}
                   isLevelActive={isLevelActive}
                   onSelectLevel={(level: any) => handleSelectPhrases(level.phrases, level.id)}
                   themeScheme={(forceScheme === 'light' || (currentTheme.scheme === 'light' && !forceScheme)) ? 'light' : currentTheme.scheme}
@@ -631,6 +633,8 @@ const App: React.FC = () => {
                   combo={combo}
                   comboMultiplier={comboMultiplier}
                   onDimensionalMenu={(e) => { setShowDimensionalSettings(!showDimensionalSettings); }}
+                  onToggleSpheres={() => setShowSpheres(!showSpheres)}
+                  showSpheres={showSpheres}
                   hexToRgba={(hex, a) => `rgba(${currentTheme.r}, ${currentTheme.g}, ${currentTheme.b}, ${a})`}
                   customColor={`rgb(${currentTheme.r}, ${currentTheme.g}, ${currentTheme.b})`}
                   highlightedKeys={highlightedKeys}

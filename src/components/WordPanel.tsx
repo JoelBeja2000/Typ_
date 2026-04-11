@@ -52,6 +52,7 @@ interface WordPanelProps {
     currentLevelProgress?: number;
     currentLevelScore?: number;
     currentLevelAccuracy?: number;
+    showSpheres: boolean;
 }
 
 import { GUIDE_PHASES } from '../data/GuideData';
@@ -85,6 +86,7 @@ export const WordPanel: React.FC<WordPanelProps> = ({
     currentLevelProgress = 0,
     currentLevelScore = 0,
     currentLevelAccuracy = 100,
+    showSpheres,
 }) => {
     const textColor = themeScheme === 'light' ? 'text-black' : 'text-white';
     const themeColor = 'text-[var(--accent-primary)]';
@@ -94,7 +96,6 @@ export const WordPanel: React.FC<WordPanelProps> = ({
     const [expandedStars, setExpandedStars] = useState<number | null>(null);
     const [practiceExpanded, setPracticeExpanded] = useState(false);
     const [musicExpanded, setMusicExpanded] = useState(false);
-    const [showSpheres, setShowSpheres] = useState(true);
 
     const togglePractice = () => {
         setPracticeExpanded(!practiceExpanded);
@@ -381,24 +382,6 @@ export const WordPanel: React.FC<WordPanelProps> = ({
         <div className="w-full relative group flex justify-center">
             {/* CENTRAL CINEMATIC BOX */}
             <div className="w-full bg-[var(--bg-glass)] backdrop-blur-xl border border-[var(--border-glass)] rounded-[2.5rem] p-6 pt-6 flex flex-col items-center shadow-2xl relative" style={{ overflow: 'visible' }}>
-                
-                {/* FLOATING VISUALS TOGGLE */}
-                <div className="absolute top-6 right-8 z-[100]">
-                    <button
-                        onClick={() => setShowSpheres(!showSpheres)}
-                        title={showSpheres ? "Ocultar Esferas 3D" : "Mostrar Esferas 3D"}
-                        className={`group/eye flex items-center gap-3 px-4 py-2 rounded-full border backdrop-blur-md transition-all duration-500 ${
-                            showSpheres 
-                            ? 'border-[var(--accent-primary)]/30 bg-[var(--accent-primary)]/5 hover:bg-[var(--accent-primary)]/10 text-[var(--accent-primary)]' 
-                            : 'border-red-500/30 bg-red-500/5 hover:bg-red-500/10 text-red-400'
-                        }`}
-                    >
-                        <i className={`fa ${showSpheres ? 'fa-eye' : 'fa-eye-slash'} text-xs transition-transform group-hover/eye:scale-110`}></i>
-                        <span className="text-[9px] font-black uppercase tracking-[0.2em]">
-                            Esferas 3D: {showSpheres ? 'ON' : 'OFF'}
-                        </span>
-                    </button>
-                </div>
 
                 {/* CONTENT AREA */}
                 <div className="w-full flex-grow flex flex-col items-center justify-center select-none">
