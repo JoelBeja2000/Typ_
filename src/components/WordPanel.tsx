@@ -151,7 +151,7 @@ export const WordPanel: React.FC<WordPanelProps> = ({
                                                     <i key={i} className={`fa fa-star text-[12px] ${isExpanded ? 'text-[var(--accent-primary)] animate-pulse' : 'text-amber-400 opacity-60'}`}></i>
                                                 ))}
                                             </div>
-                                            <span className={`text-[12px] font-black uppercase tracking-wider ${isExpanded ? 'text-[var(--accent-primary)]' : 'text-[var(--text-primary)]'}`}>
+                                            <span className={`text-[12px] font-black uppercase tracking-wider ${isExpanded ? 'text-[var(--accent-primary)]' : 'text-white'}`}>
                                                 {name}
                                             </span>
                                         </div>
@@ -200,7 +200,7 @@ export const WordPanel: React.FC<WordPanelProps> = ({
                                 <div className="flex items-center gap-4">
                                     <div className="flex flex-col">
                                         <i className={`fa fa-hand-paper-o text-[14px] mb-1 ${practiceExpanded ? 'text-[var(--accent-primary)] animate-pulse' : 'text-amber-400 opacity-60'}`}></i>
-                                        <span className={`text-[12px] font-black uppercase tracking-wider ${practiceExpanded ? 'text-[var(--accent-primary)]' : 'text-[var(--text-primary)]'}`}>
+                                        <span className={`text-[12px] font-black uppercase tracking-wider ${practiceExpanded ? 'text-[var(--accent-primary)]' : 'text-white'}`}>
                                             Práctica de Dedos
                                         </span>
                                     </div>
@@ -243,7 +243,7 @@ export const WordPanel: React.FC<WordPanelProps> = ({
                                 <div className="flex items-center gap-4">
                                     <div className="flex flex-col">
                                         <i className={`fa ${musicIcons[musicStyles.indexOf(currentMusicStyle)] || 'fa-music'} text-[14px] mb-1 ${musicExpanded ? 'text-[var(--accent-primary)] animate-pulse' : 'text-amber-400 opacity-60'}`}></i>
-                                        <span className={`text-[12px] font-black uppercase tracking-wider ${musicExpanded ? 'text-[var(--accent-primary)]' : 'text-[var(--text-primary)]'}`}>
+                                        <span className={`text-[12px] font-black uppercase tracking-wider ${musicExpanded ? 'text-[var(--accent-primary)]' : 'text-white'}`}>
                                             {currentMusicStyle.name}
                                         </span>
                                     </div>
