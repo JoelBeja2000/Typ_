@@ -12,7 +12,7 @@ import { TECHNO_STYLE, AMBIENT_STYLE, ACID_HOUSE_STYLE, MusicStyle } from './src
 import { KEY_TO_FINGER_MAP, SPACE_DATA } from './constants';
 import { Language, TypingStats } from './types';
 import { generateLocalPhrases } from './src/utils/phraseUtils';
-import { VisualsConfig, DEFAULT_VISUALS_CONFIG } from './src/types/visuals';
+import { VisualsConfig, DEFAULT_VISUALS_CONFIG, GeometryType } from './src/types/visuals';
 import { GUIDE_PHASES } from './src/data/GuideData';
 import { BrowserThemeManager } from './src/infrastructure/ui/BrowserThemeManager';
 import { ZEN_PHRASES, PHRASE_CATEGORIES } from './src/data/ZenPhrases';
@@ -429,7 +429,7 @@ const App: React.FC = () => {
   useEffect(() => {
     let frameId: number;
     const pollEnergy = () => {
-      if (audioSystemRef.current && isMusicEnabled && isLevelActive && !isFinished) {
+      if (audioSystemRef.current && isMusicEnabled && audioReady) {
         setFrequencyBands(audioSystemRef.current.getFrequencyBands());
       } else {
         setFrequencyBands({ bass: 0, mid: 0, high: 0 });
@@ -438,7 +438,7 @@ const App: React.FC = () => {
     };
     frameId = requestAnimationFrame(pollEnergy);
     return () => cancelAnimationFrame(frameId);
-  }, [isMusicEnabled, isLevelActive, isFinished]);
+  }, [isMusicEnabled, audioReady]);
 
   useEffect(() => {
     document.documentElement.style.setProperty('--ui-scale', uiScale.toString());
@@ -585,6 +585,21 @@ const App: React.FC = () => {
     setSolvedWords([]);
   }, []);
 
+  const cycleShapes = useCallback((e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
+    const shapes: GeometryType[] = ['icosahedron', 'box', 'octahedron', 'tetrahedron', 'dodecahedron', 'knot', 'torus'];
+    setVisualsConfig(prev => {
+      const current = prev.outerSphere.shape;
+      const nextIndex = (shapes.indexOf(current) + 1) % shapes.length;
+      const nextShape = shapes[nextIndex];
+      return {
+        ...prev,
+        outerSphere: { ...prev.outerSphere, shape: nextShape },
+        innerSphere: { ...prev.innerSphere, shape: nextShape }
+      };
+    });
+  }, []);
+
 
   return (
     <div
@@ -667,7 +682,7 @@ const App: React.FC = () => {
           
           {/* LEFT CURTAIN */}
           <div 
-            className="hidden xl:flex w-[250px] shrink-0 z-0 overflow-hidden relative"
+            className="hidden xl:flex w-[450px] shrink-0 z-0 overflow-hidden relative"
           >
             <WordCurtain 
               text={solvedWords.join('  ')} 
@@ -707,6 +722,7 @@ const App: React.FC = () => {
                   circuitTitle={currentCircuitTitle}
                   onCircuitCycle={handleManualCircuitCycle}
                   onDimensionalMenu={(e) => { setShowDimensionalSettings(!showDimensionalSettings); }}
+                  onCycleShapes={cycleShapes}
                   isLevelActive={isLevelActive}
                   onSelectLevel={(level: any) => handleSelectPhrases(level.phrases, level.id)}
                   themeScheme={(forceScheme === 'light' || (currentTheme.scheme === 'light' && !forceScheme)) ? 'light' : currentTheme.scheme}
@@ -846,6 +862,13 @@ const App: React.FC = () => {
                 <i className="fa fa-hand-paper-o w-4"></i>
                 <span>Guía</span>
               </button>
+              <button onClick={cycleShapes} className="w-full px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wider flex items-center gap-3 transition-all text-[var(--accent-primary)] bg-[var(--accent-primary)]/10 hover:bg-[var(--accent-primary)]/20">
+                <i className="fa fa-cube w-4"></i>
+                <div className="flex flex-col">
+                    <span className="text-[7px] opacity-60">Geometría</span>
+                    <span className="leading-none">{visualsConfig.outerSphere.shape}</span>
+                </div>
+              </button>
             </div>
 
           </div>
@@ -853,7 +876,7 @@ const App: React.FC = () => {
 
           {/* RIGHT CURTAIN */}
           <div 
-            className="hidden xl:flex w-[250px] shrink-0 z-0 overflow-hidden relative"
+            className="hidden xl:flex w-[450px] shrink-0 z-0 overflow-hidden relative"
           >
             <WordCurtain 
               text={solvedWords.join('  ')} 

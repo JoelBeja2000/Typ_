@@ -1,0 +1,257 @@
+import React, { useEffect, useRef } from 'react';
+import * as THREE from 'three';
+
+interface MorphSphereProps {
+    className?: string;
+    color?: string;
+    bands?: { bass: number, mid: number, high: number };
+    side?: 'left' | 'right';
+    onClick?: (e: React.MouseEvent) => void;
+    lightingEnabled?: boolean;
+}
+
+const SHAPES = ['icosahedron', 'sphere', 'torus', 'box', 'cone', 'octahedron', 'tetrahedron', 'knot', 'dodecahedron', 'cylinder'];
+let shapeIndex = 0;
+let currentShape = 'icosahedron';
+
+const createGeometry = (shape: string, size: number, segments: number): THREE.BufferGeometry => {
+    switch (shape) {
+        case 'sphere': return new THREE.SphereGeometry(size, segments, segments);
+        case 'torus': return new THREE.TorusGeometry(size * 0.7, size * 0.3, 32, 64);
+        case 'box': return new THREE.BoxGeometry(size * 1.6, size * 1.6, size * 1.6, 16, 16, 16);
+        case 'cone': return new THREE.ConeGeometry(size, size * 2.2, 64, 32);
+        case 'octahedron': return new THREE.OctahedronGeometry(size * 1.3, 4);
+        case 'tetrahedron': return new THREE.TetrahedronGeometry(size * 1.5, 4);
+        case 'knot': return new THREE.TorusKnotGeometry(size * 0.6, size * 0.22, 200, 32);
+        case 'dodecahedron': return new THREE.DodecahedronGeometry(size * 1.1, 2);
+        case 'cylinder': return new THREE.CylinderGeometry(size * 0.8, size * 0.8, size * 2, 64, 32);
+        case 'icosahedron':
+        default: return new THREE.IcosahedronGeometry(size, segments);
+    }
+};
+
+const MorphSphere: React.FC<MorphSphereProps> = ({
+    className = "",
+    color = "#7F77DD",
+    bands = { bass: 0, mid: 0, high: 0 },
+    side = 'left',
+    onClick,
+    lightingEnabled = false
+}) => {
+    const containerRef = useRef<HTMLDivElement>(null);
+    const bandsRef = useRef(bands);
+    const meshRef = useRef<THREE.Mesh | null>(null);
+    const innerMeshRef = useRef<THREE.Mesh | null>(null);
+    const morphRef = useRef({ t: 1, src: new Float32Array(0), dst: new Float32Array(0), active: false });
+
+    useEffect(() => { bandsRef.current = bands; }, [bands]);
+
+    useEffect(() => {
+        if (typeof window === 'undefined') return;
+        
+        const container = containerRef.current;
+        if (!container) return;
+
+        while (container.firstChild) {
+            container.removeChild(container.firstChild);
+        }
+
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(50, 1, 0.1, 1000);
+        camera.position.z = 5;
+
+        const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+        const width = container.clientWidth || 180;
+        const height = container.clientHeight || 180;
+        renderer.setSize(width, height);
+        renderer.setClearColor(0x000000, 0);
+        container.appendChild(renderer.domElement);
+
+        // Use lower segments to avoid NaN issues
+        const BASE_SIZE = 2;
+        const BASE_SEGMENTS = 2;
+        
+        // Create base geometry
+        const baseGeo = new THREE.IcosahedronGeometry(BASE_SIZE, BASE_SEGMENTS);
+        const VC = baseGeo.attributes.position.count;
+
+        // Create shape cache with normalized vertex counts
+        const shapeCache: Record<string, Float32Array> = {};
+        SHAPES.forEach(shapeName => {
+            const geo = createGeometry(shapeName, BASE_SIZE, BASE_SEGMENTS);
+            const positions = geo.attributes.position;
+            const arr = new Float32Array(VC * 3);
+            const scale = BASE_SIZE;
+            for (let i = 0; i < VC; i++) {
+                const idx = Math.floor((i / VC) * positions.count);
+                arr[i * 3] = positions.getX(idx);
+                arr[i * 3 + 1] = positions.getY(idx);
+                arr[i * 3 + 2] = positions.getZ(idx);
+            }
+            shapeCache[shapeName] = arr;
+            geo.dispose();
+        });
+        
+        // Clean up base geometry
+        baseGeo.dispose();
+
+        // Use icosahedron as base for consistent vertex count
+        const currentGeo = new THREE.IcosahedronGeometry(BASE_SIZE, BASE_SEGMENTS);
+        const innerGeo = new THREE.IcosahedronGeometry(BASE_SIZE, BASE_SEGMENTS);
+        
+        const material = new THREE.MeshBasicMaterial({
+            color: new THREE.Color(color),
+            wireframe: true,
+            transparent: true,
+            opacity: 0.85,
+        });
+        
+        const innerMaterial = new THREE.MeshBasicMaterial({
+            color: new THREE.Color('#5DCAA5'),
+            wireframe: true,
+            transparent: true,
+            opacity: 0.3,
+        });
+        
+        const mesh = new THREE.Mesh(currentGeo, material);
+        const innerMesh = new THREE.Mesh(innerGeo, innerMaterial);
+        innerMesh.scale.setScalar(0.55);
+        
+        meshRef.current = mesh;
+        innerMeshRef.current = innerMesh;
+        
+        scene.add(mesh);
+        scene.add(innerMesh);
+
+        let time = 0;
+        
+        function easeInOutCubic(t: number) {
+            return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+        }
+
+        const animate = () => {
+            requestAnimationFrame(animate);
+            time += 0.016;
+
+            const b = bandsRef.current;
+            const morph = morphRef.current;
+            
+            // Handle morphing
+            let vertexData: Float32Array;
+            
+            if (morph.active && morph.t < 1) {
+                morph.t = Math.min(1, morph.t + 0.025);
+                const ease = easeInOutCubic(morph.t);
+                vertexData = new Float32Array(VC * 3);
+                for (let i = 0; i < VC * 3; i++) {
+                    vertexData[i] = morph.src[i] + (morph.dst[i] - morph.src[i]) * ease;
+                }
+                if (morph.t >= 1) {
+                    morph.active = false;
+                }
+            } else {
+                vertexData = shapeCache[currentShape];
+            }
+
+            // Apply vertex positions
+            const pos = currentGeo.attributes.position;
+            const innerPos = innerGeo.attributes.position;
+            for (let i = 0; i < VC; i++) {
+                pos.setXYZ(i, vertexData[i * 3], vertexData[i * 3 + 1], vertexData[i * 3 + 2]);
+                innerPos.setXYZ(i, vertexData[i * 3], vertexData[i * 3 + 1], vertexData[i * 3 + 2]);
+            }
+            pos.needsUpdate = true;
+            innerPos.needsUpdate = true;
+
+            // Audio deformation
+            const deform = 1 + b.bass * 0.5 + b.mid * 0.3 + b.high * 0.15;
+            mesh.scale.setScalar(deform);
+            innerMesh.scale.setScalar(deform * 0.55);
+
+            // Rotation
+            mesh.rotation.x += 0.004 + b.bass * 0.015;
+            mesh.rotation.y += 0.006 + b.mid * 0.01;
+            innerMesh.rotation.x -= 0.002;
+            innerMesh.rotation.y -= 0.004;
+            innerMesh.rotation.z += 0.001;
+
+            // Color shift
+            if (lightingEnabled) {
+                const hue = (time * 12 + b.bass * 60) % 360;
+                const sat = 0.55 + b.bass * 0.35;
+                const lit = 0.45 + b.mid * 0.3;
+                material.color.setHSL(hue / 360, sat, lit);
+            }
+
+            material.opacity = 0.7 + b.bass * 0.25;
+            innerMaterial.opacity = 0.25 + b.bass * 0.2;
+
+            renderer.render(scene, camera);
+        };
+
+        animate();
+
+        return () => {
+            while (container.firstChild) {
+                container.removeChild(container.firstChild);
+            }
+            currentGeo.dispose();
+            innerGeo.dispose();
+            material.dispose();
+            innerMaterial.dispose();
+            renderer.dispose();
+            scene.clear();
+        };
+    }, []);
+
+    const handleClick = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        
+        const mesh = meshRef.current;
+        if (!mesh) return;
+        
+        // Get vertex count
+        const pos = mesh.geometry.attributes.position;
+        const VC = pos.count;
+        
+        // Get next shape
+        shapeIndex = (shapeIndex + 1) % SHAPES.length;
+        const nextShape = SHAPES[shapeIndex];
+        
+        // Create destination geometry
+        const geo = createGeometry(nextShape, 2, 2);
+        const dst = new Float32Array(VC * 3);
+        for (let i = 0; i < VC; i++) {
+            const idx = Math.floor((i / VC) * geo.attributes.position.count);
+            dst[i * 3] = geo.attributes.position.getX(idx);
+            dst[i * 3 + 1] = geo.attributes.position.getY(idx);
+            dst[i * 3 + 2] = geo.attributes.position.getZ(idx);
+        }
+        geo.dispose();
+        
+        // Get current positions as source
+        const src = new Float32Array(VC * 3);
+        for (let i = 0; i < VC; i++) {
+            src[i * 3] = pos.getX(i);
+            src[i * 3 + 1] = pos.getY(i);
+            src[i * 3 + 2] = pos.getZ(i);
+        }
+        
+        // Start morph
+        currentShape = nextShape;
+        morphRef.current = { t: 0, src, dst, active: true };
+        
+        if (onClick) onClick(e);
+    };
+
+    return (
+        <div
+            ref={containerRef}
+            className={`w-full h-full flex items-center justify-center pointer-events-auto cursor-pointer ${className}`}
+            onClick={handleClick}
+            style={{ width: '100%', height: '100%', borderRadius: '50%' }}
+        />
+    );
+};
+
+export default MorphSphere;

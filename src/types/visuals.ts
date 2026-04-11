@@ -1,3 +1,5 @@
+export type GeometryType = 'icosahedron' | 'box' | 'octahedron' | 'tetrahedron' | 'dodecahedron' | 'knot' | 'torus';
+
 export interface SphereConfig {
     size: number;
     segments: number;
@@ -5,6 +7,9 @@ export interface SphereConfig {
     deformationFactor: number;
     spikeFactor: number;
     isWireframe: boolean;
+    shape: GeometryType;
+    morphSpeed: number;
+    noiseScale: number;
 }
 
 export interface BirdConfig {
@@ -24,7 +29,7 @@ export interface VisualsConfig {
 }
 
 export const DEFAULT_VISUALS_CONFIG: VisualsConfig = {
-    type: 'bird',
+    type: 'circle',
     bird: {
         tubeRadius: 0.08,
         segments: 120,
@@ -36,17 +41,23 @@ export const DEFAULT_VISUALS_CONFIG: VisualsConfig = {
         size: 7,
         segments: 4,
         opacity: 0.6,
-        deformationFactor: 1.0,
+        deformationFactor: 1.2,
         spikeFactor: 1.0,
-        isWireframe: true
+        isWireframe: true,
+        shape: 'icosahedron',
+        morphSpeed: 1.5,
+        noiseScale: 1.0
     },
     innerSphere: {
         size: 3.5,
         segments: 2,
         opacity: 0.3,
-        deformationFactor: 1.0,
-        spikeFactor: 0.5,
-        isWireframe: true
+        deformationFactor: 1.2,
+        spikeFactor: 0.8,
+        isWireframe: true,
+        shape: 'icosahedron',
+        morphSpeed: 1.5,
+        noiseScale: 1.0
     },
     globalRotationSpeed: 1.0
 };

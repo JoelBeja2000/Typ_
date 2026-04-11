@@ -2,10 +2,18 @@
 
 const worker: DedicatedWorkerGlobalScope = self as any;
 
+// A simple deterministic noise hash for vertex jitter (from morphsphere.html)
+function noiseHash(x: number, y: number, z: number) {
+    const n = Math.sin(x * 127.1 + y * 311.7 + z * 74.7) * 43758.5453123;
+    return n - Math.floor(n);
+}
+
 worker.onmessage = (e: MessageEvent) => {
     const {
         positions,
-        originalPositions,
+        srcPositions,
+        dstPositions,
+        morphProgress,
         time,
         bands,
         config,
@@ -15,56 +23,66 @@ worker.onmessage = (e: MessageEvent) => {
     const bass = (bands?.bass || 0) / 255;
     const mid = (bands?.mid || 0) / 255;
     const high = (bands?.high || 0) / 255;
-    const energy = (bass + mid + high) / 3;
+    
+    // Smooth easing for morphing
+    const morphT = morphProgress < 0.5 
+        ? 4 * morphProgress * morphProgress * morphProgress 
+        : 1 - Math.pow(-2 * morphProgress + 2, 3) / 2;
 
-    // Progression logic (copied from modeling.ts for self-containment)
-    // Progression logic (copied from modeling.ts for self-containment)
-    // TUNED FOR IMMEDIATE REACTIVITY: Gates now open much earlier or have baselines
-    const breathingGate = 0.8 + (Math.min(1.0, combo / 25) * 0.2); // Always breathing nicely
+    const ns = config.noiseScale || 1.0;
+    const str = config.deformationFactor || 1.0;
 
-    // Bass: Starts immediately (20% baseline), full by combo 15
-    const bassGate = 0.2 + (Math.min(1.0, Math.max(0, combo / 15)) * 0.8);
-
-    // Mids: Starts at combo 5 (was 25), full by 30
-    const midGate = Math.min(1.0, Math.max(0, (combo - 5) / 25));
-
-    // Highs: Starts at combo 15 (was 60), full by 50
-    const highGate = Math.min(1.0, Math.max(0, (combo - 15) / 35));
-
-    const audioActivity = (energy > 0.01) ? 1.0 : energy * 100;
+    // Progression gates based on combo (subtle organic growth)
+    const audioActivity = (bass + mid + high > 0.01) ? 1.0 : 0.2;
+    
+    // Total displacement amount weighted by audio bands (MorphSphere style)
+    const dispAmt = str * (
+        bass * 0.6 * (0.5 + combo * 0.02) + 
+        mid * 0.35 * (0.8 + combo * 0.01) + 
+        high * 0.2 * (0.5 + combo * 0.02) + 
+        0.02 // Baseline life
+    ) * audioActivity;
 
     for (let i = 0; i < positions.length / 3; i++) {
-        const ox = originalPositions[i * 3];
-        const oy = originalPositions[i * 3 + 1];
-        const oz = originalPositions[i * 3 + 2];
+        // Step 1: Linear interpolation between source and destination shapes (The "skeleton")
+        const sx = srcPositions[i * 3];
+        const sy = srcPositions[i * 3 + 1];
+        const sz = srcPositions[i * 3 + 2];
 
-        const len = Math.sqrt(ox * ox + oy * oy + oz * oz) || 1;
-        const nx = ox / len;
-        const ny = oy / len;
-        const nz = oz / len;
+        const dx = dstPositions[i * 3];
+        const dy = dstPositions[i * 3 + 1];
+        const dz = dstPositions[i * 3 + 2];
 
-        const bassAtt = Math.max(0, bass - 0.02) * 1.02;
-        const midAtt = Math.max(0, mid - 0.02) * 1.02;
-        const highAtt = Math.max(0, high - 0.02) * 1.02;
+        // The base position is the morph between shapes
+        const bx = sx + (dx - sx) * morphT;
+        const by = sy + (dy - sy) * morphT;
+        const bz = sz + (dz - sz) * morphT;
 
-        const breath = Math.sin(nx * 1.5 + time * 0.8) * Math.cos(ny * 1.5 + time * 0.6) * 0.25 * breathingGate;
-        const pulse = Math.pow(bassAtt, 1.5) * 14.0 * bassGate;
-        const swell = Math.sin(nx * 2.0 + time * 2.5 + bassAtt * 10) * Math.cos(ny * 2.0 + time * 2.0) * bassGate;
-        const ripple = Math.sin(nz * 15.0 - time * 6.5 + midAtt * 25) * Math.sin(nx * 8.0 + time * 4.5) * midGate;
-        const agitationRaw = Math.sin(nx * 45 + ny * 45 + time * 22);
-        const agitation = Math.pow(Math.abs(agitationRaw), 1.8) * Math.sign(agitationRaw) * highAtt * 28.0 * config.spikeFactor * highGate;
+        const len = Math.sqrt(bx * bx + by * by + bz * bz) || 1;
+        const nx = bx / len;
+        const ny = by / len;
+        const nz = bz / len;
 
-        const peekVal = (midAtt + bassAtt) / 2;
-        const peakBoost = 1.0 + (peekVal * peekVal) * 12.0 * midGate;
+        // Step 2: Organic Noise Displacement (High Intensity)
+        // Three layers of noise at different frequencies for detail
+        const n1 = noiseHash(bx * ns + time * 0.8, by * ns, bz * ns);
+        const n2 = noiseHash(bx * ns * 2.5, by * ns * 2.5 + time * 0.6, bz * ns * 2.5);
+        const n3 = noiseHash(bx * 0.5, by * ns * 3.0, bz * ns * 3.0 + time * 1.2);
 
-        const totalMod = (
-            breath + swell * (1.1 + bassAtt * 6.0) + ripple * (0.8 + midAtt * 5.0) + agitation + pulse
-        ) * config.deformationFactor * peakBoost * audioActivity;
+        // Center noise around zero (-0.5 to 0.5) for bidirectional vibration
+        const noiseVal = (n1 * 0.5 + n2 * 0.3 + n3 * 0.2) - 0.5;
+        
+        // Multiplier for visible deformation (5x increase)
+        const noiseDisp = noiseVal * dispAmt * 5.0; 
+        
+        // Final vertex position
+        const spike = config.spikeFactor || 1.0;
+        const roughness = high * 2.0 * spike; // High frequencies create sharp bumps
+        const distortion = 1 + noiseDisp + (noiseVal * roughness);
 
-        const distortion = 1 + totalMod * 0.55;
-        positions[i * 3] = ox * distortion;
-        positions[i * 3 + 1] = oy * distortion;
-        positions[i * 3 + 2] = oz * distortion;
+        positions[i * 3] = bx * distortion;
+        positions[i * 3 + 1] = by * distortion;
+        positions[i * 3 + 2] = bz * distortion;
     }
 
     // Send back the updated positions with the identifier

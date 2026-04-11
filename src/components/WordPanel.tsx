@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import BackgroundSphere from './BackgroundSphere';
+import MorphSphere from './MorphSphere';
 import { VisualsConfig } from '../types/visuals';
 import { MusicStyle, TECHNO_STYLE, AMBIENT_STYLE, ACID_HOUSE_STYLE } from '../domain/models/MusicStyles';
 
@@ -52,6 +52,7 @@ interface WordPanelProps {
     currentLevelProgress?: number;
     currentLevelScore?: number;
     currentLevelAccuracy?: number;
+    onCycleShapes?: () => void;
 }
 
 import { GUIDE_PHASES } from '../data/GuideData';
@@ -85,6 +86,7 @@ export const WordPanel: React.FC<WordPanelProps> = ({
     currentLevelProgress = 0,
     currentLevelScore = 0,
     currentLevelAccuracy = 100,
+    onCycleShapes,
 }) => {
     const textColor = themeScheme === 'light' ? 'text-black' : 'text-white';
     const themeColor = 'text-[var(--accent-primary)]';
@@ -384,65 +386,48 @@ export const WordPanel: React.FC<WordPanelProps> = ({
                         {isLevelActive ? renderVocabField() : renderLevelSelector()}
                     </div>
 
-                    {/* BOTTOM INTERACTIVE GROUP: Word Pill + 3D Animations */}
+                    {/* BOTTOM INTERACTIVE GROUP: Word Pill + 3D Animations - Only show when level active */}
                     <div className={`w-full flex flex-col items-center gap-4 mt-6 relative transition-all duration-1000 ${isLevelActive ? 'opacity-100' : 'opacity-0 h-0 pointer-events-none'}`}>
                         {/* SPHERES CONTAINER - ABSOLUTE POSITIONING */}
                         {/* LEFT SPHERE */}
-                        {true && (
-                            <div className="absolute hidden md:block"
-                                style={{
-                                    left: '0px',
-                                    top: '50%',
-                                    transform: `translateY(-50%)`,
-                                    width: `${birdSize * 0.8}px`,
-                                    height: `${birdSize * 0.8}px`,
-                                    pointerEvents: 'auto',
-                                    zIndex: 50,
-                                    opacity: 0.8
-                                }}>
-                                <BackgroundSphere
-                                    key={`circle-left`}
-                                    color={sphereColor}
-                                    speed={0.75}
-                                    bands={frequencyBands}
-                                    rotation={birdRotation}
-                                    position={birdPos3D}
-                                    side="left"
-                                    scale={(birdSize * 0.8) / 180}
-                                    config={visualsConfig}
-                                    combo={combo * comboMultiplier}
-                                    lightingEnabled={isMusicLightingEnabled}
-                                    onClick={onDimensionalMenu} />
-                            </div>
-                        )}
+                        {/* LEFT SPHERE */}
+                        <div className="absolute"
+                            style={{
+                                left: '10px',
+                                top: '50%',
+                                width: '180px',
+                                height: '180px',
+                                transform: 'translateY(-50%)',
+                                zIndex: 50,
+                            }}>
+                            <MorphSphere
+                                key={`circle-left`}
+                                color={sphereColor}
+                                bands={frequencyBands}
+                                side="left"
+                                combo={combo * comboMultiplier}
+                                lightingEnabled={isMusicLightingEnabled}
+                                onClick={onCycleShapes} />
+                        </div>
                         {/* RIGHT SPHERE */}
-                        {true && (
-                            <div className="absolute hidden md:block"
-                                style={{
-                                    right: '0px',
-                                    top: '50%',
-                                    transform: `translateY(-50%)`,
-                                    width: `${birdSize * 0.8}px`,
-                                    height: `${birdSize * 0.8}px`,
-                                    pointerEvents: 'auto',
-                                    zIndex: 50,
-                                    opacity: 0.8
-                                }}>
-                                <BackgroundSphere
-                                    key={`circle-right`}
-                                    color={sphereColor}
-                                    speed={0.75}
-                                    bands={frequencyBands}
-                                    rotation={birdRotation}
-                                    position={birdPos3D}
-                                    side="right"
-                                    scale={(birdSize * 0.8) / 180}
-                                    config={visualsConfig}
-                                    combo={combo * comboMultiplier}
-                                    lightingEnabled={isMusicLightingEnabled}
-                                    onClick={onDimensionalMenu} />
-                            </div>
-                        )}
+                        <div className="absolute"
+                            style={{
+                                right: '10px',
+                                top: '50%',
+                                width: '180px',
+                                height: '180px',
+                                transform: 'translateY(-50%)',
+                                zIndex: 50,
+                            }}>
+                            <MorphSphere
+                                key={`circle-right`}
+                                color={sphereColor}
+                                bands={frequencyBands}
+                                side="right"
+                                combo={combo * comboMultiplier}
+                                lightingEnabled={isMusicLightingEnabled}
+                                onClick={onCycleShapes} />
+                        </div>
 
                         {/* CIRCUIT TIMER (Moved here) */}
                         {isCircuitMode && circuitTimer !== undefined && (
@@ -463,7 +448,7 @@ export const WordPanel: React.FC<WordPanelProps> = ({
                         )}
 
                         {/* CURRENT WORD PILL SECTION */}
-                        <div className="relative overflow-visible flex items-center justify-center gap-8" style={{ height: `${birdSize * 0.8}px` }}>
+                        <div className="relative overflow-visible flex items-center justify-center gap-8 min-h-[144px]">
                             <div className="bg-[var(--bg-floating)] backdrop-blur-3xl border border-[var(--border-strong)] rounded-[2.5rem] px-14 h-24 flex items-center justify-center min-w-[400px] shadow-3xl scale-110 z-30 relative overflow-visible">
                                 <div className="relative font-mono text-4xl flex items-center h-full min-w-[200px]">
                                     <div className={`absolute inset-0 whitespace-pre flex items-center justify-start pointer-events-none ${textColor}`}>{currentWordInfo.word}</div>
