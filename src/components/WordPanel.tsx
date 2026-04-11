@@ -176,17 +176,19 @@ export const WordPanel: React.FC<WordPanelProps> = ({
                                                         <i className="fa fa-play text-[8px] text-[var(--accent-primary)] opacity-0 group-hover:opacity-100 transform translate-x-2 group-hover:translate-x-0 transition-all"></i>
                                                     </div>
                                                 </button>
-                                            ))}
-                                        </div>
-                                    </div>
+))}
+                    </div>
+
+                </div>
                                 </div>
                             </div>
                         );
                     })}
                     </div>
 
-                    {/* Column 2: Practice */}
+                    {/* Column 2: Practice + Music */}
                     <div className="space-y-4">
+                        {/* Practice */}
                         <h2 className="text-[10px] font-black uppercase tracking-[0.5em] text-[var(--accent-primary)] mb-4 text-center">
                             ✋ Práctica
                         </h2>
@@ -228,10 +230,8 @@ export const WordPanel: React.FC<WordPanelProps> = ({
                                 </div>
                             </div>
                         </div>
-                    </div>
-
-                    {/* Column 3: Music Styles */}
-                    <div className="space-y-4">
+                        
+                        {/* Music */}
                         <h2 className="text-[10px] font-black uppercase tracking-[0.5em] text-[var(--accent-primary)] mb-4 text-center">
                             🎵 Música
                         </h2>
