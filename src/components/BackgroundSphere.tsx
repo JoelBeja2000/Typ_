@@ -3,7 +3,7 @@ import * as THREE from 'three';
 import { VisualsConfig, DEFAULT_VISUALS_CONFIG } from '../types/visuals';
 import { getMusicTransform } from '../domain/visuals/modeling';
 
-interface BirdAnimationProps {
+interface BackgroundSphereProps {
     className?: string;
     speed?: number;
     color?: string;
@@ -18,7 +18,7 @@ interface BirdAnimationProps {
     lightingEnabled?: boolean;
 }
 
-const BirdAnimation: React.FC<BirdAnimationProps> = ({
+const BackgroundSphere: React.FC<BackgroundSphereProps> = ({
     className = "",
     speed = 1.0,
     color = "#ffffff",
@@ -231,4 +231,4 @@ const BirdAnimation: React.FC<BirdAnimationProps> = ({
     );
 };
 
-export default BirdAnimation;
+export default BackgroundSphere;

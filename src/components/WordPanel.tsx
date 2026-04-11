@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import BirdAnimation from './BirdAnimation';
+import BackgroundSphere from './BackgroundSphere';
 import { VisualsConfig } from '../types/visuals';
 import { MusicStyle, TECHNO_STYLE, AMBIENT_STYLE, ACID_HOUSE_STYLE } from '../domain/models/MusicStyles';
 
@@ -400,7 +400,7 @@ export const WordPanel: React.FC<WordPanelProps> = ({
                                     zIndex: 50,
                                     opacity: 0.8
                                 }}>
-                                <BirdAnimation
+                                <BackgroundSphere
                                     key={`circle-left`}
                                     color={sphereColor}
                                     speed={0.75}
@@ -428,7 +428,7 @@ export const WordPanel: React.FC<WordPanelProps> = ({
                                     zIndex: 50,
                                     opacity: 0.8
                                 }}>
-                                <BirdAnimation
+                                <BackgroundSphere
                                     key={`circle-right`}
                                     color={sphereColor}
                                     speed={0.75}

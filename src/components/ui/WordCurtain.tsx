@@ -85,10 +85,11 @@ class Particle {
   originalPinnedState: boolean;
   id: number;
   char: string;
+  wordId: number;
   gravityVec: Vec2;
   downConstraint?: Constraint;
 
-  constructor({ x = 0, y = 0, pinned = false, id = 0, char = ' ' } = {}) {
+  constructor({ x = 0, y = 0, pinned = false, id = 0, char = ' ', wordId = -1 } = {}) {
     this.pos = new Vec2(x, y);
     this.oldPos = new Vec2(x, y);
     this.velocity = new Vec2();
@@ -97,6 +98,7 @@ class Particle {
     this.originalPinnedState = pinned;
     this.id = id;
     this.char = char;
+    this.wordId = wordId;
     this.gravityVec = new Vec2();
   }
 
@@ -133,6 +135,12 @@ class Particle {
 
     this.pos.x += this.velocity.x + this.acceleration.x * dd;
     this.pos.y += this.velocity.y + this.acceleration.y * dd;
+
+    // Hard clamp to prevent letters from going above the top boundary
+    if (this.pos.y < 5) {
+      this.pos.y = 5;
+      if (this.oldPos.y < this.pos.y) this.oldPos.y = this.pos.y;
+    }
 
     this.acceleration.reset();
   }
@@ -282,18 +290,21 @@ interface WordCurtainProps {
   text: string;
   color?: string;
   frequencyBands?: { bass: number; mid: number; high: number };
+  combo?: number;
 }
 
 export const WordCurtain: React.FC<WordCurtainProps> = ({ 
   text, 
   color = '#FFFFFF',
-  frequencyBands = { bass: 0, mid: 0, high: 0 }
+  frequencyBands = { bass: 0, mid: 0, high: 0 },
+  combo = 0
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const particlesRef = useRef<Particle[]>([]);
   const configRef = useRef<any>({});
   const audioRef = useRef(frequencyBands);
+  const smoothedEnergyRef = useRef(0);
   const charCanvasesRef = useRef<Record<string, HTMLCanvasElement>>({});
   const [dims, setDims] = useState({ w: 0, h: 0 });
 
@@ -334,8 +345,8 @@ export const WordCurtain: React.FC<WordCurtainProps> = ({
       aheight: h,
       gridW: Math.max(5, Math.floor(w / 18)),
       gridH: Math.max(10, Math.floor(h / 18)),
-      gravity: 0.2,
-      damping: 0.98,
+      gravity: 0.45, // Increased gravity for heavier feel
+      damping: 0.96, // Slightly more damping to reduce wild rebounds
       iterationsPerFrame: 5,
       compressFactor: 0.1,
       stretchFactor: 1.1,
@@ -401,20 +412,57 @@ export const WordCurtain: React.FC<WordCurtainProps> = ({
     let rafID: number;
     let lastDelta = performance.now();
     
-    function draw() {
+    function draw(time: number) {
       if (!c || !ctx) return;
       ctx.clearRect(0, 0, c.width, c.height);
       
       const offset = [c.width / 2 - configRef.current.awidth / 2, 0];
+      const audio = audioRef.current;
+      
+      // Even smoother energy transitions for a more organic feel
+      const instantEnergy = (audio.bass * 1.2 + audio.mid * 0.6 + audio.high * 0.4);
+      smoothedEnergyRef.current += (instantEnergy - smoothedEnergyRef.current) * 0.08;
+      const energy = smoothedEnergyRef.current;
+      
+      const pulseScale = 1 + Math.min(0.12, energy * 0.1);
+      
+      // Calculate tremble per word
+      const wordTrembles: Record<number, { x: number, y: number }> = {};
       
       particles.forEach(p => {
         if (p.char && p.char !== " ") {
           const img = charCanvasesRef.current[p.char];
           if (!img) return;
-          const half = img.width / 2;
-          ctx.drawImage(img, p.pos.x + offset[0] - half, p.pos.y + offset[1] - half);
+          
+          if (p.wordId !== -1 && !wordTrembles[p.wordId]) {
+             // Multi-frequency oscillation for organic "shiver" look
+             const t = time * 0.002; // Slower time base
+             const amplitude = energy * 2.5; // Reduced from 6 to 2.5 for subtlety
+             
+             wordTrembles[p.wordId] = {
+                x: (Math.sin(t * 15 + p.wordId) + Math.sin(t * 31 + p.wordId * 2)) * amplitude * 0.5,
+                y: (Math.cos(t * 12 + p.wordId) + Math.cos(t * 22 + p.wordId * 3)) * amplitude * 0.3
+             };
+          }
+          
+          const tremble = wordTrembles[p.wordId] || { x: 0, y: 0 };
+          
+          const drawW = img.width * pulseScale;
+          const drawH = img.height * pulseScale;
+          const halfW = drawW / 2;
+          const halfH = drawH / 2;
+          
+          ctx.globalAlpha = 0.7 + Math.min(0.3, energy);
+          ctx.drawImage(
+            img, 
+            p.pos.x + offset[0] - halfW + tremble.x, 
+            p.pos.y + offset[1] - halfH + tremble.y, 
+            drawW, 
+            drawH
+          );
         }
       });
+      ctx.globalAlpha = 1.0;
     }
 
     function loop(time: number) {
@@ -425,27 +473,14 @@ export const WordCurtain: React.FC<WordCurtainProps> = ({
       
       particles.forEach(p => p.update(delta, configRef.current));
 
-      // Audio Forces Injection
-      const { bass, mid, high } = audioRef.current;
-      if (bass > 0.05 || mid > 0.05) {
-        const forceY = -bass * 30; // Upward pulse on bass
-        const forceX = (mid - high) * 30; // Swaying on mid/high diff
-        
-        particles.forEach(p => {
-          if (!p.pinned) {
-            // Add a little randomness so they don't move too uniformly
-            const individualRandom = 0.8 + Math.random() * 0.4;
-            p.pos.y += forceY * individualRandom;
-            p.pos.x += forceX * (p.pos.y / CONFIG.aheight) * individualRandom;
-          }
-        });
-      }
-
+      // Removed aggressive physics-based audio injections to prevent "sudden jumps".
+      // Subtle sway remains purely from verlet integration if mouse or gravity acts.
+      
       for (let i = 0; i < CONFIG.iterationsPerFrame; i++) {
         constraints.forEach(c => c.solve());
       }
       if (CONFIG.contain) particles.forEach(p => p.contain(configRef.current));
-      draw();
+      draw(time);
     }
     
     rafID = requestAnimationFrame(loop);
@@ -486,11 +521,33 @@ export const WordCurtain: React.FC<WordCurtainProps> = ({
     charCanvasesRef.current = newCanvases;
 
     // Distribute characters row by row (left-to-right)
-    // No repetition: fill empty space with spaces
-    particlesRef.current.forEach((p, idx) => {
-      p.char = idx < chars.length ? chars[idx] : ' ';
+    // Map characters to word indices
+    const rawText = text || '';
+    const wordList = rawText.split(/(\s+)/); // Keep spaces as separate entries
+    let charIdx = 0;
+    let currentWordId = 0;
+    
+    wordList.forEach(word => {
+       const wordChars = Array.from(word);
+       const isSpace = word.trim() === '';
+       
+       wordChars.forEach(ch => {
+          if (charIdx < particlesRef.current.length) {
+             const p = particlesRef.current[charIdx];
+             p.char = ch;
+             p.wordId = isSpace ? -1 : currentWordId;
+             charIdx++;
+          }
+       });
+       if (!isSpace) currentWordId++;
     });
-  }, [text, color]);
+    
+    for (; charIdx < particlesRef.current.length; charIdx++) {
+       const p = particlesRef.current[charIdx];
+       p.char = ' ';
+       p.wordId = -1;
+    }
+  }, [text, color, dims.w, dims.h]);
 
   return (
     <div ref={containerRef} className="absolute inset-0 w-full h-full pointer-events-auto">

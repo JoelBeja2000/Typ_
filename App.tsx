@@ -5,7 +5,7 @@ import { KeyboardSection } from './src/components/KeyboardSection';
 import LeftSidebar from './src/components/ui/LeftSidebar';
 import RightSidebar from './src/components/ui/RightSidebar';
 import { WordCurtain } from './src/components/ui/WordCurtain';
-import BirdAnimation from './src/components/BirdAnimation';
+import BackgroundSphere from './src/components/BackgroundSphere';
 import { WebAudioSystem } from './src/infrastructure/audio/WebAudioSystem';
 import { MusicSequencer } from './src/domain/services/MusicSequencer';
 import { TECHNO_STYLE, AMBIENT_STYLE, ACID_HOUSE_STYLE, MusicStyle } from './src/domain/models/MusicStyles';
@@ -429,8 +429,7 @@ const App: React.FC = () => {
   useEffect(() => {
     let frameId: number;
     const pollEnergy = () => {
-      const isActuallyPlaying = isLevelActive && !isFinished && !wordHasMistake;
-      if (audioSystemRef.current && isMusicEnabled && isActuallyPlaying) {
+      if (audioSystemRef.current && isMusicEnabled && isLevelActive && !isFinished) {
         setFrequencyBands(audioSystemRef.current.getFrequencyBands());
       } else {
         setFrequencyBands({ bass: 0, mid: 0, high: 0 });
@@ -439,7 +438,7 @@ const App: React.FC = () => {
     };
     frameId = requestAnimationFrame(pollEnergy);
     return () => cancelAnimationFrame(frameId);
-  }, [isMusicEnabled, isLevelActive, isFinished, wordHasMistake]);
+  }, [isMusicEnabled, isLevelActive, isFinished]);
 
   useEffect(() => {
     document.documentElement.style.setProperty('--ui-scale', uiScale.toString());
@@ -674,6 +673,7 @@ const App: React.FC = () => {
               text={solvedWords.join('  ')} 
               color={`rgb(${currentTheme.r}, ${currentTheme.g}, ${currentTheme.b})`} 
               frequencyBands={frequencyBands}
+              combo={combo}
             />
           </div>
 
