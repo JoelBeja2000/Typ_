@@ -595,6 +595,9 @@ const App: React.FC = () => {
                   themeScheme={currentTheme.scheme}
                   currentMusicStyle={currentMusicStyle}
                   onMusicStyleChange={setCurrentMusicStyle}
+                  currentLevelProgress={currentPhrase.length > 0 ? Math.min(100, Math.round((normalizedTypedText.length / currentPhrase.length) * 100)) : 0}
+                  currentLevelScore={score}
+                  currentLevelAccuracy={stats.accuracy}
                 />
 
                 {isLevelActive && (

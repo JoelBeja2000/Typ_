@@ -49,6 +49,9 @@ interface WordPanelProps {
     themeScheme?: 'dark' | 'light';
     currentMusicStyle?: MusicStyle;
     onMusicStyleChange?: (style: MusicStyle) => void;
+    currentLevelProgress?: number;
+    currentLevelScore?: number;
+    currentLevelAccuracy?: number;
 }
 
 import { GUIDE_PHASES } from '../data/GuideData';
@@ -79,6 +82,9 @@ export const WordPanel: React.FC<WordPanelProps> = ({
     themeScheme = 'dark',
     currentMusicStyle = TECHNO_STYLE,
     onMusicStyleChange,
+    currentLevelProgress = 0,
+    currentLevelScore = 0,
+    currentLevelAccuracy = 100,
 }) => {
     const textColor = themeScheme === 'light' ? 'text-black' : 'text-white';
     const musicStyles = [TECHNO_STYLE, AMBIENT_STYLE, ACID_HOUSE_STYLE];
@@ -161,23 +167,41 @@ export const WordPanel: React.FC<WordPanelProps> = ({
 
                                 <div className={`grid transition-all duration-500 ease-in-out ${isExpanded ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}>
                                     <div className="overflow-hidden">
-                                        <div className="p-3 bg-[var(--bg-app)]/20 border-t border-[var(--border-glass)] grid grid-cols-2 gap-2">
-                                            {levels.slice(0, 4).map((level) => (
+<div className="p-3 bg-[var(--bg-app)]/20 border-t border-[var(--border-glass)] grid grid-cols-2 gap-2">
+                                            {levels.slice(0, 4).map((level) => {
+                                                const levelProgress = typeof window !== 'undefined' ? Number(localStorage.getItem(`typ_progress_${level.id}`) || 0) : 0;
+                                                const isComplete = levelProgress >= 100;
+                                                return (
                                                 <button
                                                     key={level.id}
                                                     onClick={() => onSelectLevel && onSelectLevel(level)}
-                                                    className="w-full p-3 rounded-xl text-left border border-transparent hover:border-[var(--accent-primary)]/40 hover:bg-[var(--accent-primary)]/10 flex flex-col gap-2 transition-all group relative overflow-hidden"
+                                                    className={`w-full p-3 rounded-xl text-left border hover:border-[var(--accent-primary)]/40 hover:bg-[var(--accent-primary)]/10 flex flex-col gap-2 transition-all group relative overflow-hidden ${isComplete ? 'border-green-500/50 bg-green-500/10' : 'border-transparent'}`}
                                                 >
                                                     <div className="absolute inset-0 bg-gradient-to-r from-[var(--accent-primary)]/0 to-[var(--accent-primary)]/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
                                                     <div className="flex items-center justify-between relative z-10">
-                                                        <span className="text-[11px] font-black uppercase tracking-widest text-[var(--text-secondary)] group-hover:text-[var(--text-primary)] transition-colors">
+                                                        <span className={`text-[11px] font-black uppercase tracking-widest ${isComplete ? 'text-green-400' : 'text-[var(--text-secondary)] group-hover:text-[var(--text-primary)]'} transition-colors`}>
                                                             {level.title}
                                                         </span>
-                                                        <i className="fa fa-play text-[8px] text-[var(--accent-primary)] opacity-0 group-hover:opacity-100 transform translate-x-2 group-hover:translate-x-0 transition-all"></i>
+                                                        <div className="flex items-center gap-1">
+                                                            {levelProgress > 0 && (
+                                                                <span className={`text-[8px] font-bold ${isComplete ? 'text-green-400' : 'text-[var(--text-ghost)]'}`}>
+                                                                    {levelProgress}%
+                                                                </span>
+                                                            )}
+                                                            <i className={`fa ${isComplete ? 'fa-check' : 'fa-play'} text-[8px] ${isComplete ? 'text-green-400' : 'text-[var(--accent-primary)] opacity-0 group-hover:opacity-100 transform translate-x-2 group-hover:translate-x-0 transition-all'}`}></i>
+                                                        </div>
                                                     </div>
+                                                    {levelProgress > 0 && (
+                                                        <div className="w-full h-[2px] bg-white/10 rounded-full relative overflow-hidden">
+                                                            <div 
+                                                                className={`absolute inset-y-0 left-0 ${isComplete ? 'bg-green-500 shadow-[0_0_8px_#22c55e]' : 'bg-[var(--accent-primary)] shadow-[0_0_8px_var(--accent-primary)]'} transition-all duration-1000`} 
+                                                                style={{ width: `${levelProgress}%` }}
+                                                            ></div>
+                                                        </div>
+                                                    )}
                                                 </button>
-))}
-                    </div>
+                                            );})}
+                                            </div>
 
                 </div>
                                 </div>
@@ -325,6 +349,23 @@ export const WordPanel: React.FC<WordPanelProps> = ({
                             );
                         })}
                     </div>
+                    {/* Level Stats Display */}
+                    {isLevelActive && (currentLevelProgress > 0 || currentLevelScore > 0) && (
+                        <div className="flex items-center justify-center gap-4 mt-4">
+                            <div className="bg-[var(--bg-floating)]/80 backdrop-blur-sm border border-[var(--border-glass)] rounded-full px-3 py-1.5 flex items-center gap-2">
+                                <span className="text-[9px] font-black uppercase tracking-widest text-[var(--text-ghost)]">PTS</span>
+                                <span className="text-[14px] font-bold text-white">{currentLevelScore.toLocaleString()}</span>
+                            </div>
+                            <div className="bg-[var(--bg-floating)]/80 backdrop-blur-sm border border-[var(--border-glass)] rounded-full px-3 py-1.5 flex items-center gap-2">
+                                <span className="text-[9px] font-black uppercase tracking-widest text-[var(--text-ghost)]">%</span>
+                                <span className="text-[14px] font-bold text-white">{currentLevelProgress}%</span>
+                            </div>
+                            <div className="bg-[var(--bg-floating)]/80 backdrop-blur-sm border border-[var(--border-glass)] rounded-full px-3 py-1.5 flex items-center gap-2">
+                                <span className="text-[9px] font-black uppercase tracking-widest text-[var(--text-ghost)]">ACC</span>
+                                <span className="text-[14px] font-bold text-white">{currentLevelAccuracy}%</span>
+                            </div>
+                        </div>
+                    )}
                 </div>
             </div>
         );
