@@ -3,8 +3,7 @@ import { ZEN_PHRASES } from '../../data/ZenPhrases';
 
 export class BrowserPhraseProvider implements IPhraseProvider {
   async getPhrases(language: string, count: number): Promise<string[]> {
-    // Current implementation uses Static JSON or Gemini. 
-    // This adapter will eventually handle Gemini calls if needed.
+    // Current implementation uses Static JSON.
     return []; 
   }
 

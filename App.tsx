@@ -10,7 +10,7 @@ import { MusicSequencer } from './src/domain/services/MusicSequencer';
 import { TECHNO_STYLE, AMBIENT_STYLE, ACID_HOUSE_STYLE, MusicStyle } from './src/domain/models/MusicStyles';
 import { KEY_TO_FINGER_MAP, SPACE_DATA } from './constants';
 import { Language, TypingStats } from './types';
-import { generatePracticePhrases } from './services/geminiService';
+import { generateLocalPhrases } from './src/utils/phraseUtils';
 import { VisualsConfig, DEFAULT_VISUALS_CONFIG } from './src/types/visuals';
 import { GUIDE_PHASES } from './src/data/GuideData';
 import { BrowserThemeManager } from './src/infrastructure/ui/BrowserThemeManager';
@@ -412,22 +412,13 @@ const App: React.FC = () => {
 
   useEffect(() => {
     const init = async () => {
-      try {
-        setIsLoading(true);
-        setIsGuideMode(false); 
-        const newPhrases = await generatePracticePhrases(language, focus, 10);
-        setPhrases(newPhrases.map(p => p.normalize('NFC')));
-        setTypedText(''); 
-        lastProcessedText.current = ''; 
-        setPhraseIndex(0); 
-        setCombo(0); 
-        setWordHasMistake(false);
-        if (inputRef.current) inputRef.current.value = '';
-      } catch (err) {
-        console.error("Initialization error:", err);
-      } finally {
-        setIsLoading(false);
-      }
+      setIsLoading(true);
+      setIsGuideMode(false); // Reset to generator mode when language/focus changes
+      const newPhrases = generateLocalPhrases(language, focus, 10);
+      setPhrases(newPhrases.map(p => p.normalize('NFC')));
+      setTypedText(''); lastProcessedText.current = ''; setPhraseIndex(0); setCombo(0); setWordHasMistake(false);
+      if (inputRef.current) inputRef.current.value = '';
+      setIsLoading(false);
     };
     init();
   }, [language, focus]);
@@ -477,7 +468,7 @@ const App: React.FC = () => {
       const fetchMore = async () => {
         isFetchingMore.current = true;
         try {
-          const more = await generatePracticePhrases(language, focus, 10);
+          const more = generateLocalPhrases(language, focus, 10);
           if (more && more.length > 0) {
             const normalized = more.map(p => p.normalize('NFC'));
             setPhrases(prev => [...prev, ...normalized]);
