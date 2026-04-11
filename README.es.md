@@ -1,5 +1,5 @@
 > [!NOTE]
-> Este es un proyecto **pequeño y rápido** realizado como experimento utilizando **Google Antigravity**. No pretende ser un producto profesional, sino una exploración de capacidades de desarrollo asistido por IA.
+> Este es un proyecto **pequeño y rápido** construido con **GitHub Copilot CLI**. No pretende ser un producto profesional, sino una exploración de capacidades de desarrollo asistido por IA.
 
 # Typ_ (Type Master)
 
@@ -9,39 +9,43 @@
 
 ## Características Principales
 
-- **Entrenamiento Técnico**: Fases especializadas para la coordinación estricta de dedos y memoria muscular.
-- **Guías Biomecánicas**: Representación visual del mapeo de dedos a teclas.
-- **Retroalimentación Cinematográfica**: Retroalimentación auditiva y visual en tiempo real (WPM, Precisión, sistemas de Combo).
-- **Experiencia Personalizable**: Múltiples modos de enfoque (Básico, Programación, Acentos), escalado de UI y paletas de colores seleccionadas.
-- **Soporte Multilingüe**: Conjuntos de entrenamiento en inglés y español.
+- **Arquitectura Hexagonal**: Separación estricta de preocupaciones (Dominio, Puertos, Infraestructura).
+- **Latencia Ultra-Baja**: Motor de escritura síncrono con tiempos de respuesta sub-16ms.
+- **Niveles por Estrellas**: Dificultad progresiva de Novato (1★) → Experto (2★) → Maestro (3★).
+- **Práctica de Dedos**: Entrenamiento dedicado para cada dedo (Índice, Corazón, Anular, Meñique).
+- **Estilos de Música**: Retroalimentación dinámica (Berlín Techno, Cyber Ambient, Acid House 303).
+- **Guías Biomecánicas**: Representación visual del mapeo dedos-teclas.
+- **Retroalimentación Cinematográfica**: WPM, Precisión, sistemas de Combo en tiempo real.
+- **Modo Día/Noche**: Cambia entre temas claros y oscuros.
+- **Seguimiento de Progreso**: Muestra porcentaje y estadísticas al completar nivel.
+- **GHS Integrado**: Git History Standard para contexto de agentes IA.
 
-## Demo Visual
+## Nuevo Sistema de Niveles
 
-![Demo Recording](docs/media/demo.webp)
+### Niveles por Estrellas (Desafíos)
+- **Novato** (1★): Pares básicos de dedos
+- **Experto** (2★): Combinaciones avanzadas
+- **Maestro** (3★): Dominio completo del teclado
 
-## Estructura del Proyecto
-
-### Configuración y Personalización
-![Configuración](docs/media/config.png)
-Cambia fácilmente entre idiomas, modos de enfoque y estilos visuales según tu entorno de entrenamiento.
-
-### Entrenamiento Técnico
-![Entrenamiento](docs/media/training.png)
-Sigue fases estructuradas desde pares básicos de dedos hasta combinaciones avanzadas y pangramas.
+### Práctica de Dedos
+- **Índice**: F, G, V, B, R, T, J, H, N, M...
+- **Corazón**: D, E, C, K, I
+- **Anular**: S, W, X, L, O
+- **Meñique**: A, Q, Z, Ñ, P
 
 ## Primeros Pasos
 
 ### Prerrequisitos
 
 - **Node.js**: Requerido para ejecutar el servidor de desarrollo Vite.
-- **Git**: Para el control de versiones.
+- **Git**: Para control de versiones.
 
 ### Instalación
 
 1. **Clonar el repositorio**:
    ```bash
-   git clone https://github.com/JoelBeja2000/Typ_.git
-   cd Typ_
+   git clone https://github.com/JoelBeja2000/OveTyp_.git
+   cd OveTyp_
    ```
 
 2. **Instalar dependencias**:
@@ -54,14 +58,24 @@ Sigue fases estructuradas desde pares básicos de dedos hasta combinaciones avan
    npm run dev
    ```
 
+### Configuración GHS (Opcional)
+
+Para contexto de agentes IA, configura Git History Standard:
+
+```bash
+source .venv/bin/activate
+python3 tools/search.py "tu consulta"   # Buscar en código
+python3 tools/indexer.py            # Re-indexar cambios
+```
+
 ## Desarrollo
 
 Construido con:
-- **Tauri**: Para la integración de escritorio multiplataforma.
-- **React**: Para la interfaz de usuario.
-- **Web Audio API**: Para una retroalimentación auditiva de baja latencia.
-- **Gemini AI**: Para la generación dinámica de frases de práctica.
+- **Tauri**: Integración de escritorio multiplataforma.
+- **React**: Interfaz de usuario.
+- **Web Audio API**: Retroalimentación auditiva de baja latencia.
+- **GitHub Copilot CLI**: Desarrollo asistido por IA.
 
 ---
 
-*ALPINE_ECODECOR_PRO // 2025*
+*ALPINE_ECODECOR_PRO // 2026*

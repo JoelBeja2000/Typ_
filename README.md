@@ -1,10 +1,9 @@
 > [!NOTE]
-> Este es un proyecto **pequeño y rápido** realizado como experimento utilizando **Google Antigravity**. No pretende ser un producto profesional, sino una exploración de capacidades de desarrollo asistido por IA.
->
-> [Leer en Español](README.es.md)
+> This is a **small and fast** project built with **GitHub Copilot CLI**. Not intended to be a professional product, but an exploration of AI-assisted development capabilities.
+
+[Leer en Español](README.es.md)
 
 # OveTyp_ (Type Master)
-
 
 **OveTyp_** is a professional-grade typing trainer designed for efficiency, speed, and precision. Built with a focus on biomechanics and auditory feedback, it provides a cinematic training experience for developers and typing enthusiasts.
 
@@ -12,36 +11,29 @@
 
 ## Core Features
 
-- **Hexagonal Architecture**: Strict separation of concerns (Domain, Ports, Infrastructure) for maximum maintainability.
+- **Hexagonal Architecture**: Strict separation of concerns (Domain, Ports, Infrastructure).
 - **Ultra-Low Latency**: Synchronous typing engine providing sub-16ms response times.
-- **Technical Training**: Specialized phases for strict finger coordination and muscle memory.
-- **Biomechanical Guides**: Visual representation of finger-to-key mapping.
-- **Cinematic Feedback**: Real-time auditory and visual feedback (WPM, Accuracy, Combo systems).
-- **Customizable Experience**: Multiple focus modes (Basic, Programming, Accents), UI scaling, and curated color palettes.
-- **Multilingual Support**: Training sets in English and Spanish.
+- **Star-Based Levels**: Progressive difficulty from Novato (1★) → Experto (2★) → Maestro (3★).
+- **Finger Practice**: Dedicated training for each finger (Índice, Corazón, Anular, Meñique).
+- **Music Styles**: Dynamic audio feedback (Berlín Techno, Cyber Ambient, Acid House 303).
+- **Biomechanical Guides**: Visual finger-to-key mapping.
+- **Cinematic Feedback**: Real-time WPM, Accuracy, Combo systems.
+- **Day/Night Mode**: Switch between light and dark themes.
+- **Progress Tracking**: Shows percentage and stats when level completed.
+- **GHS Integrated**: Git History Standard for AI agent context.
 
-## Visual Demo
+## New Level System
 
-![Demo Recording](docs/media/demo.webp)
+### Star Levels (Challenges)
+- **Novato** (1★): Basic finger pairs
+- **Experto** (2★): Advanced combinations  
+- **Maestro** (3★): Full keyboard mastery
 
-## Project Structure
-
-### Architecture & Performance
-![Architecture](docs/media/architecture.png)
-The app follows a **Hexagonal Architecture** pattern:
-- **Domain**: Pure business logic (Typing, Scoring, Stats).
-- **Ports**: Interface definitions for external dependencies.
-- **Infrastructure**: Adapters for Browser APIs (Web Audio, LocalStorage).
-
-Optimized for **20ms Priority**: All audio and typing events bypass asynchronous React state cycles for immediate feedback.
-
-### Technical Training
-![Training](docs/media/training.png)
-Follow structured phases from basic finger pairs to advanced combinations and pangrams.
-
-### Configuration & Customization
-![Configuration](docs/media/config.png)
-Easily switch between languages, focus modes, and visual styles to suit your training environment.
+### Finger Practice
+- **Índice**: F, G, V, B, R, T, J, H, N, M...
+- **Corazón**: D, E, C, K, I
+- **Anular**: S, W, X, L, O
+- **Meñique**: A, Q, Z, Ñ, P
 
 ## Getting Started
 
@@ -68,15 +60,24 @@ Easily switch between languages, focus modes, and visual styles to suit your tra
    npm run dev
    ```
 
+### GHS Setup (Optional)
+
+For AI agent context, set up Git History Standard:
+
+```bash
+source .venv/bin/activate
+python3 tools/search.py "your query"     # Search codebase
+python3 tools/indexer.py              # Re-index after changes
+```
 
 ## Development
 
 Built with:
-- **Tauri**: For cross-platform desktop integration.
-- **React**: For the user interface.
-- **Web Audio API**: For low-latency auditory feedback.
-- **Gemini AI**: For dynamic practice phrase generation.
+- **Tauri**: Cross-platform desktop integration.
+- **React**: User interface.
+- **Web Audio API**: Low-latency auditory feedback.
+- **GitHub Copilot CLI**: AI-assisted development.
 
 ---
 
-*ALPINE_ECODECOR_PRO // 2025*
+*ALPINE_ECODECOR_PRO // 2026*
