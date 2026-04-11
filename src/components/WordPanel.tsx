@@ -78,11 +78,14 @@ export const WordPanel: React.FC<WordPanelProps> = ({
     const textColor = themeScheme === 'light' ? 'text-black' : 'text-white';
     
     const [expandedStars, setExpandedStars] = useState<number | null>(null);
-    const [expandedPractice, setExpandedPractice] = useState<string | null>(null);
 
-    const practicePhases = GUIDE_PHASES.filter(p => 
-        ['fase_1', 'fase_2', 'fase_3', 'fase_4', 'fase_6'].includes(p.id)
-    );
+    const practiceLevels = [
+        { id: 'practice_indice', title: 'Dedos Índices', fingers: ['L2', 'R2'], keys: ['F', 'G', 'V', 'B', 'R', 'T', 'J', 'H', 'N', 'M', 'Y', 'U'] },
+        { id: 'practice_anular', title: 'Dedos Anulares', fingers: ['L4', 'R4'], keys: ['S', 'W', 'X', 'L', 'O'] },
+        { id: 'practice_corazon', title: 'Dedos Corazón', fingers: ['L3', 'R3'], keys: ['D', 'E', 'C', 'K', 'I'] },
+        { id: 'practice_anular_izq', title: 'Anular Izquierdo', fingers: ['L4'], keys: ['S', 'W', 'X'] },
+        { id: 'practice_menique', title: 'Meñique', fingers: ['L5', 'R5'], keys: ['A', 'Q', 'Z', 'Ñ', 'P'] },
+    ];
 
     const levelsByStars = {
         1: GUIDE_PHASES.flatMap(p => p.levels.filter(l => l.difficulty === 1)),
@@ -170,54 +173,29 @@ export const WordPanel: React.FC<WordPanelProps> = ({
                     </div>
 
                     {/* Column 2: Practice */}
-                    <div className="space-y-4">
+                    <div className="space-y-3">
                         <h2 className="text-[10px] font-black uppercase tracking-[0.5em] text-[var(--accent-primary)] mb-4 text-center">
                             Práctica de Dedos
                         </h2>
                         
-                        {practicePhases.map(phase => (
-                        <div key={phase.id} className="w-full flex flex-col rounded-2xl bg-[var(--bg-glass)] border border-[var(--border-glass)] overflow-hidden transition-all duration-500">
+                        {practiceLevels.map(level => (
                             <button
-                                onClick={() => setExpandedPractice(expandedPractice === phase.id ? null : phase.id)}
-                                className={`w-full p-4 flex items-center justify-between transition-all ${expandedPractice === phase.id ? 'bg-[var(--accent-primary)]/10' : 'hover:bg-[var(--bg-glass-strong)]'}`}
+                                key={level.id}
+                                onClick={() => onSelectLevel && onSelectLevel({ ...level, phrases: [`${level.keys.join(' ')} ${level.keys.join(' ')}`] })}
+                                className="w-full p-3 rounded-xl text-left border border-[var(--border-glass)] hover:border-[var(--accent-primary)]/40 hover:bg-[var(--accent-primary)]/10 flex flex-col gap-2 transition-all group relative overflow-hidden bg-[var(--bg-glass)]"
                             >
-                                <div className="flex items-center gap-3">
-                                    <span
-                                        className="w-3 h-3 rounded-full shadow-[0_0_8px]"
-                                        style={{
-                                            backgroundColor: PHASE_COLORS[phase.id],
-                                            boxShadow: `0 0 10px ${PHASE_COLORS[phase.id]}`
-                                        }}
-                                    />
-                                    <span className="text-[12px] font-black uppercase tracking-wider text-[var(--text-primary)]">
-                                        {phase.levels[0]?.fingers.map(f => FINGER_CODE_MAP[f] || f).join(' + ')}
-                                    </span>
+                                <span className="text-[11px] font-black uppercase tracking-widest text-[var(--text-secondary)] group-hover:text-[var(--text-primary)] transition-colors">
+                                    {level.title}
+                                </span>
+                                <div className="flex flex-wrap gap-1">
+                                    {level.keys.slice(0, 8).map(key => (
+                                        <span key={key} className="px-1.5 py-0.5 text-[9px] font-mono rounded bg-[var(--bg-app)]/50 border border-[var(--border-glass)] text-[var(--text-secondary)]">
+                                            {key}
+                                        </span>
+                                    ))}
                                 </div>
-                                <i className={`fa fa-chevron-down text-[10px] text-[var(--text-secondary)] transition-transform duration-500 ${expandedPractice === phase.id ? 'rotate-180' : ''}`}></i>
                             </button>
-                            
-                            <div className={`grid transition-all duration-500 ease-in-out ${expandedPractice === phase.id ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}>
-                                <div className="overflow-hidden">
-                                    <div className="p-3 bg-[var(--bg-app)]/20 border-t border-[var(--border-glass)]">
-                                        <button
-                                            onClick={() => onSelectLevel && onSelectLevel(phase.levels[0])}
-                                            className="w-full p-3 rounded-xl text-left border border-transparent hover:border-[var(--accent-primary)]/40 hover:bg-[var(--accent-primary)]/10 flex flex-col gap-2 transition-all group relative overflow-hidden"
-                                        >
-                                            <div className="flex flex-wrap gap-1">
-                                                {phase.levels[0]?.keys.length > 0 ? phase.levels[0].keys.slice(0, 10).map(key => (
-                                                    <span key={key} className="px-2 py-1 text-[10px] font-mono rounded bg-[var(--bg-app)]/50 border border-[var(--border-glass)] text-[var(--text-secondary)]">
-                                                        {key}
-                                                    </span>
-                                                )) : (
-                                                    <span className="text-[10px] text-[var(--text-ghost)]">Todas las teclas</span>
-                                                )}
-                                            </div>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    ))}
+                        ))}
                     </div>
 
                 </div>
