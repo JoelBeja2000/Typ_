@@ -466,7 +466,7 @@ export const WordPanel: React.FC<WordPanelProps> = ({
                                     <div className="relative flex items-center whitespace-pre h-full">
                                         {currentWordInfo.userTypedSlice.split('').map((userChar, idx) => {
                                             const correct = userChar === (currentWordInfo.word[idx] || '');
-                                            const color = (isComposingState && idx === currentWordInfo.userTypedSlice.length - 1) ? "text-yellow-400" : (correct ? 'text-[var(--accent-primary)]' : 'text-red-400 bg-red-500/10 border-b-2 border-red-500/30');
+                                            const color = (isComposingState && idx === currentWordInfo.userTypedSlice.length - 1) ? "text-yellow-400" : (correct ? 'text-white' : 'text-red-400 bg-red-500/10 border-b-2 border-red-500/30');
                                             return <span key={idx} className={`relative inline-block ${color}`}>{userChar === ' ' ? '\u00A0' : userChar}</span>;
                                         })}
                                         <span className="inline-block w-0.5 h-10 bg-[var(--accent-primary)] shadow-[0_0_15px_var(--accent-primary)] animate-pulse rounded-full ml-1" />
