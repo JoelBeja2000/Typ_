@@ -111,11 +111,13 @@ export const WordPanel: React.FC<WordPanelProps> = ({
 
         return (
             <div className="w-full bg-[var(--bg-glass-strong)] border border-[var(--border-glass)] rounded-[2.5rem] p-6 flex flex-col items-center relative overflow-hidden transition-all duration-1000 shadow-inner">
-                <div className="w-full max-w-md space-y-4">
-                    <h2 className="text-[10px] font-black uppercase tracking-[0.5em] text-[var(--accent-primary)] mb-4 text-center">
-                        🏆 Desafíos por Estrellas
-                    </h2>
-                    {[1, 2, 3].map(star => {
+                <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {/* Column 1: Star Levels */}
+                    <div className="space-y-4">
+                        <h2 className="text-[10px] font-black uppercase tracking-[0.5em] text-[var(--accent-primary)] mb-4 text-center">
+                            🏆 Niveles
+                        </h2>
+                        {[1, 2, 3].map(star => {
                         const levels = starLevels(star);
                         const isExpanded = expandedStars === star;
                         const name = star === 1 ? 'Novato' : star === 2 ? 'Experto' : 'Maestro';
@@ -165,14 +167,15 @@ export const WordPanel: React.FC<WordPanelProps> = ({
                             </div>
                         );
                     })}
+                    </div>
 
-                    <div className="border-t border-[var(--border-glass)] my-4"></div>
-
-                    <h2 className="text-[10px] font-black uppercase tracking-[0.5em] text-[var(--accent-primary)] mb-4 text-center">
-                        Práctica de Dedos
-                    </h2>
-                    
-                    {practicePhases.map(phase => (
+                    {/* Column 2: Practice */}
+                    <div className="space-y-4">
+                        <h2 className="text-[10px] font-black uppercase tracking-[0.5em] text-[var(--accent-primary)] mb-4 text-center">
+                            Práctica de Dedos
+                        </h2>
+                        
+                        {practicePhases.map(phase => (
                         <div key={phase.id} className="w-full flex flex-col rounded-2xl bg-[var(--bg-glass)] border border-[var(--border-glass)] overflow-hidden transition-all duration-500">
                             <button
                                 onClick={() => setExpandedPractice(expandedPractice === phase.id ? null : phase.id)}
@@ -215,6 +218,7 @@ export const WordPanel: React.FC<WordPanelProps> = ({
                             </div>
                         </div>
                     ))}
+                    </div>
 
                 </div>
 
