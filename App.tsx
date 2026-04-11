@@ -412,22 +412,13 @@ const App: React.FC = () => {
 
   useEffect(() => {
     const init = async () => {
-      try {
-        setIsLoading(true);
-        setIsGuideMode(false); 
-        const newPhrases = await generatePracticePhrases(language, focus, 10);
-        setPhrases(newPhrases.map(p => p.normalize('NFC')));
-        setTypedText(''); 
-        lastProcessedText.current = ''; 
-        setPhraseIndex(0); 
-        setCombo(0); 
-        setWordHasMistake(false);
-        if (inputRef.current) inputRef.current.value = '';
-      } catch (err) {
-        console.error("Initialization error:", err);
-      } finally {
-        setIsLoading(false);
-      }
+      setIsLoading(true);
+      setIsGuideMode(false); // Reset to generator mode when language/focus changes
+      const newPhrases = await generatePracticePhrases(language, focus, 10);
+      setPhrases(newPhrases.map(p => p.normalize('NFC')));
+      setTypedText(''); lastProcessedText.current = ''; setPhraseIndex(0); setCombo(0); setWordHasMistake(false);
+      if (inputRef.current) inputRef.current.value = '';
+      setIsLoading(false);
     };
     init();
   }, [language, focus]);
