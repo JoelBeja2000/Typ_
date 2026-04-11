@@ -52,7 +52,6 @@ interface WordPanelProps {
     currentLevelProgress?: number;
     currentLevelScore?: number;
     currentLevelAccuracy?: number;
-    showSpheres: boolean;
 }
 
 import { GUIDE_PHASES } from '../data/GuideData';
@@ -86,7 +85,6 @@ export const WordPanel: React.FC<WordPanelProps> = ({
     currentLevelProgress = 0,
     currentLevelScore = 0,
     currentLevelAccuracy = 100,
-    showSpheres,
 }) => {
     const textColor = themeScheme === 'light' ? 'text-black' : 'text-white';
     const themeColor = 'text-[var(--accent-primary)]';
@@ -297,10 +295,7 @@ export const WordPanel: React.FC<WordPanelProps> = ({
                                 </div>
                             </div>
                         </div>
-                        
-                        </div>
                     </div>
-
                 </div>
 
                 <div className="mt-4 text-[10px] font-black uppercase tracking-[0.4em] text-[var(--text-secondary)] animate-pulse text-center">
@@ -393,7 +388,7 @@ export const WordPanel: React.FC<WordPanelProps> = ({
                     <div className={`w-full flex flex-col items-center gap-4 mt-6 relative transition-all duration-1000 ${isLevelActive ? 'opacity-100' : 'opacity-0 h-0 pointer-events-none'}`}>
                         {/* SPHERES CONTAINER - ABSOLUTE POSITIONING */}
                         {/* LEFT SPHERE */}
-                        {showSpheres && (
+                        {true && (
                             <div className="absolute hidden md:block"
                                 style={{
                                     left: '0px',
@@ -421,7 +416,7 @@ export const WordPanel: React.FC<WordPanelProps> = ({
                             </div>
                         )}
                         {/* RIGHT SPHERE */}
-                        {showSpheres && (
+                        {true && (
                             <div className="absolute hidden md:block"
                                 style={{
                                     right: '0px',

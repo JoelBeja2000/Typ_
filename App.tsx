@@ -78,7 +78,7 @@ const App: React.FC = () => {
 
   const [language, setLanguage] = useState<Language>('es');
   const [focus, setFocus] = useState('Básico');
-  
+
   // HEXAGONAL ARCHITECTURE: Dependencies
   const phraseProvider = useMemo(() => new BrowserPhraseProvider(), []);
   const storageProvider = useMemo(() => new BrowserStorageProvider(), []);
@@ -168,7 +168,6 @@ const App: React.FC = () => {
   const [birdSize, setBirdSize] = useState(180);
   const [visualsConfig, setVisualsConfig] = useState<VisualsConfig>({ ...DEFAULT_VISUALS_CONFIG, type: 'circle' });
   const [showDimensionalSettings, setShowDimensionalSettings] = useState(false);
-  const [showSpheres, setShowSpheres] = useState(true);
 
   // GUIDE STATE
   const [highlightedKeys, setHighlightedKeys] = useState<string[]>([]);
@@ -373,10 +372,10 @@ const App: React.FC = () => {
   }, [currentTheme, uiScale, isPureBlack, forceScheme]);
 
   const toggleTheme = () => {
-     // Simple toggle or cycle through THEMES
-     const currentIndex = THEMES.indexOf(currentTheme);
-     const nextIndex = (currentIndex + 1) % THEMES.length;
-     setCurrentTheme(THEMES[nextIndex]);
+    // Simple toggle or cycle through THEMES
+    const currentIndex = THEMES.indexOf(currentTheme);
+    const nextIndex = (currentIndex + 1) % THEMES.length;
+    setCurrentTheme(THEMES[nextIndex]);
   };
 
   useEffect(() => {
@@ -478,7 +477,7 @@ const App: React.FC = () => {
     if (!newPhrases || newPhrases.length === 0) return;
     setIsGuideMode(true); // Enable Guide Mode
     if (levelId) setCurrentLevelId(levelId);
-    
+
     setPhrases(newPhrases.map(p => p.normalize('NFC')));
     setTypedText('');
     lastProcessedText.current = '';
@@ -504,9 +503,18 @@ const App: React.FC = () => {
         height: '100%'
       }}
     >
+      <div
+        className="fixed left-[2vw] top-0 h-full bg-[#ff00ff] z-0"
+        style={{ width: '18vw' }}
+      />
+      <div
+        className="fixed right-[2vw] top-0 h-full bg-[#ff00ff] z-0"
+        style={{ width: '18vw' }}
+      />
+
 
       <HiddenInput inputRef={inputRef} onInput={handleInput} onCompositionStart={handleCompositionStart} onCompositionEnd={handleCompositionEnd} onKeyDown={handleKeyDown} onBlur={() => setIsComposingState(false)} />
-      <input type="color" ref={colorInputRef} onChange={(e) => { 
+      <input type="color" ref={colorInputRef} onChange={(e) => {
         const hex = e.target.value;
         const r = parseInt(hex.slice(1, 3), 16);
         const g = parseInt(hex.slice(3, 5), 16);
@@ -556,7 +564,7 @@ const App: React.FC = () => {
         AMBIENT_STYLE={AMBIENT_STYLE}
         ACID_HOUSE_STYLE={ACID_HOUSE_STYLE}
         isInfiniteMode={false}
-        onToggleZenMode={() => {}}
+        onToggleZenMode={() => { }}
         score={score}
       />
 
@@ -591,7 +599,6 @@ const App: React.FC = () => {
                   circuitTitle={currentCircuitTitle}
                   onCircuitCycle={handleManualCircuitCycle}
                   onDimensionalMenu={(e) => { setShowDimensionalSettings(!showDimensionalSettings); }}
-                  showSpheres={showSpheres}
                   isLevelActive={isLevelActive}
                   onSelectLevel={(level: any) => handleSelectPhrases(level.phrases, level.id)}
                   themeScheme={(forceScheme === 'light' || (currentTheme.scheme === 'light' && !forceScheme)) ? 'light' : currentTheme.scheme}
@@ -603,7 +610,7 @@ const App: React.FC = () => {
                 />
 
                 {isLevelActive && (
-                  <button 
+                  <button
                     onClick={() => setIsLevelActive(false)}
                     className="absolute right-[-80px] top-1/2 -translate-y-1/2 w-14 h-14 rounded-full bg-[var(--bg-glass)] border border-[var(--border-glass)] flex items-center justify-center text-[var(--text-secondary)] hover:text-[var(--accent-primary)] hover:border-[var(--accent-primary)] transition-all hover:scale-110 active:scale-95 group shadow-2xl backdrop-blur-xl"
                     title="Volver al Selector"
@@ -624,7 +631,7 @@ const App: React.FC = () => {
                   isZenMode={false}
                   score={score}
                   onRestart={restart}
-                  onZenToggle={() => {}}
+                  onZenToggle={() => { }}
                   audioReady={audioReady}
                   audioSystem={audioSystemRef.current}
                   currentMusicStyle={currentMusicStyle}
@@ -633,8 +640,6 @@ const App: React.FC = () => {
                   combo={combo}
                   comboMultiplier={comboMultiplier}
                   onDimensionalMenu={(e) => { setShowDimensionalSettings(!showDimensionalSettings); }}
-                  onToggleSpheres={() => setShowSpheres(!showSpheres)}
-                  showSpheres={showSpheres}
                   hexToRgba={(hex, a) => `rgba(${currentTheme.r}, ${currentTheme.g}, ${currentTheme.b}, ${a})`}
                   customColor={`rgb(${currentTheme.r}, ${currentTheme.g}, ${currentTheme.b})`}
                   highlightedKeys={highlightedKeys}
@@ -671,17 +676,17 @@ const App: React.FC = () => {
                 </div>
                 <div className="grid grid-cols-4 gap-2">
                   {THEMES.map((theme) => (
-                     <button
-                       key={theme.id}
-                       onClick={() => setCurrentTheme(theme)}
-                       className={`w-full aspect-square rounded-full border-2 transition-all duration-300 flex items-center justify-center ${currentTheme.id === theme.id ? 'border-[var(--accent-primary)] ring-2 ring-[var(--accent-glow)]' : 'border-white/10 hover:border-white/40'}`}
-                       style={{ backgroundColor: `rgb(${theme.r}, ${theme.g}, ${theme.b})` }}
-                       title={theme.name}
-                     >
-                       {currentTheme.id === theme.id && <i className="fa fa-check text-[10px] text-white mix-blend-difference"></i>}
-                     </button>
+                    <button
+                      key={theme.id}
+                      onClick={() => setCurrentTheme(theme)}
+                      className={`w-full aspect-square rounded-full border-2 transition-all duration-300 flex items-center justify-center ${currentTheme.id === theme.id ? 'border-[var(--accent-primary)] ring-2 ring-[var(--accent-glow)]' : 'border-white/10 hover:border-white/40'}`}
+                      style={{ backgroundColor: `rgb(${theme.r}, ${theme.g}, ${theme.b})` }}
+                      title={theme.name}
+                    >
+                      {currentTheme.id === theme.id && <i className="fa fa-check text-[10px] text-white mix-blend-difference"></i>}
+                    </button>
                   ))}
-                  <button 
+                  <button
                     onClick={() => colorInputRef.current?.click()}
                     className="w-full aspect-square rounded-full border-2 border-dashed border-white/20 flex items-center justify-center hover:border-white/40 transition-all font-bold text-[18px] text-[var(--text-secondary)]"
                     title="Color Personalizado"
@@ -692,7 +697,7 @@ const App: React.FC = () => {
               </div>
 
               <div className="px-4 py-3 space-y-3">
-                <div 
+                <div
                   onClick={() => setIsPureBlack(!isPureBlack)}
                   className="flex items-center justify-between cursor-pointer group"
                 >
@@ -702,7 +707,7 @@ const App: React.FC = () => {
                   </div>
                 </div>
 
-                <div 
+                <div
                   onClick={() => {
                     const effectiveIsLight = forceScheme === 'light' || (currentTheme.scheme === 'light' && forceScheme === null);
                     setForceScheme(effectiveIsLight ? 'dark' : 'light');

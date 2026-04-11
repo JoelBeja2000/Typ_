@@ -28,8 +28,6 @@ interface KeyboardSectionProps {
     combo: number;
     comboMultiplier: number;
     onDimensionalMenu: (e: React.MouseEvent | any) => void;
-    onToggleSpheres: () => void;
-    showSpheres: boolean;
     hexToRgba: (hex: string, alpha: number) => string;
     customColor: string;
     // Guide Integration
@@ -57,8 +55,6 @@ export const KeyboardSection: React.FC<KeyboardSectionProps> = React.memo(({
     combo,
     comboMultiplier,
     onDimensionalMenu,
-    onToggleSpheres,
-    showSpheres,
     hexToRgba,
     customColor,
     highlightedKeys = [],
@@ -95,13 +91,7 @@ export const KeyboardSection: React.FC<KeyboardSectionProps> = React.memo(({
 
                 {/* GEAR BUTTON (RIGHT) */}
                 <div className="flex gap-2">
-                    <button 
-                        onClick={onToggleSpheres} 
-                        className={`h-11 w-11 flex items-center justify-center backdrop-blur-xl border rounded-2xl transition-all duration-500 bg-[var(--bg-glass)] ${showSpheres ? 'border-[var(--border-strong)] text-[var(--text-secondary)] hover:text-[var(--accent-primary)]' : 'border-red-500/40 text-red-500 bg-red-500/5'} hover:bg-[var(--accent-primary)]/10 shadow-lg`} 
-                        title={showSpheres ? "Ocultar Esferas" : "Mostrar Esferas"}
-                    >
-                        <i className={`fa ${showSpheres ? 'fa-eye' : 'fa-eye-slash'}`}></i>
-                    </button>
+
 
                     <button 
                         onClick={onDimensionalMenu} 
