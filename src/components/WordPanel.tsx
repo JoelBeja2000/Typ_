@@ -318,11 +318,11 @@ export const WordPanel: React.FC<WordPanelProps> = ({
 
                 <div className="font-mono text-xl md:text-3xl relative overflow-hidden h-20 w-full max-w-2xl flex items-center">
                     <div 
-                        className="absolute top-0 left-0 h-full text-[var(--text-ghost)] whitespace-nowrap leading-none transition-transform duration-300 ease-out flex items-center will-change-transform"
+                        className="absolute top-0 left-0 h-full text-white/40 whitespace-nowrap leading-none transition-transform duration-300 ease-out flex items-center will-change-transform"
                         style={{ transform: `translateX(calc(-${offset}ch))` }}
                     >
                         {currentPhrase.split('').map((char, i) => {
-                            let color = textColor;
+                            let color = "text-white";
                             let glow = "";
                             if (i < normalizedTypedText.length) {
                                 const isMismatch = normalizedTypedText[i] !== char;
@@ -330,12 +330,12 @@ export const WordPanel: React.FC<WordPanelProps> = ({
 
                                 if (isMismatch) {
                                     if (isLastChar && isComposingState) {
-                                        color = `${textColor} border-b-2 border-[var(--accent-primary)] animate-pulse`;
+                                        color = "text-white border-b-2 border-[var(--accent-primary)] animate-pulse";
                                     } else {
                                         color = "text-red-400 bg-red-500/10 border-b-2 border-red-500/30";
                                     }
                                 } else {
-                                    color = textColor;
+                                    color = "text-white";
                                     glow = "drop-shadow-[0_0_8px_var(--accent-primary)]";
                                 }
                             }
@@ -462,7 +462,7 @@ export const WordPanel: React.FC<WordPanelProps> = ({
                         <div className="relative overflow-visible flex items-center justify-center gap-8" style={{ height: `${birdSize * 0.8}px` }}>
                             <div className="bg-[var(--bg-floating)] backdrop-blur-3xl border border-[var(--border-strong)] rounded-[2.5rem] px-14 h-24 flex items-center justify-center min-w-[400px] shadow-3xl scale-110 z-30 relative overflow-visible">
                                 <div className="relative font-mono text-4xl flex items-center h-full min-w-[200px]">
-                                    <div className="absolute inset-0 text-[var(--text-ghost)] whitespace-pre flex items-center justify-start pointer-events-none opacity-40">{currentWordInfo.word}</div>
+                                    <div className="absolute inset-0 text-white/40 whitespace-pre flex items-center justify-start pointer-events-none">{currentWordInfo.word}</div>
                                     <div className="relative flex items-center whitespace-pre h-full">
                                         {currentWordInfo.userTypedSlice.split('').map((userChar, idx) => {
                                             const correct = userChar === (currentWordInfo.word[idx] || '');
