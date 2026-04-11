@@ -3,7 +3,8 @@ import { GoogleGenAI, Type } from "@google/genai";
 import { Language } from "../types";
 import { LOCAL_PHRASE_DB, PhraseCategory } from "../constants/phrases";
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+const API_KEY = (import.meta as any).env?.VITE_GEMINI_API_KEY || "";
+const ai = new GoogleGenAI(API_KEY);
 
 /**
  * Obtiene frases de práctica. 
