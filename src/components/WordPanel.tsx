@@ -94,6 +94,7 @@ export const WordPanel: React.FC<WordPanelProps> = ({
     const [expandedStars, setExpandedStars] = useState<number | null>(null);
     const [practiceExpanded, setPracticeExpanded] = useState(false);
     const [musicExpanded, setMusicExpanded] = useState(false);
+    const [showSpheres, setShowSpheres] = useState(true);
 
     const togglePractice = () => {
         setPracticeExpanded(!practiceExpanded);
@@ -295,6 +296,8 @@ export const WordPanel: React.FC<WordPanelProps> = ({
                                 </div>
                             </div>
                         </div>
+                        
+                        </div>
                     </div>
 
                 </div>
@@ -378,6 +381,24 @@ export const WordPanel: React.FC<WordPanelProps> = ({
         <div className="w-full relative group flex justify-center">
             {/* CENTRAL CINEMATIC BOX */}
             <div className="w-full bg-[var(--bg-glass)] backdrop-blur-xl border border-[var(--border-glass)] rounded-[2.5rem] p-6 pt-6 flex flex-col items-center shadow-2xl relative" style={{ overflow: 'visible' }}>
+                
+                {/* FLOATING VISUALS TOGGLE */}
+                <div className="absolute top-6 right-8 z-[100]">
+                    <button
+                        onClick={() => setShowSpheres(!showSpheres)}
+                        title={showSpheres ? "Ocultar Esferas 3D" : "Mostrar Esferas 3D"}
+                        className={`group/eye flex items-center gap-3 px-4 py-2 rounded-full border backdrop-blur-md transition-all duration-500 ${
+                            showSpheres 
+                            ? 'border-[var(--accent-primary)]/30 bg-[var(--accent-primary)]/5 hover:bg-[var(--accent-primary)]/10 text-[var(--accent-primary)]' 
+                            : 'border-red-500/30 bg-red-500/5 hover:bg-red-500/10 text-red-400'
+                        }`}
+                    >
+                        <i className={`fa ${showSpheres ? 'fa-eye' : 'fa-eye-slash'} text-xs transition-transform group-hover/eye:scale-110`}></i>
+                        <span className="text-[9px] font-black uppercase tracking-[0.2em]">
+                            Esferas 3D: {showSpheres ? 'ON' : 'OFF'}
+                        </span>
+                    </button>
+                </div>
 
                 {/* CONTENT AREA */}
                 <div className="w-full flex-grow flex flex-col items-center justify-center select-none">
@@ -389,57 +410,61 @@ export const WordPanel: React.FC<WordPanelProps> = ({
                     <div className={`w-full flex flex-col items-center gap-4 mt-6 relative transition-all duration-1000 ${isLevelActive ? 'opacity-100' : 'opacity-0 h-0 pointer-events-none'}`}>
                         {/* SPHERES CONTAINER - ABSOLUTE POSITIONING */}
                         {/* LEFT SPHERE */}
-                        <div className="absolute hidden md:block"
-                            style={{
-                                left: '0px',
-                                top: '50%',
-                                transform: `translateY(-50%)`,
-                                width: `${birdSize * 0.8}px`,
-                                height: `${birdSize * 0.8}px`,
-                                pointerEvents: 'auto',
-                                zIndex: 50,
-                                opacity: 0.8
-                            }}>
-                            <BirdAnimation
-                                key={`circle-left`}
-                                color={sphereColor}
-                                speed={0.75}
-                                bands={frequencyBands}
-                                rotation={birdRotation}
-                                position={birdPos3D}
-                                side="left"
-                                scale={(birdSize * 0.8) / 180}
-                                config={visualsConfig}
-                                combo={combo * comboMultiplier}
-                                lightingEnabled={isMusicLightingEnabled}
-                                onClick={onDimensionalMenu} />
-                        </div>
+                        {showSpheres && (
+                            <div className="absolute hidden md:block"
+                                style={{
+                                    left: '0px',
+                                    top: '50%',
+                                    transform: `translateY(-50%)`,
+                                    width: `${birdSize * 0.8}px`,
+                                    height: `${birdSize * 0.8}px`,
+                                    pointerEvents: 'auto',
+                                    zIndex: 50,
+                                    opacity: 0.8
+                                }}>
+                                <BirdAnimation
+                                    key={`circle-left`}
+                                    color={sphereColor}
+                                    speed={0.75}
+                                    bands={frequencyBands}
+                                    rotation={birdRotation}
+                                    position={birdPos3D}
+                                    side="left"
+                                    scale={(birdSize * 0.8) / 180}
+                                    config={visualsConfig}
+                                    combo={combo * comboMultiplier}
+                                    lightingEnabled={isMusicLightingEnabled}
+                                    onClick={onDimensionalMenu} />
+                            </div>
+                        )}
                         {/* RIGHT SPHERE */}
-                        <div className="absolute hidden md:block"
-                            style={{
-                                right: '0px',
-                                top: '50%',
-                                transform: `translateY(-50%)`,
-                                width: `${birdSize * 0.8}px`,
-                                height: `${birdSize * 0.8}px`,
-                                pointerEvents: 'auto',
-                                zIndex: 50,
-                                opacity: 0.8
-                            }}>
-                            <BirdAnimation
-                                key={`circle-right`}
-                                color={sphereColor}
-                                speed={0.75}
-                                bands={frequencyBands}
-                                rotation={birdRotation}
-                                position={birdPos3D}
-                                side="right"
-                                scale={(birdSize * 0.8) / 180}
-                                config={visualsConfig}
-                                combo={combo * comboMultiplier}
-                                lightingEnabled={isMusicLightingEnabled}
-                                onClick={onDimensionalMenu} />
-                        </div>
+                        {showSpheres && (
+                            <div className="absolute hidden md:block"
+                                style={{
+                                    right: '0px',
+                                    top: '50%',
+                                    transform: `translateY(-50%)`,
+                                    width: `${birdSize * 0.8}px`,
+                                    height: `${birdSize * 0.8}px`,
+                                    pointerEvents: 'auto',
+                                    zIndex: 50,
+                                    opacity: 0.8
+                                }}>
+                                <BirdAnimation
+                                    key={`circle-right`}
+                                    color={sphereColor}
+                                    speed={0.75}
+                                    bands={frequencyBands}
+                                    rotation={birdRotation}
+                                    position={birdPos3D}
+                                    side="right"
+                                    scale={(birdSize * 0.8) / 180}
+                                    config={visualsConfig}
+                                    combo={combo * comboMultiplier}
+                                    lightingEnabled={isMusicLightingEnabled}
+                                    onClick={onDimensionalMenu} />
+                            </div>
+                        )}
 
                         {/* CIRCUIT TIMER (Moved here) */}
                         {isCircuitMode && circuitTimer !== undefined && (
