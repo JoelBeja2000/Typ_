@@ -592,7 +592,7 @@ const App: React.FC = () => {
                   onDimensionalMenu={(e) => { setShowDimensionalSettings(!showDimensionalSettings); }}
                   isLevelActive={isLevelActive}
                   onSelectLevel={(level: any) => handleSelectPhrases(level.phrases, level.id)}
-                  themeScheme={currentTheme.scheme}
+                  themeScheme={(forceScheme === 'light' || (currentTheme.scheme === 'light' && !forceScheme)) ? 'light' : currentTheme.scheme}
                   currentMusicStyle={currentMusicStyle}
                   onMusicStyleChange={setCurrentMusicStyle}
                   currentLevelProgress={currentPhrase.length > 0 ? Math.min(100, Math.round((normalizedTypedText.length / currentPhrase.length) * 100)) : 0}
