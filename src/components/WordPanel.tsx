@@ -78,10 +78,10 @@ export const WordPanel: React.FC<WordPanelProps> = ({
     const textColor = themeScheme === 'light' ? 'text-black' : 'text-white';
     
     const [expandedStars, setExpandedStars] = useState<number | null>(null);
-    const [expandedPractice, setExpandedPractice] = useState<string | null>(null);
+    const [practiceExpanded, setPracticeExpanded] = useState(false);
 
-    const togglePractice = (id: string) => {
-        setExpandedPractice(expandedPractice === id ? null : id);
+    const togglePractice = () => {
+        setPracticeExpanded(!practiceExpanded);
     };
 
     const practiceLevels = [
@@ -178,48 +178,43 @@ export const WordPanel: React.FC<WordPanelProps> = ({
                     </div>
 
                     {/* Column 2: Practice */}
-                    <div className="space-y-3">
-                        <h2 className="text-[10px] font-black uppercase tracking-[0.5em] text-[var(--accent-primary)] mb-4 text-center">
-                            ✋ Práctica de Dedos
-                        </h2>
-                        
-                        {practiceLevels.map(level => {
-                            const isExpanded = expandedPractice === level.id;
-                            return (
-                                <div key={level.id} className="flex flex-col rounded-2xl bg-[var(--bg-glass)] border border-[var(--border-glass)] overflow-hidden transition-all duration-500">
-                                    <button
-                                        onClick={() => togglePractice(level.id)}
-                                        className={`w-full p-4 flex items-center justify-between transition-all ${isExpanded ? 'bg-[var(--accent-primary)]/10' : 'hover:bg-[var(--bg-glass-strong)]'}`}
-                                    >
-                                        <div className="flex items-center gap-3">
-                                            <span className={`text-[12px] font-black uppercase tracking-wider ${isExpanded ? 'text-[var(--accent-primary)]' : 'text-[var(--text-primary)]'}`}>
-                                                {level.title}
-                                            </span>
-                                        </div>
-                                        <i className={`fa fa-hand-paper-o text-[12px] text-[var(--text-secondary)] transition-transform duration-500 ${isExpanded ? 'rotate-180' : ''}`}></i>
-                                    </button>
-                                    
-                                    <div className={`grid transition-all duration-500 ease-in-out ${isExpanded ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}>
-                                        <div className="overflow-hidden">
-                                            <div className="p-3 bg-[var(--bg-app)]/20 border-t border-[var(--border-glass)]">
-                                                <button
-                                                    onClick={() => onSelectLevel && onSelectLevel({ ...level, phrases: [`${level.keys.join(' ')} ${level.keys.join(' ')}`] })}
-                                                    className="w-full p-3 rounded-xl text-left border border-transparent hover:border-[var(--accent-primary)]/40 hover:bg-[var(--accent-primary)]/10 flex flex-col gap-2 transition-all group relative overflow-hidden"
-                                                >
-                                                    <div className="flex flex-wrap gap-1">
-                                                        {level.keys.slice(0, 10).map(key => (
-                                                            <span key={key} className="px-2 py-1 text-[10px] font-mono rounded bg-[var(--bg-app)]/50 border border-[var(--border-glass)] text-[var(--text-secondary)]">
-                                                                {key}
-                                                            </span>
-                                                        ))}
-                                                    </div>
-                                                </button>
-                                            </div>
-                                        </div>
+                    <div className="space-y-4">
+                        <div className="flex flex-col rounded-2xl bg-[var(--bg-glass)] border border-[var(--border-glass)] overflow-hidden transition-all duration-500">
+                            <button
+                                onClick={togglePractice}
+                                className={`w-full p-4 flex items-center justify-between transition-all ${practiceExpanded ? 'bg-[var(--accent-primary)]/10' : 'hover:bg-[var(--bg-glass-strong)]'}`}
+                            >
+                                <span className={`text-[12px] font-black uppercase tracking-wider ${practiceExpanded ? 'text-[var(--accent-primary)]' : 'text-[var(--text-primary)]'}`}>
+                                    ✋ Práctica de Dedos
+                                </span>
+                                <i className={`fa fa-chevron-down text-[10px] text-[var(--text-secondary)] transition-transform duration-500 ${practiceExpanded ? 'rotate-180' : ''}`}></i>
+                            </button>
+                            
+                            <div className={`grid transition-all duration-500 ease-in-out ${practiceExpanded ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}>
+                                <div className="overflow-hidden">
+                                    <div className="p-3 bg-[var(--bg-app)]/20 border-t border-[var(--border-glass)] grid grid-cols-1 gap-2">
+                                        {practiceLevels.map(level => (
+                                            <button
+                                                key={level.id}
+                                                onClick={() => onSelectLevel && onSelectLevel({ ...level, phrases: [`${level.keys.join(' ')} ${level.keys.join(' ')}`] })}
+                                                className="w-full p-3 rounded-xl text-left border border-transparent hover:border-[var(--accent-primary)]/40 hover:bg-[var(--accent-primary)]/10 flex flex-col gap-2 transition-all group relative overflow-hidden"
+                                            >
+                                                <span className="text-[11px] font-black uppercase tracking-widest text-[var(--text-secondary)] group-hover:text-[var(--text-primary)] transition-colors">
+                                                    {level.title}
+                                                </span>
+                                                <div className="flex flex-wrap gap-1">
+                                                    {level.keys.slice(0, 8).map(key => (
+                                                        <span key={key} className="px-1.5 py-0.5 text-[9px] font-mono rounded bg-[var(--bg-app)]/50 border border-[var(--border-glass)] text-[var(--text-secondary)]">
+                                                            {key}
+                                                        </span>
+                                                    ))}
+                                                </div>
+                                            </button>
+                                        ))}
                                     </div>
                                 </div>
-                            );
-                        })}
+                            </div>
+                        </div>
                     </div>
 
                 </div>
