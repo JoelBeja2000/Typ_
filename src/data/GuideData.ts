@@ -1,3 +1,4 @@
+import { PHRASE_CATEGORIES } from './ZenPhrases';
 
 export interface GuideLevel {
     id: string;
@@ -23,6 +24,40 @@ export interface GuideSection {
 }
 
 export const GUIDE_PHASES: GuidePhase[] = [
+    {
+        id: 'fase_estrellas',
+        title: '🏆 Desafíos por Estrellas',
+        description: 'Niveles de dificultad real con frases de 60+ palabras.',
+        levels: [
+            ...PHRASE_CATEGORIES.oneStar.levels.map(l => ({
+                id: `star_1_lvl_${l.id}`,
+                title: `1 Estrella - Nivel ${l.id}`,
+                description: 'Vocabulario esencial y fluidez básica.',
+                fingers: [],
+                keys: [],
+                difficulty: 1,
+                phrases: l.phrases
+            })),
+            ...PHRASE_CATEGORIES.twoStars.levels.map(l => ({
+                id: `star_2_lvl_${l.id}`,
+                title: `2 Estrellas - Nivel ${l.id}`,
+                description: 'Puntuación, tildes y gramática compleja.',
+                fingers: [],
+                keys: [],
+                difficulty: 2,
+                phrases: l.phrases
+            })),
+            ...PHRASE_CATEGORIES.threeStars.levels.map(l => ({
+                id: `star_3_lvl_${l.id}`,
+                title: `3 Estrellas - Nivel ${l.id}`,
+                description: 'Símbolos, código y términos técnicos densos.',
+                fingers: [],
+                keys: [],
+                difficulty: 3,
+                phrases: l.phrases
+            }))
+        ]
+    },
     {
         id: 'fase_1',
         title: 'Fase 1: Pares de Dedos (Homólogos)',

@@ -105,95 +105,120 @@ export const WordPanel: React.FC<WordPanelProps> = ({
     };
 
     const renderLevelSelector = () => {
+        const starLevels = (star: number) => {
+            return GUIDE_PHASES.find(p => p.id === 'fase_estrellas')?.levels.filter(l => l.difficulty === star) || [];
+        };
+
         return (
             <div className="w-full bg-[var(--bg-glass-strong)] border border-[var(--border-glass)] rounded-[2.5rem] p-6 flex flex-col items-center relative overflow-hidden transition-all duration-1000 shadow-inner">
                 <div className="w-full max-w-md space-y-4">
-                    {[1, 2, 3].map(stars => (
-                        <div key={stars} className="w-full">
+                    <h2 className="text-[10px] font-black uppercase tracking-[0.5em] text-[var(--accent-primary)] mb-4 text-center">
+                        🏆 Desafíos por Estrellas
+                    </h2>
+                    {[1, 2, 3].map(star => {
+                        const levels = starLevels(star);
+                        const isExpanded = expandedStars === star;
+                        const name = star === 1 ? 'Novato' : star === 2 ? 'Experto' : 'Maestro';
+                        
+                        return (
+                            <div key={star} className="w-full flex flex-col rounded-2xl bg-[var(--bg-glass)] border border-[var(--border-glass)] overflow-hidden transition-all duration-500">
+                                <button
+                                    onClick={() => toggleStars(star)}
+                                    className={`w-full p-4 flex items-center justify-between transition-all ${isExpanded ? 'bg-[var(--accent-primary)]/10 shadow-[inset_0_0_20px_rgba(var(--accent-rgb),0.1)]' : 'hover:bg-[var(--bg-glass-strong)]'}`}
+                                >
+                                    <div className="flex items-center gap-4">
+                                        <div className="flex flex-col">
+                                            <div className="flex gap-1 mb-1">
+                                                {Array.from({ length: star }).map((_, i) => (
+                                                    <i key={i} className={`fa fa-star text-[12px] ${isExpanded ? 'text-[var(--accent-primary)] animate-pulse' : 'text-amber-400 opacity-60'}`}></i>
+                                                ))}
+                                            </div>
+                                            <span className={`text-[12px] font-black uppercase tracking-wider ${isExpanded ? 'text-[var(--accent-primary)]' : 'text-[var(--text-primary)]'}`}>
+                                                {name}
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <i className={`fa fa-chevron-down text-[10px] text-[var(--text-secondary)] transition-transform duration-500 ${isExpanded ? 'rotate-180 text-[var(--accent-primary)]' : ''}`}></i>
+                                </button>
+
+                                <div className={`grid transition-all duration-500 ease-in-out ${isExpanded ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}>
+                                    <div className="overflow-hidden">
+                                        <div className="p-3 bg-[var(--bg-app)]/20 border-t border-[var(--border-glass)] grid grid-cols-1 md:grid-cols-2 gap-2">
+                                            {levels.map((level) => (
+                                                <button
+                                                    key={level.id}
+                                                    onClick={() => onSelectLevel && onSelectLevel(level)}
+                                                    className="w-full p-3 rounded-xl text-left border border-transparent hover:border-[var(--accent-primary)]/40 hover:bg-[var(--accent-primary)]/10 flex flex-col gap-2 transition-all group relative overflow-hidden"
+                                                >
+                                                    <div className="absolute inset-0 bg-gradient-to-r from-[var(--accent-primary)]/0 to-[var(--accent-primary)]/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                                                    <div className="flex items-center justify-between relative z-10">
+                                                        <span className="text-[11px] font-black uppercase tracking-widest text-[var(--text-secondary)] group-hover:text-[var(--text-primary)] transition-colors">
+                                                            {level.title}
+                                                        </span>
+                                                        <i className="fa fa-play text-[8px] text-[var(--accent-primary)] opacity-0 group-hover:opacity-100 transform translate-x-2 group-hover:translate-x-0 transition-all"></i>
+                                                    </div>
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        );
+                    })}
+
+                    <div className="border-t border-[var(--border-glass)] my-4"></div>
+
+                    <h2 className="text-[10px] font-black uppercase tracking-[0.5em] text-[var(--accent-primary)] mb-4 text-center">
+                        Práctica de Dedos
+                    </h2>
+                    
+                    {practicePhases.map(phase => (
+                        <div key={phase.id} className="w-full flex flex-col rounded-2xl bg-[var(--bg-glass)] border border-[var(--border-glass)] overflow-hidden transition-all duration-500">
                             <button
-                                onClick={() => toggleStars(stars)}
-                                className="w-full flex items-center justify-between px-4 py-3 bg-[var(--bg-glass)] border border-[var(--border-glass)] rounded-xl hover:border-[var(--accent-primary)] transition-all group"
+                                onClick={() => setExpandedPractice(expandedPractice === phase.id ? null : phase.id)}
+                                className={`w-full p-4 flex items-center justify-between transition-all ${expandedPractice === phase.id ? 'bg-[var(--accent-primary)]/10' : 'hover:bg-[var(--bg-glass-strong)]'}`}
                             >
-                                <span className="flex items-center gap-3">
-                                    <span className="text-xs font-black uppercase tracking-[0.2em] text-[var(--text-primary)] group-hover:text-[var(--accent-primary)] transition-colors">
-                                        {stars} Estrella{stars > 1 ? 's' : ''}
+                                <div className="flex items-center gap-3">
+                                    <span
+                                        className="w-3 h-3 rounded-full shadow-[0_0_8px]"
+                                        style={{
+                                            backgroundColor: PHASE_COLORS[phase.id],
+                                            boxShadow: `0 0 10px ${PHASE_COLORS[phase.id]}`
+                                        }}
+                                    />
+                                    <span className="text-[12px] font-black uppercase tracking-wider text-[var(--text-primary)]">
+                                        {phase.levels[0]?.fingers.map(f => FINGER_CODE_MAP[f] || f).join(' + ')}
                                     </span>
-                                    <span className="flex gap-0.5">
-                                        {[...Array(3)].map((_, i) => (
-                                            <i key={i} className={`fa fa-star text-[6px] ${i < stars ? 'text-amber-400' : 'text-white/10'}`}></i>
-                                        ))}
-                                    </span>
-                                </span>
-                                <i className={`fa fa-chevron-down text-xs text-[var(--text-secondary)] group-hover:text-[var(--accent-primary)] transition-all ${expandedStars === stars ? 'rotate-180' : ''}`}></i>
+                                </div>
+                                <i className={`fa fa-chevron-down text-[10px] text-[var(--text-secondary)] transition-transform duration-500 ${expandedPractice === phase.id ? 'rotate-180' : ''}`}></i>
                             </button>
-                            <div className={`overflow-hidden transition-all duration-500 ease-in-out ${expandedStars === stars ? 'max-h-[300px] opacity-100 mt-2' : 'max-h-0 opacity-0'}`}>
-                                <div className="grid grid-colss-1 gap-3 p-2">
-                                    {levelsByStars[stars as 1 | 2 | 3].slice(0, 4).map(level => (
+                            
+                            <div className={`grid transition-all duration-500 ease-in-out ${expandedPractice === phase.id ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}>
+                                <div className="overflow-hidden">
+                                    <div className="p-3 bg-[var(--bg-app)]/20 border-t border-[var(--border-glass)]">
                                         <button
-                                            key={level.id}
-                                            onClick={() => onSelectLevel && onSelectLevel(level)}
-                                            className="w-full group relative p-3 rounded-xl bg-[var(--bg-glass)] border border-[var(--border-glass)] hover:border-[var(--accent-primary)] transition-all flex items-center justify-center gap-1 overflow-hidden"
+                                            onClick={() => onSelectLevel && onSelectLevel(phase.levels[0])}
+                                            className="w-full p-3 rounded-xl text-left border border-transparent hover:border-[var(--accent-primary)]/40 hover:bg-[var(--accent-primary)]/10 flex flex-col gap-2 transition-all group relative overflow-hidden"
                                         >
-                                            <span className="text-[10px] font-black uppercase tracking-wider text-[var(--text-primary)] group-hover:text-[var(--accent-primary)] transition-colors relative z-10 text-center">{level.title}</span>
+                                            <div className="flex flex-wrap gap-1">
+                                                {phase.levels[0]?.keys.length > 0 ? phase.levels[0].keys.slice(0, 10).map(key => (
+                                                    <span key={key} className="px-2 py-1 text-[10px] font-mono rounded bg-[var(--bg-app)]/50 border border-[var(--border-glass)] text-[var(--text-secondary)]">
+                                                        {key}
+                                                    </span>
+                                                )) : (
+                                                    <span className="text-[10px] text-[var(--text-ghost)]">Todas las teclas</span>
+                                                )}
+                                            </div>
                                         </button>
-                                    ))}
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     ))}
 
-                    <div className="border-t border-[var(--border-glass)] my-4"></div>
-
-                    <div className="w-full">
-                        <button
-                            onClick={() => setExpandedPractice(expandedPractice ? null : 'practice')}
-                            className="w-full flex items-center justify-between px-4 py-3 bg-[var(--bg-glass)] border border-[var(--border-glass)] rounded-xl hover:border-[var(--accent-primary)] transition-all group"
-                        >
-                            <span className="text-xs font-black uppercase tracking-[0.2em] text-[var(--text-primary)] group-hover:text-[var(--accent-primary)] transition-colors">
-                                Práctica de Dedos
-                            </span>
-                            <i className={`fa fa-chevron-down text-xs text-[var(--text-secondary)] group-hover:text-[var(--accent-primary)] transition-all ${expandedPractice ? 'rotate-180' : ''}`}></i>
-                        </button>
-                        <div className={`overflow-hidden transition-all duration-500 ease-in-out ${expandedPractice ? 'max-h-[400px] opacity-100 mt-2' : 'max-h-0 opacity-0'}`}>
-                            <div className="grid grid-cols-1 gap-3 p-2">
-                                {practicePhases.map(phase => (
-                                    <div key={phase.id} className="w-full">
-                                        {phase.levels.slice(0, 1).map(level => (
-                                            <button
-                                                key={level.id}
-                                                onClick={() => onSelectLevel && onSelectLevel(level)}
-                                                className="w-full group relative p-3 rounded-xl bg-[var(--bg-glass)] border border-[var(--border-glass)] hover:border-[var(--accent-primary)] transition-all flex flex-col items-center gap-2 overflow-hidden"
-                                            >
-                                                <div className="flex items-center gap-2">
-                                                    <span
-                                                        className="w-2 h-2 rounded-full shadow-[0_0_8px]"
-                                                        style={{
-                                                            backgroundColor: PHASE_COLORS[phase.id],
-                                                            boxShadow: `0 0 10px ${PHASE_COLORS[phase.id]}`
-                                                        }}
-                                                    />
-                                                    <span className="text-[10px] font-bold text-[var(--text-primary)] group-hover:text-[var(--accent-primary)] transition-colors truncate">
-                                                        {level.fingers.map(f => FINGER_CODE_MAP[f] || f).join(' + ')}
-                                                    </span>
-                                                </div>
-                                                <div className="flex flex-wrap gap-1 justify-center">
-                                                    {level.keys.length > 0 ? level.keys.slice(0, 8).map(key => (
-                                                        <span key={key} className="px-1.5 py-0.5 text-[9px] font-mono rounded bg-[var(--bg-app)]/50 border border-[var(--border-glass)] text-[var(--text-secondary)]">
-                                                            {key}
-                                                        </span>
-                                                    )) : (
-                                                        <span className="text-[8px] text-[var(--text-ghost)]">Todas las teclas</span>
-                                                    )}
-                                                </div>
-                                            </button>
-                                        ))}
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                    </div>
                 </div>
-                <div className="mt-4 text-[10px] font-black uppercase tracking-[0.4em] text-[var(--text-secondary)] animate-pulse">
+
+                <div className="mt-4 text-[10px] font-black uppercase tracking-[0.4em] text-[var(--text-secondary)] animate-pulse text-center">
                     Selecciona un nivel para comenzar
                 </div>
             </div>

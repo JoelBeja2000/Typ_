@@ -24,6 +24,14 @@ export const useTypingEngine = (
   const [combo, setCombo] = useState(0);
   const [score, setScore] = useState(() => storageProvider.getScore());
   const [isInfiniteMode, setIsInfiniteMode] = useState(false);
+  const [currentLevelId, setCurrentLevelId] = useState<string | null>(null);
+
+  const saveLevelProgress = useCallback((id: string, progress: number) => {
+    const existing = Number(localStorage.getItem(`typ_progress_${id}`) || 0);
+    if (progress > existing) {
+      localStorage.setItem(`typ_progress_${id}`, Math.round(progress).toString());
+    }
+  }, []);
 
   // Use refs for frequency data to avoid re-renders if possible, 
   // but here we need state for UI reactivity.
@@ -95,11 +103,18 @@ export const useTypingEngine = (
           setTypedText('');
         }, 50);
       } else if (phraseIndex < phrases.length - 1) {
+        if (currentLevelId) {
+          const progress = ((phraseIndex + 1) / phrases.length) * 100;
+          saveLevelProgress(currentLevelId, progress);
+        }
         setTimeout(() => {
           setPhraseIndex(prev => prev + 1);
           setTypedText('');
         }, 50);
       } else {
+        if (currentLevelId) {
+          saveLevelProgress(currentLevelId, 100);
+        }
         setIsFinished(true);
       }
     }
@@ -137,6 +152,8 @@ export const useTypingEngine = (
     setStartTime,
     isInfiniteMode,
     setIsInfiniteMode,
+    currentLevelId,
+    setCurrentLevelId,
     restart
   };
 };

@@ -71,7 +71,6 @@ export const KeyboardSection: React.FC<KeyboardSectionProps> = React.memo(({
                 {/* ACTION BUTTONS (LEFT) */}
                 <div className="flex gap-2">
                     <button onClick={onRestart} className="h-11 w-11 flex items-center justify-center bg-[var(--bg-glass)] border border-[var(--border-strong)] rounded-2xl text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-all shadow-lg" title="Reiniciar"><i className="fa fa-refresh"></i></button>
-                    <button onClick={onZenToggle} className={`h-11 px-6 flex items-center justify-center border rounded-2xl font-black text-[10px] uppercase tracking-widest transition-all shadow-lg ${isZenMode ? 'bg-[var(--accent-primary)] text-[var(--bg-app)] border-[var(--accent-primary)] shadow-[0_0_15px_var(--accent-glow)]' : 'bg-[var(--bg-glass)] text-[var(--text-secondary)] border-[var(--border-strong)]'}`}>ZEN {isZenMode ? 'ON' : 'OFF'}</button>
                 </div>
 
                 {/* STATS BAR (CENTERED) */}

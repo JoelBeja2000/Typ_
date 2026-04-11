@@ -1,11 +1,17 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { KeyData } from '../../types';
 import { GUIDE_PHASES } from '../data/GuideData';
+import { PHRASE_CATEGORIES } from '../data/ZenPhrases';
+
+const getLevelProgress = (levelId: string): number => {
+  const progress = localStorage.getItem(`typ_progress_${levelId}`);
+  return progress ? Number(progress) : 0;
+};
 
 interface FingerGuideProps {
   targetKeyData?: KeyData;
   onSelectLevel?: (keys: string[]) => void; // Callback to highlight keys on main keyboard
-  onSelectPhrases?: (phrases: string[]) => void; // Callback to update practice text
+  onSelectPhrases?: (phrases: string[], levelId?: string) => void; // Callback to update practice text
 }
 
 const FingerGuide: React.FC<FingerGuideProps> = ({ targetKeyData, onSelectLevel, onSelectPhrases }) => {
@@ -18,7 +24,7 @@ const FingerGuide: React.FC<FingerGuideProps> = ({ targetKeyData, onSelectLevel,
   useEffect(() => {
     if (currentLevel) {
       if (onSelectLevel) onSelectLevel(currentLevel.keys);
-      if (onSelectPhrases) onSelectPhrases(currentLevel.phrases);
+      if (onSelectPhrases) onSelectPhrases(currentLevel.phrases, currentLevel.id);
     }
   }, [currentLevel, onSelectLevel, onSelectPhrases]);
 
@@ -31,7 +37,7 @@ const FingerGuide: React.FC<FingerGuideProps> = ({ targetKeyData, onSelectLevel,
             <div className="space-y-3">
               <h4 className="text-xs uppercase text-[var(--text-secondary)] font-bold tracking-wider mb-2">Fases de Aprendizaje</h4>
 
-              {GUIDE_PHASES.map(phase => (
+              {GUIDE_PHASES.filter(p => p.id !== 'fase_estrellas').map(phase => (
                 <div key={phase.id} className="rounded-xl border border-[var(--border-glass)] bg-[var(--bg-glass)] overflow-hidden">
                   {/* Phase Header */}
                   <button
