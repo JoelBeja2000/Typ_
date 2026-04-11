@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import BirdAnimation from './BirdAnimation';
 import { VisualsConfig } from '../types/visuals';
+import { MusicStyle, TECHNO_STYLE, AMBIENT_STYLE, ACID_HOUSE_STYLE } from '../domain/models/MusicStyles';
 
 const PHASE_COLORS: Record<string, string> = {
     'fase_1': '#22d3ee',
@@ -46,6 +47,8 @@ interface WordPanelProps {
     isLevelActive?: boolean;
     onSelectLevel?: (level: any) => void;
     themeScheme?: 'dark' | 'light';
+    currentMusicStyle?: MusicStyle;
+    onMusicStyleChange?: (style: MusicStyle) => void;
 }
 
 import { GUIDE_PHASES } from '../data/GuideData';
@@ -74,11 +77,16 @@ export const WordPanel: React.FC<WordPanelProps> = ({
     isLevelActive,
     onSelectLevel,
     themeScheme = 'dark',
+    currentMusicStyle = TECHNO_STYLE,
+    onMusicStyleChange,
 }) => {
     const textColor = themeScheme === 'light' ? 'text-black' : 'text-white';
+    const musicStyles = [TECHNO_STYLE, AMBIENT_STYLE, ACID_HOUSE_STYLE];
+    const musicIcons = ['fa-bolt', 'fa-leaf', 'fa-flask'];
     
     const [expandedStars, setExpandedStars] = useState<number | null>(null);
     const [practiceExpanded, setPracticeExpanded] = useState(false);
+    const [musicExpanded, setMusicExpanded] = useState(false);
 
     const togglePractice = () => {
         setPracticeExpanded(!practiceExpanded);
@@ -214,6 +222,48 @@ export const WordPanel: React.FC<WordPanelProps> = ({
                                                     </span>
                                                     <i className="fa fa-play text-[8px] text-[var(--accent-primary)] opacity-0 group-hover:opacity-100 transform translate-x-2 group-hover:translate-x-0 transition-all"></i>
                                                 </div>
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Column 3: Music Styles */}
+                    <div className="space-y-4">
+                        <h2 className="text-[10px] font-black uppercase tracking-[0.5em] text-[var(--accent-primary)] mb-4 text-center">
+                            🎵 Música
+                        </h2>
+                        <div className="flex flex-col rounded-2xl bg-[var(--bg-glass)] border border-[var(--border-glass)] overflow-hidden transition-all duration-500">
+                            <button
+                                onClick={() => setMusicExpanded(!musicExpanded)}
+                                className={`w-full p-4 flex items-center justify-between transition-all ${musicExpanded ? 'bg-[var(--accent-primary)]/10 shadow-[inset_0_0_20px_rgba(var(--accent-rgb),0.1)]' : 'hover:bg-[var(--bg-glass-strong)]'}`}
+                            >
+                                <div className="flex items-center gap-4">
+                                    <div className="flex flex-col">
+                                        <i className={`fa ${musicIcons[musicStyles.indexOf(currentMusicStyle)] || 'fa-music'} text-[14px] mb-1 ${musicExpanded ? 'text-[var(--accent-primary)] animate-pulse' : 'text-amber-400 opacity-60'}`}></i>
+                                        <span className={`text-[12px] font-black uppercase tracking-wider ${musicExpanded ? 'text-[var(--accent-primary)]' : 'text-[var(--text-primary)]'}`}>
+                                            {currentMusicStyle.name}
+                                        </span>
+                                    </div>
+                                </div>
+                                <i className={`fa fa-chevron-down text-[10px] text-[var(--text-secondary)] transition-transform duration-500 ${musicExpanded ? 'rotate-180 text-[var(--accent-primary)]' : ''}`}></i>
+                            </button>
+                            
+                            <div className={`grid transition-all duration-500 ease-in-out ${musicExpanded ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}>
+                                <div className="overflow-hidden">
+                                    <div className="p-3 bg-[var(--bg-app)]/20 border-t border-[var(--border-glass)] grid grid-cols-1 gap-2">
+                                        {musicStyles.filter(s => s.name !== currentMusicStyle.name).map((style, idx) => (
+                                            <button
+                                                key={style.name}
+                                                onClick={() => onMusicStyleChange && onMusicStyleChange(style)}
+                                                className="w-full p-3 rounded-xl text-left border border-transparent hover:border-[var(--accent-primary)]/40 hover:bg-[var(--accent-primary)]/10 flex items-center gap-3 transition-all group relative overflow-hidden"
+                                            >
+                                                <i className={`fa ${musicIcons[musicStyles.indexOf(style)] || 'fa-music'} text-[12px] text-[var(--text-secondary)] group-hover:text-[var(--accent-primary)]`}></i>
+                                                <span className="text-[11px] font-black uppercase tracking-widest text-[var(--text-secondary)] group-hover:text-[var(--text-primary)] transition-colors">
+                                                    {style.name}
+                                                </span>
                                             </button>
                                         ))}
                                     </div>

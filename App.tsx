@@ -593,6 +593,8 @@ const App: React.FC = () => {
                   isLevelActive={isLevelActive}
                   onSelectLevel={(level: any) => handleSelectPhrases(level.phrases, level.id)}
                   themeScheme={currentTheme.scheme}
+                  currentMusicStyle={currentMusicStyle}
+                  onMusicStyleChange={setCurrentMusicStyle}
                 />
 
                 {isLevelActive && (
