@@ -1,10 +1,20 @@
-
 import { GoogleGenAI, Type } from "@google/genai";
 import { Language } from "../types";
 import { LOCAL_PHRASE_DB, PhraseCategory } from "../constants/phrases";
 
-const API_KEY = (import.meta as any).env?.VITE_GEMINI_API_KEY || "";
-const ai = new GoogleGenAI(API_KEY);
+let aiInstance: GoogleGenAI | null = null;
+const getAI = () => {
+    if (aiInstance) return aiInstance;
+    const API_KEY = (import.meta as any).env?.VITE_GEMINI_API_KEY || "";
+    if (!API_KEY) return null;
+    try {
+        aiInstance = new GoogleGenAI(API_KEY);
+        return aiInstance;
+    } catch (err) {
+        console.error("Failed to initialize GoogleGenAI:", err);
+        return null;
+    }
+};
 
 /**
  * Obtiene frases de práctica. 
@@ -32,6 +42,9 @@ export const generatePracticePhrases = async (language: Language, focus: string,
   }
 
   // Fallback a IA si por alguna razón no hay frases locales para ese idioma/categoría
+  const ai = getAI();
+  if (!ai) return ["Error al cargar frases (API Key falta). Por favor, usa el modo offline."];
+
   try {
     const response = await ai.models.generateContent({
       model: 'gemini-3-flash-preview',
@@ -55,6 +68,9 @@ export const generatePracticePhrases = async (language: Language, focus: string,
 };
 
 export const explainKeyUtility = async (keyLabel: string): Promise<string> => {
+  const ai = getAI();
+  if (!ai) return `La tecla ${keyLabel} es fundamental para una navegación rápida y eficiente sin levantar las manos del teclado.`;
+
   try {
     const response = await ai.models.generateContent({
       model: 'gemini-3-flash-preview',
