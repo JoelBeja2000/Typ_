@@ -17,6 +17,7 @@
 
 | Commit | Author | Description | Screenshots | Technical Details |
 | :--- | :--- | :--- | :--- | :--- |
+| `da3e7f1` | @antigravity | [AI] Remove Frost Theme & GHS Compliance | - | Removed the 'frost' (light blue) theme from the personalization menu. Finalized GHS documentation for the synchronization phase. |
 | `9cfe057` | @antigravity | [AI] Stabilize 1:1 Physics Sync & Growth | - | Implemented a master shared clock (`masterStartTime`) via Web Workers, Unified text growth logic (`solvedWords` + `typedText`), and synchronized both sidebars for identical physical response. |
 | `884db3e` | @antigravity | [AI] Modular Physics & Fixed Apex Math | - | Reverted global stateful physics to a pure mathematical `Math.cos()` algorithm mapped to a fixed ceiling origin at 62%, ensuring rhythmic audio sync while tracking dynamic floor heights. |
 | `0b43e08` | @antigravity | [AI] Realistic Ball Bounce & Squash/Stretch | - | Refined bounce formula for gravitational acceleration and added elastic squash-and-stretch deformations. |
