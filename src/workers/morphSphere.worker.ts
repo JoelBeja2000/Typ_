@@ -101,6 +101,7 @@ let startTime = 0;
 let isBouncing = false; // Explicit control relative to combo
 let bounceWeight = 0; // Target weight for delayed entry
 let currentBounceWeight = 0; // Smoothed weight
+let smoothedColorT = 0;
 
 function easeInOutCubic(t: number) {
     return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
@@ -264,16 +265,20 @@ function animate() {
         const oppCol = new THREE.Color(oppositeColor);
         
         // Use a base temporal "drift" so it's always alive
-        // Cycles every ~8 seconds
-        const drift = (Math.sin(time * 0.8) + 1) / 2;
+        // Cycles every ~15 seconds for a cinematic feel
+        const drift = (Math.sin(time * 0.4) + 1) / 2;
         
         // Use bass for theme, mid/high for opposite accents
-        const audioT = Math.min(1.0, bands.mid * 2.0 + bands.high * 2.5);
+        const audioT = Math.min(1.0, bands.mid * 2.5 + bands.high * 3.0);
         
-        // Combine drift (30% weight) and audio (70% weight)
-        const t = Math.min(1.0, drift * 0.3 + audioT * 0.7);
+        // Combine drift and audio
+        const targetT = Math.min(1.0, drift * 0.4 + audioT * 0.6);
         
-        material.color.copy(themeCol).lerp(oppCol, t);
+        // LIQUID INTERTIA: Smoth the transition over time
+        // 0.03 = Very gradual/liquid, 0.1 = Snappy
+        smoothedColorT += (targetT - smoothedColorT) * 0.03;
+        
+        material.color.copy(themeCol).lerp(oppCol, smoothedColorT);
         
         // Add brightness based on bass intensity
         material.color.multiplyScalar(0.85 + bands.bass * 0.4);

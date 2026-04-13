@@ -44,7 +44,7 @@ export const DEFAULT_VISUALS_CONFIG: VisualsConfig = {
         deformationFactor: 1.2,
         spikeFactor: 1.0,
         isWireframe: true,
-        shape: 'icosahedron',
+        shape: 'torus',
         morphSpeed: 1.5,
         noiseScale: 1.0
     },
@@ -55,7 +55,7 @@ export const DEFAULT_VISUALS_CONFIG: VisualsConfig = {
         deformationFactor: 1.2,
         spikeFactor: 0.8,
         isWireframe: true,
-        shape: 'icosahedron',
+        shape: 'torus',
         morphSpeed: 1.5,
         noiseScale: 1.0
     },
