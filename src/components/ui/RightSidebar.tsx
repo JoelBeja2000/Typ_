@@ -34,54 +34,43 @@ export const RightSidebar: React.FC<RightSidebarProps> = ({
 }) => {
   return (
     <aside
-      className={`fixed top-0 right-0 h-full w-[450px] z-[2001] theme-glass backdrop-blur-3xl border-l border-[var(--border-glass)] p-8 transition-all duration-500 transform flex flex-col ${isOpen ? 'translate-x-0' : 'translate-x-full'
+      className={`fixed top-0 right-0 h-full w-[400px] z-[2001] theme-glass backdrop-blur-3xl border-l border-[var(--border-glass)] p-8 transition-all duration-500 transform flex flex-col ${isOpen ? 'translate-x-0' : 'translate-x-full'
         }`}
     >
-      <div className="flex flex-col gap-8 mb-8 shrink-0">
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex flex-col">
-            <h2 className="text-[10px] font-black uppercase tracking-[0.5em] text-[var(--accent-primary)] mb-1">
-              Estado de Sesión
-            </h2>
-            <div className="flex items-center gap-2">
-              <span className="text-[24px] font-black text-[var(--text-primary)] tracking-tighter">
-                {score.toLocaleString()}
-              </span>
-              <span className="text-[10px] uppercase font-bold text-[var(--text-secondary)] mt-2 italic opacity-50">Pts</span>
-            </div>
-          </div>
-          <button
-            onClick={onClose}
-            className="w-10 h-10 flex items-center justify-center rounded-full bg-[var(--bg-glass)] text-[var(--text-secondary)] border border-[var(--border-glass)] hover:text-[var(--text-primary)] transition-all"
-          >
-            <i className="fa fa-close"></i>
-          </button>
-        </div>
+      <div className="flex items-center justify-end mb-12">
+        <button
+          onClick={onClose}
+          className="w-10 h-10 flex items-center justify-center rounded-full bg-[var(--bg-glass)] text-[var(--text-secondary)] border border-[var(--border-glass)] hover:text-[var(--text-primary)] transition-all"
+        >
+          <i className="fa fa-close"></i>
+        </button>
+      </div>
 
-        <div>
-          <h2 className="text-[10px] font-black uppercase tracking-[0.5em] text-[var(--accent-primary)] mb-4">
-            Estilos de Música
-          </h2>
-          <div className="grid grid-cols-1 gap-2">
-            <button
-              onClick={() => onMusicStyleChange(TECHNO_STYLE)}
-              className={getBtnClass(currentMusicStyle === TECHNO_STYLE)}
-            >
-              <span>{TECHNO_STYLE.name}</span> <i className="fa fa-bolt"></i>
-            </button>
-            <button
-              onClick={() => onMusicStyleChange(AMBIENT_STYLE)}
-              className={getBtnClass(currentMusicStyle === AMBIENT_STYLE)}
-            >
-              <span>{AMBIENT_STYLE.name}</span> <i className="fa fa-leaf"></i>
-            </button>
-            <button
-              onClick={() => onMusicStyleChange(ACID_HOUSE_STYLE)}
-              className={getBtnClass(currentMusicStyle === ACID_HOUSE_STYLE)}
-            >
-              <span>{ACID_HOUSE_STYLE.name}</span> <i className="fa fa-flask"></i>
-            </button>
-          </div>
+      <div className="flex-grow flex flex-col items-center justify-center text-center px-4">
+        <div className="w-20 h-20 bg-[var(--accent-primary)]/10 rounded-3xl flex items-center justify-center mb-8 border border-[var(--accent-primary)]/30 shadow-[0_0_30px_var(--accent-glow)]">
+          <i className="fa fa-github text-4xl text-[var(--accent-primary)]"></i>
+        </div>
+        
+        <h2 className="text-2xl font-black text-[var(--text-primary)] mb-4 tracking-tighter">
+          Apoya el Proyecto
+        </h2>
+        
+        <p className="text-[var(--text-secondary)] text-sm leading-relaxed mb-10 max-w-[280px]">
+          Si disfrutas de la experiencia cinemática de <b>OveTyp_</b>, por favor considera dejar una estrella en el repositorio. ¡Tu apoyo es fundamental para seguir mejorando!
+        </p>
+
+        <a 
+          href="https://github.com/JoelBeja2000/OveTyp_" 
+          target="_blank" 
+          rel="noopener noreferrer"
+          className="group relative px-8 py-4 bg-[var(--accent-primary)] text-black font-black rounded-2xl flex items-center gap-3 transition-all hover:scale-105 active:scale-95 shadow-[0_0_20px_var(--accent-glow)]"
+        >
+          <i className="fa fa-star"></i>
+          Dar Estrella en GitHub
+        </a>
+
+        <div className="mt-12 pt-12 border-t border-[var(--border-glass)] w-full text-[10px] font-black uppercase tracking-[0.4em] text-[var(--text-secondary)] opacity-30">
+          Open Source © 2026
         </div>
       </div>
     </aside>
