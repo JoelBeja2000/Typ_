@@ -21,8 +21,7 @@
     "right": {
       "support_title": "Apoya el Proyecto",
       "support_desc": "Si disfrutas de la experiencia cinemática de OveTyp_, por favor considera dejar una estrella en el repositorio. ¡Tu apoyo es fundamental para seguir mejorando!",
-      "star_button": "Dar Estrella en GitHub",
-      "footer": "Open Source © 2026"
+      "star_button": "Dar Estrella en GitHub"
     }
   },
   "settings": {
@@ -42,9 +41,11 @@
     "indices": "Dedos Índices",
     "middle": "Dedos Medios",
     "ring": "Dedos Anulares",
-    "pinky": "Dedos Meñiques",
+    "pinky": "Meñiques",
+    "full_hand": "Mano Completa",
     "left": "Izq.",
-    "right": "Der."
+    "right": "Der.",
+    "training_label": "Entrenando Pareja"
   },
   "fingers": {
     "left-index": "Índice Izquierdo",
