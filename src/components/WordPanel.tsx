@@ -242,7 +242,10 @@ export const WordPanel: React.FC<WordPanelProps> = ({
                                         {practiceLevels.map(level => (
                                             <button
                                                 key={level.id}
-                                                onClick={() => onSelectLevel && onSelectLevel({ ...level, phrases: [`${level.keys.join(' ')} ${level.keys.join(' ')}`] })}
+                                                onClick={() => {
+                                                    const hugePhrase = Array(100).fill(level.keys.join(' ')).join(' ');
+                                                    onSelectLevel && onSelectLevel({ ...level, phrases: [hugePhrase] });
+                                                }}
                                                 className="w-full p-3 rounded-xl text-left border border-transparent hover:border-[var(--accent-primary)]/40 hover:bg-[var(--accent-primary)]/10 flex flex-col gap-2 transition-all group relative overflow-hidden"
                                             >
                                                 <div className="absolute inset-0 bg-gradient-to-r from-[var(--accent-primary)]/0 to-[var(--accent-primary)]/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>

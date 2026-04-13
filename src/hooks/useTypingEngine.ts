@@ -120,11 +120,9 @@ export const useTypingEngine = (
         const isPracticeLevel = currentLevelId?.startsWith('practice_');
         
         if (isPracticeLevel || isInfiniteMode) {
-          // Wrap around to the first phrase
-          setTimeout(() => {
-            setPhraseIndex(0);
-            setTypedText('');
-          }, 50);
+          // Wrap around to the first phrase immediately
+          setPhraseIndex(0);
+          setTypedText('');
         } else {
           // Standard finish for challenge levels
           setIsFinished(true);
