@@ -263,12 +263,20 @@ function animate() {
         const themeCol = new THREE.Color(color);
         const oppCol = new THREE.Color(oppositeColor);
         
-        // Use bass for theme, mid/high for opposite
-        const t = Math.min(1.0, bands.mid * 2.5 + bands.high * 3.0);
+        // Use a base temporal "drift" so it's always alive
+        // Cycles every ~8 seconds
+        const drift = (Math.sin(time * 0.8) + 1) / 2;
+        
+        // Use bass for theme, mid/high for opposite accents
+        const audioT = Math.min(1.0, bands.mid * 2.0 + bands.high * 2.5);
+        
+        // Combine drift (30% weight) and audio (70% weight)
+        const t = Math.min(1.0, drift * 0.3 + audioT * 0.7);
+        
         material.color.copy(themeCol).lerp(oppCol, t);
         
-        // Add a bit of brightness based on bass
-        material.color.multiplyScalar(0.8 + bands.bass * 0.4);
+        // Add brightness based on bass intensity
+        material.color.multiplyScalar(0.85 + bands.bass * 0.4);
     }
 
     material.opacity = 0.7 + bands.bass * 0.25;
