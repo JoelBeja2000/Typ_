@@ -8,25 +8,24 @@ interface MorphSphereProps {
     side?: 'left' | 'right';
     onClick?: (e: React.MouseEvent) => void;
     lightingEnabled?: boolean;
+    shape?: string;
 }
 
-const SHAPES = ['icosahedron', 'sphere', 'torus', 'box', 'cone', 'octahedron', 'tetrahedron', 'knot', 'dodecahedron', 'cylinder'];
-let shapeIndex = 0;
-let currentShape = 'icosahedron';
+const SHAPES = ['icosahedron', 'sphere', 'torus', 'box', 'cone', 'octahedron', 'tetrahedron', 'dodecahedron', 'cylinder'];
+
 
 const createGeometry = (shape: string, size: number, segments: number): THREE.BufferGeometry => {
     switch (shape) {
-        case 'sphere': return new THREE.SphereGeometry(size, segments, segments);
-        case 'torus': return new THREE.TorusGeometry(size * 0.7, size * 0.3, 32, 64);
-        case 'box': return new THREE.BoxGeometry(size * 1.6, size * 1.6, size * 1.6, 16, 16, 16);
-        case 'cone': return new THREE.ConeGeometry(size, size * 2.2, 64, 32);
-        case 'octahedron': return new THREE.OctahedronGeometry(size * 1.3, 4);
-        case 'tetrahedron': return new THREE.TetrahedronGeometry(size * 1.5, 4);
-        case 'knot': return new THREE.TorusKnotGeometry(size * 0.6, size * 0.22, 200, 32);
-        case 'dodecahedron': return new THREE.DodecahedronGeometry(size * 1.1, 2);
-        case 'cylinder': return new THREE.CylinderGeometry(size * 0.8, size * 0.8, size * 2, 64, 32);
+        case 'sphere': return new THREE.SphereGeometry(size, 32, 32);
+        case 'torus': return new THREE.TorusGeometry(size * 0.75, size * 0.25, 32, 64);
+        case 'box': return new THREE.BoxGeometry(size * 1.5, size * 1.5, size * 1.5, 10, 10, 10);
+        case 'cone': return new THREE.ConeGeometry(size * 1.1, size * 1.8, 64, 32);
+        case 'octahedron': return new THREE.OctahedronGeometry(size * 1.2, 2);
+        case 'tetrahedron': return new THREE.TetrahedronGeometry(size * 1.2, 2);
+        case 'dodecahedron': return new THREE.DodecahedronGeometry(size * 1.2, 2);
+        case 'cylinder': return new THREE.CylinderGeometry(size * 0.9, size * 0.9, size * 1.8, 64, 32);
         case 'icosahedron':
-        default: return new THREE.IcosahedronGeometry(size, segments);
+        default: return new THREE.IcosahedronGeometry(size, 2);
     }
 };
 
@@ -36,13 +35,16 @@ const MorphSphere: React.FC<MorphSphereProps> = ({
     bands = { bass: 0, mid: 0, high: 0 },
     side = 'left',
     onClick,
-    lightingEnabled = false
+    lightingEnabled = false,
+    shape = 'icosahedron'
 }) => {
     const containerRef = useRef<HTMLDivElement>(null);
     const bandsRef = useRef(bands);
     const meshRef = useRef<THREE.Mesh | null>(null);
     const innerMeshRef = useRef<THREE.Mesh | null>(null);
-    const morphRef = useRef({ t: 1, src: new Float32Array(0), dst: new Float32Array(0), active: false });
+    const morphRef = useRef({ t: 1, src: new Float32Array(0), dst: new Float32Array(0), active: false, currentShape: shape });
+    const shapeCacheRef = useRef<Record<string, Float32Array>>({});
+    const vcRef = useRef(0);
 
     useEffect(() => { bandsRef.current = bands; }, [bands]);
 
@@ -58,7 +60,7 @@ const MorphSphere: React.FC<MorphSphereProps> = ({
 
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(50, 1, 0.1, 1000);
-        camera.position.z = 5;
+        camera.position.z = 9;
 
         const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
         const width = container.clientWidth || 180;
@@ -107,10 +109,10 @@ const MorphSphere: React.FC<MorphSphereProps> = ({
         });
         
         const innerMaterial = new THREE.MeshBasicMaterial({
-            color: new THREE.Color('#5DCAA5'),
+            color: new THREE.Color('#FFFFFF'),
             wireframe: true,
             transparent: true,
-            opacity: 0.3,
+            opacity: 0.2,
         });
         
         const mesh = new THREE.Mesh(currentGeo, material);
@@ -123,6 +125,10 @@ const MorphSphere: React.FC<MorphSphereProps> = ({
         scene.add(mesh);
         scene.add(innerMesh);
 
+        // Save to refs
+        shapeCacheRef.current = shapeCache;
+        vcRef.current = VC;
+        
         let time = 0;
         
         function easeInOutCubic(t: number) {
@@ -150,7 +156,7 @@ const MorphSphere: React.FC<MorphSphereProps> = ({
                     morph.active = false;
                 }
             } else {
-                vertexData = shapeCache[currentShape];
+                vertexData = shapeCache[morph.currentShape];
             }
 
             // Apply vertex positions
@@ -204,32 +210,17 @@ const MorphSphere: React.FC<MorphSphereProps> = ({
         };
     }, []);
 
-    const handleClick = (e: React.MouseEvent) => {
-        e.stopPropagation();
-        
+    // Listen for shape changes to trigger morphing
+    useEffect(() => {
         const mesh = meshRef.current;
-        if (!mesh) return;
+        const VC = vcRef.current;
+        const cache = shapeCacheRef.current;
+        const morph = morphRef.current;
         
-        // Get vertex count
-        const pos = mesh.geometry.attributes.position;
-        const VC = pos.count;
-        
-        // Get next shape
-        shapeIndex = (shapeIndex + 1) % SHAPES.length;
-        const nextShape = SHAPES[shapeIndex];
-        
-        // Create destination geometry
-        const geo = createGeometry(nextShape, 2, 2);
-        const dst = new Float32Array(VC * 3);
-        for (let i = 0; i < VC; i++) {
-            const idx = Math.floor((i / VC) * geo.attributes.position.count);
-            dst[i * 3] = geo.attributes.position.getX(idx);
-            dst[i * 3 + 1] = geo.attributes.position.getY(idx);
-            dst[i * 3 + 2] = geo.attributes.position.getZ(idx);
-        }
-        geo.dispose();
+        if (!mesh || !VC || !cache[shape] || morph.currentShape === shape) return;
         
         // Get current positions as source
+        const pos = mesh.geometry.attributes.position;
         const src = new Float32Array(VC * 3);
         for (let i = 0; i < VC; i++) {
             src[i * 3] = pos.getX(i);
@@ -238,18 +229,30 @@ const MorphSphere: React.FC<MorphSphereProps> = ({
         }
         
         // Start morph
-        currentShape = nextShape;
-        morphRef.current = { t: 0, src, dst, active: true };
-        
+        morph.src = src;
+        morph.dst = cache[shape];
+        morph.t = 0;
+        morph.active = true;
+        morph.currentShape = shape;
+    }, [shape]);
+
+    const handleClick = (e: React.MouseEvent) => {
+        e.stopPropagation();
         if (onClick) onClick(e);
     };
+
+    useEffect(() => {
+        if (meshRef.current) {
+            (meshRef.current.material as THREE.MeshBasicMaterial).color.set(color);
+        }
+    }, [color]);
 
     return (
         <div
             ref={containerRef}
             className={`w-full h-full flex items-center justify-center pointer-events-auto cursor-pointer ${className}`}
             onClick={handleClick}
-            style={{ width: '100%', height: '100%', borderRadius: '50%' }}
+            style={{ width: '100%', height: '100%' }}
         />
     );
 };

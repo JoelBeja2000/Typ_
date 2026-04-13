@@ -212,7 +212,7 @@ class Input {
     this.c = c;
     this.particles = particles;
     this.CONFIG = CONFIG;
-    this.mousePos = new Vec2();
+    this.mousePos = new Vec2(-1000, -1000); // Start outside to prevent initial repulsion artifacts
     this.grabRadius = 20;
     this.bind();
   }
@@ -277,7 +277,7 @@ class Input {
     window.addEventListener('pointermove', this.pointermove);
   }
 
-  unbind() {
+  destroy() {
     this.c.removeEventListener('pointerdown', this.pointerdown);
     window.removeEventListener('pointerup', this.pointerup);
     window.removeEventListener('pointermove', this.pointermove);
@@ -291,27 +291,43 @@ interface WordCurtainProps {
   color?: string;
   frequencyBands?: { bass: number; mid: number; high: number };
   combo?: number;
+  repulsionEnergy?: number;
+  repulsionCenter?: { x: number; y: number };
+  repulsionShape?: string;
+  repulsionRotation?: number;
 }
 
 export const WordCurtain: React.FC<WordCurtainProps> = ({ 
   text, 
   color = '#FFFFFF',
   frequencyBands = { bass: 0, mid: 0, high: 0 },
-  combo = 0
+  combo = 0,
+  repulsionEnergy = 0,
+  repulsionCenter,
+  repulsionShape = 'sphere',
+  repulsionRotation = 0
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const particlesRef = useRef<Particle[]>([]);
   const configRef = useRef<any>({});
-  const audioRef = useRef(frequencyBands);
   const smoothedEnergyRef = useRef(0);
   const charCanvasesRef = useRef<Record<string, HTMLCanvasElement>>({});
   const [dims, setDims] = useState({ w: 0, h: 0 });
 
-  // Sync audio ref securely for RAF access
-  useEffect(() => {
-    audioRef.current = frequencyBands;
-  }, [frequencyBands]);
+  const energyRef = useRef(repulsionEnergy);
+  const centerRef = useRef(repulsionCenter);
+  const shapeRef = useRef(repulsionShape);
+  const rotateRef = useRef(repulsionRotation);
+  const dimsRef = useRef(dims);
+  const audioRef = useRef(frequencyBands);
+
+  useEffect(() => { audioRef.current = frequencyBands; }, [frequencyBands]);
+  useEffect(() => { energyRef.current = repulsionEnergy; }, [repulsionEnergy]);
+  useEffect(() => { centerRef.current = repulsionCenter; }, [repulsionCenter]);
+  useEffect(() => { shapeRef.current = repulsionShape; }, [repulsionShape]);
+  useEffect(() => { rotateRef.current = repulsionRotation; }, [repulsionRotation]);
+  useEffect(() => { dimsRef.current = dims; }, [dims]);
 
   // Monitor container size
   useEffect(() => {
@@ -331,6 +347,7 @@ export const WordCurtain: React.FC<WordCurtainProps> = ({
   }, []);
 
   useEffect(() => {
+    if (typeof window === 'undefined' || dims.w <= 0 || dims.h <= 0) return;
     const c = canvasRef.current;
     const container = containerRef.current;
     if (!c || !container || dims.w <= 0 || dims.h <= 0) return;
@@ -420,11 +437,9 @@ export const WordCurtain: React.FC<WordCurtainProps> = ({
       const audio = audioRef.current;
       
       // Even smoother energy transitions for a more organic feel
-      const instantEnergy = (audio.bass * 1.2 + audio.mid * 0.6 + audio.high * 0.4);
-      smoothedEnergyRef.current += (instantEnergy - smoothedEnergyRef.current) * 0.08;
-      const energy = smoothedEnergyRef.current;
-      
-      const pulseScale = 1 + Math.min(0.12, energy * 0.1);
+      // Disable music-driven energy for the curtain
+      const energy = 0;
+      const pulseScale = 1.0;
       
       // Calculate tremble per word
       const wordTrembles: Record<number, { x: number, y: number }> = {};
@@ -467,18 +482,203 @@ export const WordCurtain: React.FC<WordCurtainProps> = ({
 
     function loop(time: number) {
       rafID = requestAnimationFrame(loop);
+      
+      const currentDims = dimsRef.current;
+      if (currentDims.w <= 0 || currentDims.h <= 0) return; // Guard against zero dimensions
+
       let delta = time - lastDelta;
       if (delta > 50) delta = 16;
       lastDelta = time;
       
-      particles.forEach(p => p.update(delta, configRef.current));
+      const currentCenter = centerRef.current;
+      const currentEnergy = energyRef.current;
+      const currentShape = shapeRef.current;
+      const currentRotate = rotateRef.current;
 
-      // Removed aggressive physics-based audio injections to prevent "sudden jumps".
-      // Subtle sway remains purely from verlet integration if mouse or gravity acts.
-      
+      const rot = currentRotate || 0;
+      const cosR = Math.cos(rot);
+      const sinR = Math.sin(rot);
+
+      // 1. Calculate reactive baseRadius ONCE for the whole loop to ensure consistency
+      const b = audioRef.current || { bass: 0, mid: 0, high: 0 };
+      const deform = 1 + b.bass * 0.5 + b.mid * 0.3 + b.high * 0.15;
+      // Precision Calibration: Reduced from 115 to 95 for a maximum snug fit
+      const reactiveBaseRadius = (95 + (currentEnergy || 0) * 45) * deform;
+
+      particles.forEach(p => {
+        // Only apply physical interactions to active characters
+        if (!p.char || p.char === ' ') return;
+
+        // External Repulsion Logic (Advanced Shape-Aware)
+        if (currentCenter) {
+          const centerX = currentCenter.x === -1 ? currentDims.w / 2 : currentCenter.x;
+          const centerY = currentCenter.y === -1 ? currentDims.h * 0.45 : currentCenter.y;
+          
+          // 1. Get relative coordinates
+          let dx = p.pos.x - centerX;
+          let dy = p.pos.y - centerY;
+          
+          // 2. Apply rotation to coordinate system
+          const rx = dx * cosR - dy * sinR;
+          const ry = dx * sinR + dy * cosR;
+          
+          let dist = 0;
+          let forceFactor = 0;
+
+          // 3. Shape-specific SDF (Signed Distance Field) simulation in 2D
+          // UNIFIED Multipliers to match standardized visual dimensions
+          switch (currentShape) {
+            case 'box': {
+              const bSide = reactiveBaseRadius * 0.85; 
+              const qx = Math.abs(rx) - bSide;
+              const qy = Math.abs(ry) - bSide;
+              const d = Math.sqrt(Math.max(qx, 0) ** 2 + Math.max(qy, 0) ** 2) + Math.min(Math.max(qx, qy), 0);
+              if (d < 0) {
+                dist = Math.abs(d);
+                forceFactor = 1.0;
+              }
+              break;
+            }
+            case 'cylinder': {
+              const bW = reactiveBaseRadius * 0.55;
+              const bH = reactiveBaseRadius * 1.0;
+              const qx = Math.abs(rx) - bW;
+              const qy = Math.abs(ry) - bH;
+              const d = Math.sqrt(Math.max(qx, 0) ** 2 + Math.max(qy, 0) ** 2) + Math.min(Math.max(qx, qy), 0);
+              if (d < 0) {
+                dist = Math.abs(d);
+                forceFactor = 1.0;
+              }
+              break;
+            }
+            case 'torus': {
+              const rInner = reactiveBaseRadius * 0.45;
+              const rOuter = reactiveBaseRadius * 0.8;
+              const dToCenter = Math.sqrt(rx * rx + ry * ry);
+              const d = Math.abs(dToCenter - (rInner + rOuter) / 2) - (rOuter - rInner) / 2;
+              if (d < 0) {
+                dist = Math.abs(d);
+                forceFactor = 1.0;
+              }
+              break;
+            }
+            case 'cone':
+            case 'tetrahedron': {
+                const s = reactiveBaseRadius * 1.1;
+                const px = Math.abs(rx);
+                const py = ry;
+                const d = Math.max(px * 0.866 + py * 0.5, -py) - s * 0.5;
+                if (d < 0) {
+                  dist = Math.abs(d);
+                  forceFactor = 1.0;
+                }
+                break;
+            }
+            default: { // sphere, icosahedron, etc.
+                const r = reactiveBaseRadius * 0.75;
+                const d2 = rx * rx + ry * ry;
+                const r2 = r * r;
+                if (d2 < r2) {
+                  const d = Math.sqrt(d2);
+                  dist = r - d;
+                  forceFactor = 1.0;
+                }
+                break;
+            }
+          }
+
+          if (dist > 0) {
+            const angle = Math.atan2(dy, dx);
+            
+            // 4. Hard Projection
+            p.pos.x += Math.cos(angle) * dist;
+            p.pos.y += Math.sin(angle) * dist;
+            
+            p.velocity.x *= 0.8;
+            p.velocity.y *= 0.8;
+
+            // 5. Tangential drag
+            const dragStrength = (dist / reactiveBaseRadius) * (2.0 + (currentEnergy || 0) * 4) * 0.15;
+            p.applyForce(new Vec2(-Math.sin(angle) * dragStrength, Math.cos(angle) * dragStrength));
+          }
+        }
+        
+        p.update(delta, configRef.current);
+      });
+
       for (let i = 0; i < CONFIG.iterationsPerFrame; i++) {
         constraints.forEach(c => c.solve());
       }
+      
+      // FINAL HARD BARRIER PASS
+      if (currentCenter) {
+        const centerX = currentCenter.x === -1 ? currentDims.w / 2 : currentCenter.x;
+        const centerY = currentCenter.y === -1 ? currentDims.h * 0.45 : currentCenter.y;
+
+        particles.forEach(p => {
+          if (!p.char || p.char === ' ') return;
+
+          let dx = p.pos.x - centerX;
+          let dy = p.pos.y - centerY;
+          const rx = dx * cosR - dy * sinR;
+          const ry = dx * sinR + dy * cosR;
+          
+          let dist = 0;
+
+          switch (currentShape) {
+            case 'box': {
+              const bSide = reactiveBaseRadius * 0.85;
+              const qx = Math.abs(rx) - bSide;
+              const qy = Math.abs(ry) - bSide;
+              const d = Math.sqrt(Math.max(qx, 0) ** 2 + Math.max(qy, 0) ** 2) + Math.min(Math.max(qx, qy), 0);
+              if (d < 0) dist = Math.abs(d);
+              break;
+            }
+            case 'cylinder': {
+              const bW = reactiveBaseRadius * 0.55;
+              const bH = reactiveBaseRadius * 1.0;
+              const qx = Math.abs(rx) - bW;
+              const qy = Math.abs(ry) - bH;
+              const d = Math.sqrt(Math.max(qx, 0) ** 2 + Math.max(qy, 0) ** 2) + Math.min(Math.max(qx, qy), 0);
+              if (d < 0) dist = Math.abs(d);
+              break;
+            }
+            case 'torus': {
+              const rInner = reactiveBaseRadius * 0.45;
+              const rOuter = reactiveBaseRadius * 0.8;
+              const dToCenter = Math.sqrt(rx * rx + ry * ry);
+              const d = Math.abs(dToCenter - (rInner + rOuter) / 2) - (rOuter - rInner) / 2;
+              if (d < 0) dist = Math.abs(d);
+              break;
+            }
+            case 'cone':
+            case 'tetrahedron': {
+                const s = reactiveBaseRadius * 1.1;
+                const px = Math.abs(rx);
+                const py = ry;
+                const d = Math.max(px * 0.866 + py * 0.5, -py) - s * 0.5;
+                if (d < 0) dist = Math.abs(d);
+                break;
+            }
+            default: {
+                const r = reactiveBaseRadius * 0.75;
+                const d2 = rx * rx + ry * ry;
+                const r2 = r * r;
+                if (d2 < r2) dist = r - Math.sqrt(d2);
+                break;
+            }
+          }
+
+          if (dist > 0) {
+            const angle = Math.atan2(dy, dx);
+            p.pos.x += Math.cos(angle) * dist;
+            p.pos.y += Math.sin(angle) * dist;
+            p.velocity.x *= 0.5;
+            p.velocity.y *= 0.5;
+          }
+        });
+      }
+
       if (CONFIG.contain) particles.forEach(p => p.contain(configRef.current));
       draw(time);
     }
@@ -486,7 +686,7 @@ export const WordCurtain: React.FC<WordCurtainProps> = ({
     rafID = requestAnimationFrame(loop);
     return () => {
       cancelAnimationFrame(rafID);
-      input.unbind();
+      input.destroy();
     };
   }, [dims.w, dims.h]);
 

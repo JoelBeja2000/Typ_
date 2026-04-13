@@ -35,6 +35,7 @@ interface KeyboardSectionProps {
     isWaveActive?: boolean;
     isLevelActive?: boolean;
     onGoHome?: () => void;
+    onDebugFillCurtain?: () => void;
 }
 
 export const KeyboardSection: React.FC<KeyboardSectionProps> = React.memo(({
@@ -63,6 +64,7 @@ export const KeyboardSection: React.FC<KeyboardSectionProps> = React.memo(({
     isWaveActive = false,
     isLevelActive = false,
     onGoHome,
+    onDebugFillCurtain,
 }) => {
     const bands = isMusicLightingEnabled ? frequencyBands : { bass: 0, mid: 0, high: 0 };
 
@@ -75,6 +77,9 @@ export const KeyboardSection: React.FC<KeyboardSectionProps> = React.memo(({
                 {/* ACTION BUTTONS (LEFT) */}
                 <div className="flex gap-2">
                     <button onClick={onRestart} className="h-11 w-11 flex items-center justify-center bg-[var(--bg-glass)] border border-[var(--border-strong)] rounded-2xl text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-all shadow-lg" title="Reiniciar"><i className="fa fa-refresh"></i></button>
+                    {onDebugFillCurtain && (
+                        <button onClick={onDebugFillCurtain} className="h-11 w-11 flex items-center justify-center bg-[var(--bg-glass)] border border-[var(--border-strong)] rounded-2xl text-pink-400 hover:text-pink-300 transition-all shadow-lg" title="Debug: Llenar Cortinas"><i className="fa fa-bug"></i></button>
+                    )}
                 </div>
 
                 {/* STATS BAR (CENTERED) */}

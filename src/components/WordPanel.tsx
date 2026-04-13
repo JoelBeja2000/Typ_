@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import MorphSphere from './MorphSphere';
 import { VisualsConfig } from '../types/visuals';
 import { MusicStyle, TECHNO_STYLE, AMBIENT_STYLE, ACID_HOUSE_STYLE } from '../domain/models/MusicStyles';
 
@@ -388,46 +387,7 @@ export const WordPanel: React.FC<WordPanelProps> = ({
 
                     {/* BOTTOM INTERACTIVE GROUP: Word Pill + 3D Animations - Only show when level active */}
                     <div className={`w-full flex flex-col items-center gap-4 mt-6 relative transition-all duration-1000 ${isLevelActive ? 'opacity-100' : 'opacity-0 h-0 pointer-events-none'}`}>
-                        {/* SPHERES CONTAINER - ABSOLUTE POSITIONING */}
-                        {/* LEFT SPHERE */}
-                        {/* LEFT SPHERE */}
-                        <div className="absolute"
-                            style={{
-                                left: '10px',
-                                top: '50%',
-                                width: '180px',
-                                height: '180px',
-                                transform: 'translateY(-50%)',
-                                zIndex: 50,
-                            }}>
-                            <MorphSphere
-                                key={`circle-left`}
-                                color={sphereColor}
-                                bands={frequencyBands}
-                                side="left"
-                                combo={combo * comboMultiplier}
-                                lightingEnabled={isMusicLightingEnabled}
-                                onClick={onCycleShapes} />
-                        </div>
-                        {/* RIGHT SPHERE */}
-                        <div className="absolute"
-                            style={{
-                                right: '10px',
-                                top: '50%',
-                                width: '180px',
-                                height: '180px',
-                                transform: 'translateY(-50%)',
-                                zIndex: 50,
-                            }}>
-                            <MorphSphere
-                                key={`circle-right`}
-                                color={sphereColor}
-                                bands={frequencyBands}
-                                side="right"
-                                combo={combo * comboMultiplier}
-                                lightingEnabled={isMusicLightingEnabled}
-                                onClick={onCycleShapes} />
-                        </div>
+
 
                         {/* CIRCUIT TIMER (Moved here) */}
                         {isCircuitMode && circuitTimer !== undefined && (

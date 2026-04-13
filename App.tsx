@@ -5,6 +5,7 @@ import { KeyboardSection } from './src/components/KeyboardSection';
 import LeftSidebar from './src/components/ui/LeftSidebar';
 import RightSidebar from './src/components/ui/RightSidebar';
 import { WordCurtain } from './src/components/ui/WordCurtain';
+import MorphSphere from './src/components/MorphSphere';
 import BackgroundSphere from './src/components/BackgroundSphere';
 import { WebAudioSystem } from './src/infrastructure/audio/WebAudioSystem';
 import { MusicSequencer } from './src/domain/services/MusicSequencer';
@@ -579,6 +580,12 @@ const App: React.FC = () => {
     if (inputRef.current) inputRef.current.value = '';
   }, [restart, setPhraseIndex]);
 
+  const handleDebugFillCurtain = useCallback(() => {
+    if (!phrases || phrases.length === 0) return;
+    const allWords = phrases.join(' ').trim().split(/\s+/).filter(Boolean);
+    setSolvedWords(allWords);
+  }, [phrases]);
+
   const handleGoHome = useCallback(() => {
     setIsLevelActive(false);
     setIsPureBlack(false);
@@ -587,10 +594,13 @@ const App: React.FC = () => {
 
   const cycleShapes = useCallback((e?: React.MouseEvent) => {
     if (e) e.stopPropagation();
-    const shapes: GeometryType[] = ['icosahedron', 'box', 'octahedron', 'tetrahedron', 'dodecahedron', 'knot', 'torus'];
+    const shapes: GeometryType[] = [
+      'icosahedron', 'sphere', 'torus', 'box', 'cone', 'octahedron', 'tetrahedron', 'dodecahedron', 'cylinder'
+    ];
     setVisualsConfig(prev => {
       const current = prev.outerSphere.shape;
-      const nextIndex = (shapes.indexOf(current) + 1) % shapes.length;
+      const index = shapes.indexOf(current);
+      const nextIndex = (index === -1 ? 0 : index + 1) % shapes.length;
       const nextShape = shapes[nextIndex];
       return {
         ...prev,
@@ -680,15 +690,30 @@ const App: React.FC = () => {
         
         <div className="flex flex-row items-stretch justify-center gap-4 xl:gap-12 relative w-full px-4 overflow-visible">
           
-          {/* LEFT CURTAIN */}
           <div 
-            className="hidden xl:flex w-[450px] shrink-0 z-0 overflow-hidden relative"
+            className="hidden xl:flex w-[450px] shrink-0 z-0 overflow-visible relative"
           >
+            <div className="absolute left-1/2 -translate-x-1/2 -translate-y-1/2 top-[45%] w-[400px] h-[400px] z-[60] pointer-events-none opacity-80">
+              {isLevelActive && (
+                <MorphSphere
+                    color={`rgb(${currentTheme.r}, ${currentTheme.g}, ${currentTheme.b})`}
+                    bands={frequencyBands}
+                    side="left"
+                    lightingEnabled={isMusicLightingEnabled}
+                    onClick={cycleShapes} 
+                    shape={visualsConfig.outerSphere.shape}
+                />
+              )}
+            </div>
             <WordCurtain 
               text={solvedWords.join('  ')} 
               color={`rgb(${currentTheme.r}, ${currentTheme.g}, ${currentTheme.b})`} 
               frequencyBands={frequencyBands}
               combo={combo}
+              repulsionCenter={{ x: -1, y: -1 }}
+              repulsionEnergy={0.35}
+              repulsionShape={visualsConfig.outerSphere.shape}
+              repulsionRotation={performance.now() * 0.002}
             />
           </div>
 
@@ -761,6 +786,7 @@ const App: React.FC = () => {
                   isWaveActive={isWaveActive}
                   isLevelActive={isLevelActive}
                   onGoHome={handleGoHome}
+                  onDebugFillCurtain={handleDebugFillCurtain}
                 />
 
               </div>
@@ -874,14 +900,30 @@ const App: React.FC = () => {
           </div>
           </div>
 
-          {/* RIGHT CURTAIN */}
           <div 
-            className="hidden xl:flex w-[450px] shrink-0 z-0 overflow-hidden relative"
+            className="hidden xl:flex w-[450px] shrink-0 z-0 overflow-visible relative"
           >
+            <div className="absolute left-1/2 -translate-x-1/2 -translate-y-1/2 top-[45%] w-[400px] h-[400px] z-[60] pointer-events-none opacity-80">
+              {isLevelActive && (
+                <MorphSphere
+                    color={`rgb(${currentTheme.r}, ${currentTheme.g}, ${currentTheme.b})`}
+                    bands={frequencyBands}
+                    side="right"
+                    lightingEnabled={isMusicLightingEnabled}
+                    onClick={cycleShapes} 
+                    shape={visualsConfig.outerSphere.shape}
+                />
+              )}
+            </div>
             <WordCurtain 
+              className="relative z-[10]"
               text={solvedWords.join('  ')} 
               color={`rgb(${currentTheme.r}, ${currentTheme.g}, ${currentTheme.b})`} 
               frequencyBands={frequencyBands}
+              repulsionCenter={{ x: -1, y: -1 }}
+              repulsionEnergy={0.35}
+              repulsionShape={visualsConfig.outerSphere.shape}
+              repulsionRotation={performance.now() * -0.002}
             />
           </div>
 

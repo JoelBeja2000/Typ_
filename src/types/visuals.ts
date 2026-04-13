@@ -1,4 +1,4 @@
-export type GeometryType = 'icosahedron' | 'box' | 'octahedron' | 'tetrahedron' | 'dodecahedron' | 'knot' | 'torus';
+export type GeometryType = 'icosahedron' | 'box' | 'octahedron' | 'tetrahedron' | 'dodecahedron' | 'knot' | 'torus' | 'sphere' | 'cone' | 'cylinder';
 
 export interface SphereConfig {
     size: number;
