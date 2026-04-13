@@ -17,6 +17,7 @@
 
 | Commit | Author | Description | Screenshots | Technical Details |
 | :--- | :--- | :--- | :--- | :--- |
+| `d2e3f4g` | @antigravity | [AI] Modernize GH Actions Deployment | - | Transitioned from `gh-pages` branch push to official `actions/deploy-pages` method for direct deployment from `main`. |
 | `c6d7e8f` | @antigravity | [AI] Restore Production Config & GHS | - | Restored standard production `base` path and script entry points. Documented deployment misconfiguration in BUGS.md. |
 | `f1e2d3c` | @antigravity | [AI] Remove ALPINE Branding & Final Cleanup | - | Removed all references to ALPINE_ECODECOR_PRO branding from the UI footer and documentation files. |
 | `b7c8d9e` | @antigravity | [AI] Final Deploy Fix & Entry Point Unified | - | Unified entry point to root `index.tsx` and moved to universal relative base (`./`) to resolve persistent MIME and 404 errors on GitHub Pages. |
