@@ -1,0 +1,59 @@
+{
+  "common": {
+    "points": "Puntos Totales",
+    "speed": "Velocidad",
+    "accuracy": "Precisión",
+    "completed": "Completado",
+    "start_prompt": "PULSA UNA TECLA PARA EMPEZAR",
+    "select_level_prompt": "Selecciona un nivel para comenzar",
+    "geometry": "Geometría",
+    "stars": {
+      "1": "Novato",
+      "2": "Experto",
+      "3": "Maestro"
+    }
+  },
+  "sidebar": {
+    "left": {
+      "system_language": "Idioma del Sistema",
+      "finger_mapping": "Mapeo de Dedos"
+    },
+    "right": {
+      "support_title": "Apoya el Proyecto",
+      "support_desc": "Si disfrutas de la experiencia cinemática de OveTyp_, por favor considera dejar una estrella en el repositorio. ¡Tu apoyo es fundamental para seguir mejorando!",
+      "star_button": "Dar Estrella en GitHub",
+      "footer": "Open Source © 2026"
+    }
+  },
+  "settings": {
+    "personalization": "Personalización",
+    "custom_color": "Color Personalizado",
+    "pure_black": "Modo Negro Puro",
+    "day_mode": "Modo Día",
+    "debug_mode": "Modo Debug",
+    "sound": "Sonido",
+    "music": "Música",
+    "debug_tools": "Herramientas Debug",
+    "floor_height": "Altura Suelo",
+    "fill_curtains": "Llenar Cortinas"
+  },
+  "practice": {
+    "fingers": "Práctica de Dedos",
+    "indices": "Dedos Índices",
+    "middle": "Dedos Medios",
+    "ring": "Dedos Anulares",
+    "pinky": "Dedos Meñiques",
+    "left": "Izq.",
+    "right": "Der."
+  },
+  "fingers": {
+    "left-index": "Índice Izquierdo",
+    "left-middle": "Corazón Izquierdo",
+    "left-ring": "Anular Izquierdo",
+    "left-pinky": "Meñique Izquierdo",
+    "right-index": "Índice Derecho",
+    "right-middle": "Corazón Derecho",
+    "right-ring": "Anular Derecho",
+    "right-pinky": "Meñique Derecho"
+  }
+}

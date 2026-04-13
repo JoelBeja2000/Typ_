@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { VisualsConfig } from '../types/visuals';
 import { MusicStyle, TECHNO_STYLE, AMBIENT_STYLE, ACID_HOUSE_STYLE } from '../domain/models/MusicStyles';
 import { FINGER_COLORS, FINGER_NAMES, KEY_TO_FINGER_MAP } from '../../constants';
+import { useTranslation } from '../i18n/LanguageContext';
 
 const PHASE_COLORS: Record<string, string> = {
     'fase_1': '#22d3ee',
@@ -13,15 +14,17 @@ const PHASE_COLORS: Record<string, string> = {
 };
 
 const FINGER_CODE_MAP: Record<string, string> = {
-    'L2': 'Índice Izq.',
-    'L3': 'Corazón Izq.',
-    'L4': 'Anular Izq.',
-    'L5': 'Meñique Izq.',
-    'R2': 'Índice Der.',
-    'R3': 'Corazón Der.',
-    'R4': 'Anular Der.',
-    'R5': 'Meñique Der.',
+    'L2': 'practice.indices',
+    'L3': 'practice.middle',
+    'L4': 'practice.ring',
+    'L5': 'practice.pinky',
+    'R2': 'practice.indices',
+    'R3': 'practice.middle',
+    'R4': 'practice.ring',
+    'R5': 'practice.pinky',
 };
+// Helper to get side suffix
+const getSideKey = (code: string) => code.startsWith('L') ? 'practice.left' : 'practice.right';
 
 interface WordPanelProps {
     currentPhrase: string;
@@ -90,6 +93,7 @@ export const WordPanel: React.FC<WordPanelProps> = ({
     onCycleShapes,
     activeLevel,
 }) => {
+    const { t } = useTranslation();
     const textColor = 'text-[var(--text-primary)]';
     const themeColor = 'text-[var(--accent-primary)]';
     const musicStyles = [TECHNO_STYLE, AMBIENT_STYLE, ACID_HOUSE_STYLE];
@@ -104,10 +108,10 @@ export const WordPanel: React.FC<WordPanelProps> = ({
     };
 
     const practiceLevels = [
-        { id: 'practice_indice', title: 'Dedos Índices', fingers: ['L2', 'R2'], keys: ['F', 'G', 'V', 'B', 'R', 'T', 'J', 'H', 'N', 'M', 'Y', 'U'] },
-        { id: 'practice_anular', title: 'Anulares', fingers: ['L4', 'R4'], keys: ['S', 'W', 'X', 'L', 'O'] },
-        { id: 'practice_corazon', title: 'Corazones', fingers: ['L3', 'R3'], keys: ['D', 'E', 'C', 'K', 'I'] },
-        { id: 'practice_menique', title: 'Dedos Meñique', fingers: ['L5', 'R5'], keys: ['A', 'Q', 'Z', 'Ñ', 'P'] },
+        { id: 'practice_indice', titleKey: 'practice.indices', fingers: ['L2', 'R2'], keys: ['F', 'G', 'V', 'B', 'R', 'T', 'J', 'H', 'N', 'M', 'Y', 'U'] },
+        { id: 'practice_anular', titleKey: 'practice.ring', fingers: ['L4', 'R4'], keys: ['S', 'W', 'X', 'L', 'O'] },
+        { id: 'practice_corazon', titleKey: 'practice.middle', fingers: ['L3', 'R3'], keys: ['D', 'E', 'C', 'K', 'I'] },
+        { id: 'practice_menique', titleKey: 'practice.pinky', fingers: ['L5', 'R5'], keys: ['A', 'Q', 'Z', 'Ñ', 'P'] },
     ];
 
     const levelsByStars = {
@@ -141,12 +145,11 @@ export const WordPanel: React.FC<WordPanelProps> = ({
                     {/* Column 1: Star Levels */}
                     <div className="space-y-4">
                         <h2 className="text-[10px] font-black uppercase tracking-[0.5em] text-[var(--accent-primary)] mb-4 text-center">
-                            🏆 Niveles
+                            🏆 {t('common.stars.title') || (t('common.levels') || 'Niveles')}
                         </h2>
                         {[1, 2, 3].map(star => {
                         const levels = starLevels(star);
                         const isExpanded = expandedStars === star;
-                        const name = star === 1 ? 'Novato' : star === 2 ? 'Experto' : 'Maestro';
                         
                         return (
                             <div key={star} className="w-full flex flex-col rounded-2xl bg-[var(--bg-glass)] border border-[var(--border-glass)] overflow-hidden transition-all duration-500">
@@ -162,7 +165,7 @@ export const WordPanel: React.FC<WordPanelProps> = ({
                                                 ))}
                                             </div>
                                             <span className={`text-[12px] font-black uppercase tracking-wider ${isExpanded ? 'text-[var(--accent-primary)]' : 'text-[var(--text-primary)]'}`}>
-                                                {name}
+                                                {t(`common.stars.${star}`)}
                                             </span>
                                         </div>
                                     </div>
@@ -218,7 +221,7 @@ export const WordPanel: React.FC<WordPanelProps> = ({
                     <div className="space-y-4">
                         {/* Practice */}
                         <h2 className="text-[10px] font-black uppercase tracking-[0.5em] text-[var(--accent-primary)] mb-4 text-center">
-                            ✋ Práctica
+                            ✋ {t('practice.fingers')}
                         </h2>
                         <div className="flex flex-col rounded-2xl bg-[var(--bg-glass)] border border-[var(--border-glass)] overflow-hidden transition-all duration-500">
                             <button
@@ -229,7 +232,7 @@ export const WordPanel: React.FC<WordPanelProps> = ({
                                     <div className="flex flex-col">
                                         <i className={`fa fa-hand-paper-o text-[14px] mb-1 ${practiceExpanded ? 'text-[var(--accent-primary)] animate-pulse' : 'text-amber-400 opacity-60'}`}></i>
                                         <span className={`text-[12px] font-black uppercase tracking-wider ${practiceExpanded ? 'text-[var(--accent-primary)]' : 'text-[var(--text-primary)]'}`}>
-                                            Práctica de Dedos
+                                            {t('practice.fingers')}
                                         </span>
                                     </div>
                                 </div>
@@ -251,7 +254,7 @@ export const WordPanel: React.FC<WordPanelProps> = ({
                                                 <div className="absolute inset-0 bg-gradient-to-r from-[var(--accent-primary)]/0 to-[var(--accent-primary)]/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
                                                 <div className="flex items-center justify-between relative z-10">
                                                     <span className="text-[11px] font-black uppercase tracking-widest text-[var(--text-secondary)] group-hover:text-[var(--text-primary)] transition-colors">
-                                                        {level.title}
+                                                        {t(level.titleKey)}
                                                     </span>
                                                     <i className="fa fa-play text-[8px] text-[var(--accent-primary)] opacity-0 group-hover:opacity-100 transform translate-x-2 group-hover:translate-x-0 transition-all"></i>
                                                 </div>
@@ -264,7 +267,7 @@ export const WordPanel: React.FC<WordPanelProps> = ({
                         
                         {/* Music */}
                         <h2 className="text-[10px] font-black uppercase tracking-[0.5em] text-[var(--accent-primary)] mb-4 text-center">
-                            🎵 Música
+                            🎵 {t('settings.music')}
                         </h2>
                         <div className="flex flex-col rounded-2xl bg-[var(--bg-glass)] border border-[var(--border-glass)] overflow-hidden transition-all duration-500">
                             <button
@@ -305,7 +308,7 @@ export const WordPanel: React.FC<WordPanelProps> = ({
                 </div>
 
                 <div className="mt-4 text-[10px] font-black uppercase tracking-[0.4em] text-[var(--text-secondary)] animate-pulse text-center">
-                    Selecciona un nivel para comenzar
+                    {t('common.select_level_prompt')}
                 </div>
             </div>
         );
@@ -355,24 +358,25 @@ export const WordPanel: React.FC<WordPanelProps> = ({
                             );
                         })}
                     </div>
-                    {/* Level Stats Display - Only show when level is finished */}
-                    {isLevelActive && currentLevelProgress >= 100 && (
-                        <div className="flex items-center justify-center gap-4 mt-4">
-                            <div className="bg-[var(--bg-floating)]/80 backdrop-blur-sm border border-green-500/50 rounded-full px-3 py-1.5 flex items-center gap-2 animate-pulse">
-                                <span className="text-[9px] font-black uppercase tracking-widest text-green-400">PTS</span>
-                                <span className="text-[14px] font-bold text-green-400">{currentLevelScore.toLocaleString()}</span>
-                            </div>
-                            <div className="bg-[var(--bg-floating)]/80 backdrop-blur-sm border border-green-500/50 rounded-full px-3 py-1.5 flex items-center gap-2 animate-pulse">
-                                <span className="text-[9px] font-black uppercase tracking-widest text-green-400">%</span>
-                                <span className="text-[14px] font-bold text-green-400">{currentLevelProgress}%</span>
-                            </div>
-                            <div className="bg-[var(--bg-floating)]/80 backdrop-blur-sm border border-green-500/50 rounded-full px-3 py-1.5 flex items-center gap-2 animate-pulse">
-                                <span className="text-[9px] font-black uppercase tracking-widest text-green-400">ACC</span>
-                                <span className="text-[14px] font-bold text-green-400">{currentLevelAccuracy}%</span>
-                            </div>
-                        </div>
-                    )}
                 </div>
+
+                {/* Level Stats Display - Only show when level is finished */}
+                {isLevelActive && currentLevelProgress >= 100 && (
+                    <div className="flex items-center justify-center gap-4 mt-8 w-full animate-in fade-in slide-in-from-bottom-2 duration-700">
+                        <div className="bg-[var(--bg-floating)]/80 backdrop-blur-sm border border-green-500/50 rounded-full px-4 py-2 flex items-center gap-3 shadow-[0_0_15px_rgba(34,197,94,0.2)]">
+                            <span className="text-[10px] font-black uppercase tracking-widest text-green-400">PTS</span>
+                            <span className="text-[16px] font-bold text-green-400 tabular-nums">{currentLevelScore.toLocaleString()}</span>
+                        </div>
+                        <div className="bg-[var(--bg-floating)]/80 backdrop-blur-sm border border-green-500/50 rounded-full px-4 py-2 flex items-center gap-3 shadow-[0_0_15px_rgba(34,197,94,0.2)]">
+                            <span className="text-[10px] font-black uppercase tracking-widest text-green-400">%</span>
+                            <span className="text-[16px] font-bold text-green-400 tabular-nums">{currentLevelProgress}%</span>
+                        </div>
+                        <div className="bg-[var(--bg-floating)]/80 backdrop-blur-sm border border-green-500/50 rounded-full px-4 py-2 flex items-center gap-3 shadow-[0_0_15px_rgba(34,197,94,0.2)]">
+                            <span className="text-[10px] font-black uppercase tracking-widest text-green-400">ACC</span>
+                            <span className="text-[16px] font-bold text-green-400 tabular-nums">{currentLevelAccuracy}%</span>
+                        </div>
+                    </div>
+                )}
             </div>
         );
     };
@@ -427,7 +431,7 @@ export const WordPanel: React.FC<WordPanelProps> = ({
                                                 <div className="flex items-center gap-2 mb-1.5 justify-start">
                                                     <span className="w-2 h-2 rounded-full shadow-[0_0_8px]" style={{ backgroundColor: FINGER_COLORS[mappingKey as any], boxShadow: `0 0 10px ${FINGER_COLORS[mappingKey as any]}` }} />
                                                     <span className="text-[10px] font-black uppercase tracking-wider text-[var(--accent-primary)]">
-                                                        {FINGER_NAMES[mappingKey as any]}
+                                                        {t(`fingers.${mappingKey}`)}
                                                     </span>
                                                 </div>
                                                 <div className="flex flex-wrap gap-1 justify-start">
@@ -479,7 +483,7 @@ export const WordPanel: React.FC<WordPanelProps> = ({
                                                 <div className="flex items-center gap-2 mb-1.5 justify-start">
                                                     <span className="w-2 h-2 rounded-full shadow-[0_0_8px]" style={{ backgroundColor: FINGER_COLORS[mappingKey as any], boxShadow: `0 0 10px ${FINGER_COLORS[mappingKey as any]}` }} />
                                                     <span className="text-[10px] font-black uppercase tracking-wider text-[var(--accent-primary)]">
-                                                        {FINGER_NAMES[mappingKey as any]}
+                                                        {t(`fingers.${mappingKey}`)}
                                                     </span>
                                                 </div>
                                                 <div className="flex flex-wrap gap-1 justify-start">

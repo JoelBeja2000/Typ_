@@ -1,39 +1,21 @@
 import React from 'react';
-import { AccordionItem } from './AccordionItem';
+import { useTranslation } from '../../i18n/LanguageContext';
 import { MusicStyle } from '../../domain/models/MusicStyles';
 import { FINGER_NAMES, FINGER_COLORS, KEYBOARD_LAYOUT } from '../../../constants';
 
 interface LeftSidebarProps {
   isOpen: boolean;
   onClose: () => void;
-  language: string;
-  onLanguageChange: (lang: string) => void;
-  currentMusicStyle: MusicStyle;
-  onMusicStyleChange: (style: MusicStyle) => void;
-  TECHNO_STYLE: MusicStyle;
-  AMBIENT_STYLE: MusicStyle;
-  ACID_HOUSE_STYLE: MusicStyle;
   getBtnClass: (active: boolean) => string;
-  themes: any[];
-  currentTheme: any;
-  onThemeChange: (theme: any) => void;
 }
 
 export const LeftSidebar: React.FC<LeftSidebarProps> = ({
   isOpen,
   onClose,
-  language,
-  onLanguageChange,
-  currentMusicStyle,
-  onMusicStyleChange,
-  TECHNO_STYLE,
-  AMBIENT_STYLE,
-  ACID_HOUSE_STYLE,
   getBtnClass,
-  themes,
-  currentTheme,
-  onThemeChange,
 }) => {
+  const { language, setLanguage, t } = useTranslation();
+
   const fingerKeys = React.useMemo(() => {
     const map: Record<string, string[]> = {};
     KEYBOARD_LAYOUT.flat().forEach(k => {
@@ -64,18 +46,17 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
 
       <div className="space-y-4 mb-12">
         <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-[var(--text-secondary)] mb-6">
-          Idioma del Sistema
+          {t('sidebar.left.system_language')}
         </h3>
         <div className="grid grid-cols-2 gap-4">
-          {/* Idiomas */}
           <button
-            onClick={() => onLanguageChange('es')}
+            onClick={() => setLanguage('es')}
             className={getBtnClass(language === 'es')}
           >
             <span>Español</span> <span>🇪🇸</span>
           </button>
           <button
-            onClick={() => onLanguageChange('en')}
+            onClick={() => setLanguage('en')}
             className={getBtnClass(language === 'en')}
           >
             <span>English</span> <span>🇺🇸</span>
@@ -85,7 +66,7 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
 
       <div className="mt-12 space-y-6">
         <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-[var(--text-secondary)] mb-6">
-          Mapeo de Dedos
+          {t('sidebar.left.finger_mapping')}
         </h3>
         <div className="grid grid-cols-2 gap-4">
           {Object.entries(FINGER_NAMES).filter(([f]) => f !== 'thumb').map(([finger, name]) => (
@@ -102,7 +83,7 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
                   }}
                 />
                 <span className="text-[10px] font-bold text-[var(--text-primary)] group-hover:text-[var(--accent-primary)] transition-colors truncate">
-                  {name}
+                  {t(`fingers.${finger}`)}
                 </span>
               </div>
 

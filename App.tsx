@@ -1,26 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
-import FingerGuide from './src/components/FingerGuide';
-import { WordPanel } from './src/components/WordPanel';
-import { KeyboardSection } from './src/components/KeyboardSection';
-import LeftSidebar from './src/components/ui/LeftSidebar';
-import RightSidebar from './src/components/ui/RightSidebar';
-import { WordCurtain } from './src/components/ui/WordCurtain';
-import MorphSphere from './src/components/MorphSphere';
-import BackgroundSphere from './src/components/BackgroundSphere';
-import { WebAudioSystem } from './src/infrastructure/audio/WebAudioSystem';
-import { MusicSequencer } from './src/domain/services/MusicSequencer';
-import { TECHNO_STYLE, AMBIENT_STYLE, ACID_HOUSE_STYLE, MusicStyle } from './src/domain/models/MusicStyles';
-import { KEY_TO_FINGER_MAP, SPACE_DATA } from './constants';
-import { Language, TypingStats } from './types';
-import { generateLocalPhrases } from './src/utils/phraseUtils';
-import { VisualsConfig, DEFAULT_VISUALS_CONFIG, GeometryType } from './src/types/visuals';
-import { GUIDE_PHASES } from './src/data/GuideData';
-import { BrowserThemeManager } from './src/infrastructure/ui/BrowserThemeManager';
-import { ZEN_PHRASES, PHRASE_CATEGORIES } from './src/data/ZenPhrases';
-import { THEMES } from './src/domain/models/Theme';
-import { TypingService } from './src/domain/services/TypingService';
-import { BrowserPhraseProvider, BrowserStorageProvider } from './src/infrastructure/adapters/BrowserAdapters';
-import { useTypingEngine } from './src/hooks/useTypingEngine';
+import { useTranslation, LanguageProvider } from './src/i18n/LanguageContext';
 
 import './src/infrastructure/ui/styles/Keyboard.css';
 
@@ -97,7 +75,8 @@ const lightenColor = (r: number, g: number, b: number, amount: number) => {
 
 const themeManager = new BrowserThemeManager();
 
-const App: React.FC = () => {
+const AppContent: React.FC = () => {
+  const { language, setLanguage, t } = useTranslation();
   const masterStartTime = useRef(performance.now());
   const [currentTheme, setCurrentTheme] = useState(() => {
     if (typeof window !== 'undefined') {
@@ -115,7 +94,7 @@ const App: React.FC = () => {
   }, [currentTheme]);
   const [isPureBlack, setIsPureBlack] = useState(false);
   const [forceScheme, setForceScheme] = useState<'dark' | 'light' | null>(null);
-  const [language, setLanguage] = useState<Language>('es');
+  // Removed local language state (handled by context)
   const [focus, setFocus] = useState('Básico');
 
   const [solvedWords, setSolvedWords] = useState<string[]>([]);
@@ -861,7 +840,7 @@ const App: React.FC = () => {
             {/* DROPDOWN ITEMS */}
             <div className="flex flex-col divide-y divide-[var(--border-glass)] max-h-[400px] overflow-y-auto custom-scrollbar">
               <div className="p-4 bg-[var(--accent-primary)]/5 border-b border-[var(--border-glass)]">
-                <div className="text-[9px] font-black uppercase tracking-[0.3em] text-[var(--accent-primary)] mb-1 opacity-60">Puntos Totales</div>
+                <div className="text-[9px] font-black uppercase tracking-[0.3em] text-[var(--accent-primary)] mb-1 opacity-60">{t('common.points')}</div>
                 <div className="text-2xl font-black text-[var(--text-primary)] tracking-tighter tabular-nums">
                   {score.toLocaleString()}
                 </div>
@@ -869,7 +848,7 @@ const App: React.FC = () => {
               <div className="p-4">
                 <div className="text-[10px] font-black uppercase tracking-[0.2em] text-[var(--text-secondary)] mb-4 flex items-center gap-2">
                   <i className="fa fa-paint-brush"></i>
-                  <span>Personalización</span>
+                  <span>{t('settings.personalization')}</span>
                 </div>
                 <div className="grid grid-cols-4 gap-2">
                   {THEMES.map((theme) => (
@@ -889,7 +868,7 @@ const App: React.FC = () => {
                   <button
                     onClick={() => colorInputRef.current?.click()}
                     className="w-full aspect-square rounded-full border-2 border-dashed border-white/20 flex items-center justify-center hover:border-white/40 transition-all font-bold text-[18px] text-[var(--text-secondary)]"
-                    title="Color Personalizado"
+                    title={t('settings.custom_color')}
                   >
                     +
                   </button>
@@ -905,7 +884,7 @@ const App: React.FC = () => {
                   }}
                   className="flex items-center justify-between cursor-pointer group"
                 >
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--text-secondary)] group-hover:text-[var(--text-primary)] transition-colors">Modo Negro Puro</span>
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--text-secondary)] group-hover:text-[var(--text-primary)] transition-colors">{t('settings.pure_black')}</span>
                   <div className={`w-8 h-4 rounded-full relative transition-colors ${isPureBlack ? 'bg-[var(--accent-primary)]' : 'bg-white/10'}`}>
                     <div className={`absolute top-0.5 w-3 h-3 rounded-full bg-white transition-all ${isPureBlack ? 'left-4.5' : 'left-0.5'}`} />
                   </div>
@@ -928,7 +907,7 @@ const App: React.FC = () => {
                     const activeLight = forceScheme === 'light' || (currentTheme.scheme === 'light' && !forceScheme);
                     return (
                       <>
-                        <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--text-secondary)] group-hover:text-[var(--text-primary)] transition-colors">Modo Día</span>
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--text-secondary)] group-hover:text-[var(--text-primary)] transition-colors">{t('settings.day_mode')}</span>
                         <div className={`w-8 h-4 rounded-full relative transition-colors ${activeLight ? 'bg-orange-400 shadow-[0_0_8px_rgba(251,146,60,0.4)]' : 'bg-white/10'}`}>
                           <div className={`absolute top-0.5 w-3 h-3 rounded-full bg-white transition-all ${activeLight ? 'left-4.5' : 'left-0.5'}`} />
                         </div>
@@ -941,7 +920,7 @@ const App: React.FC = () => {
                   onClick={() => setIsDebugMode(!isDebugMode)}
                   className="flex items-center justify-between cursor-pointer group pt-1"
                 >
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--text-secondary)] group-hover:text-[var(--text-primary)] transition-colors">Modo Debug</span>
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--text-secondary)] group-hover:text-[var(--text-primary)] transition-colors">{t('settings.debug_mode')}</span>
                   <div className={`w-8 h-4 rounded-full relative transition-colors ${isDebugMode ? 'bg-pink-500 shadow-[0_0_8px_rgba(236,72,153,0.4)]' : 'bg-white/10'}`}>
                     <div className={`absolute top-0.5 w-3 h-3 rounded-full bg-white transition-all ${isDebugMode ? 'left-4.5' : 'left-0.5'}`} />
                   </div>
@@ -950,27 +929,27 @@ const App: React.FC = () => {
 
               <button onClick={() => { setIsTypingSoundsEnabled(!isTypingSoundsEnabled); }} className={`w-full px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wider flex items-center gap-3 transition-all ${isTypingSoundsEnabled ? 'text-[var(--accent-primary)] bg-[var(--accent-primary)]/10' : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-white/5'}`}>
                 <i className="fa fa-keyboard-o w-4"></i>
-                <span>Sonido</span>
+                <span>{t('settings.sound')}</span>
               </button>
               <button onClick={() => { setIsMusicEnabled(!isMusicEnabled); }} className={`w-full px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wider flex items-center gap-3 transition-all ${isMusicEnabled ? 'text-[var(--accent-primary)] bg-[var(--accent-primary)]/10' : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-white/5'}`}>
                 <i className="fa fa-music w-4"></i>
-                <span>Música</span>
+                <span>{t('settings.music')}</span>
               </button>
               <button onClick={cycleShapes} className="w-full px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wider flex items-center gap-3 transition-all text-[var(--accent-primary)] bg-[var(--accent-primary)]/10 hover:bg-[var(--accent-primary)]/20">
                 <i className="fa fa-cube w-4"></i>
                 <div className="flex flex-col">
-                    <span className="text-[7px] opacity-60">Geometría</span>
+                    <span className="text-[7px] opacity-60">{t('common.geometry')}</span>
                     <span className="leading-none">{visualsConfig.outerSphere.shape}</span>
                 </div>
               </button>
 
               {isDebugMode && (
                 <div className="bg-pink-500/5 border-t border-pink-500/20">
-                  <div className="px-4 py-2 text-[9px] font-black uppercase tracking-[0.2em] text-pink-500 opacity-60">Herramientas Debug</div>
+                  <div className="px-4 py-2 text-[9px] font-black uppercase tracking-[0.2em] text-pink-500 opacity-60">{t('settings.debug_tools')}</div>
                   
                   <div className="px-4 py-3 flex flex-col gap-2">
                     <div className="flex justify-between items-center text-[10px] font-semibold uppercase tracking-wider text-pink-500/80">
-                      <span><i className="fa fa-level-up w-4"></i> Altura Suelo</span>
+                      <span><i className="fa fa-level-up w-4"></i> {t('settings.floor_height')}</span>
                       <span>{Math.round(floorHeight * 100)}%</span>
                     </div>
                     <input 
@@ -989,7 +968,7 @@ const App: React.FC = () => {
                     className="w-full px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wider flex items-center gap-3 transition-all text-pink-400 hover:text-pink-300 hover:bg-pink-500/10"
                   >
                     <i className="fa fa-bug w-4"></i>
-                    <span>Llenar Cortinas</span>
+                    <span>{t('settings.fill_curtains')}</span>
                   </button>
                 </div>
               )}
@@ -1038,6 +1017,14 @@ const App: React.FC = () => {
 
       <footer className="fixed bottom-6 right-8 text-[var(--text-secondary)] text-[8px] font-black uppercase tracking-[0.5em] font-mono opacity-20 select-none">OVETYP_</footer>
     </div>
+  );
+};
+
+export const App: React.FC = () => {
+  return (
+    <LanguageProvider>
+      <AppContent />
+    </LanguageProvider>
   );
 };
 

@@ -1,37 +1,17 @@
 import React from 'react';
-import { MusicStyle } from '../../domain/models/MusicStyles';
-
+import { useTranslation } from '../../i18n/LanguageContext';
 
 interface RightSidebarProps {
   isOpen: boolean;
   onClose: () => void;
-  targetKeyData: any;
-  onSelectLevel?: (keys: string[]) => void;
-  onSelectPhrases?: (phrases: string[], levelId?: string) => void;
-  focus: string;
-  onFocusChange: (focus: string) => void;
-  getBtnClass: (active: boolean) => string;
-  currentMusicStyle: MusicStyle;
-  onMusicStyleChange: (style: MusicStyle) => void;
-  TECHNO_STYLE: MusicStyle;
-  AMBIENT_STYLE: MusicStyle;
-  ACID_HOUSE_STYLE: MusicStyle;
-  isInfiniteMode: boolean;
-  onToggleZenMode: () => void;
-  score: number;
 }
 
 export const RightSidebar: React.FC<RightSidebarProps> = ({
   isOpen,
   onClose,
-  getBtnClass,
-  currentMusicStyle,
-  onMusicStyleChange,
-  TECHNO_STYLE,
-  AMBIENT_STYLE,
-  ACID_HOUSE_STYLE,
-  score,
 }) => {
+  const { t } = useTranslation();
+
   return (
     <aside
       className={`fixed top-0 right-0 h-full w-[400px] z-[2001] theme-glass backdrop-blur-3xl border-l border-[var(--border-glass)] p-8 transition-all duration-500 transform flex flex-col ${isOpen ? 'translate-x-0' : 'translate-x-full'
@@ -52,11 +32,11 @@ export const RightSidebar: React.FC<RightSidebarProps> = ({
         </div>
         
         <h2 className="text-2xl font-black text-[var(--text-primary)] mb-4 tracking-tighter">
-          Apoya el Proyecto
+          {t('sidebar.right.support_title')}
         </h2>
         
         <p className="text-[var(--text-secondary)] text-sm leading-relaxed mb-10 max-w-[280px]">
-          Si disfrutas de la experiencia cinemática de <b>OveTyp_</b>, por favor considera dejar una estrella en el repositorio. ¡Tu apoyo es fundamental para seguir mejorando!
+          {t('sidebar.right.support_desc')}
         </p>
 
         <a 
@@ -66,11 +46,11 @@ export const RightSidebar: React.FC<RightSidebarProps> = ({
           className="group relative px-8 py-4 bg-[var(--accent-primary)] text-black font-black rounded-2xl flex items-center gap-3 transition-all hover:scale-105 active:scale-95 shadow-[0_0_20px_var(--accent-glow)]"
         >
           <i className="fa fa-star"></i>
-          Dar Estrella en GitHub
+          {t('sidebar.right.star_button')}
         </a>
 
         <div className="mt-12 pt-12 border-t border-[var(--border-glass)] w-full text-[10px] font-black uppercase tracking-[0.4em] text-[var(--text-secondary)] opacity-30">
-          Open Source © 2026
+          {t('sidebar.right.footer')}
         </div>
       </div>
     </aside>

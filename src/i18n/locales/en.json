@@ -1,0 +1,59 @@
+{
+  "common": {
+    "points": "Total Points",
+    "speed": "Speed",
+    "accuracy": "Accuracy",
+    "completed": "Completed",
+    "start_prompt": "PRESS ANY KEY TO START",
+    "select_level_prompt": "Select a level to start",
+    "geometry": "Geometry",
+    "stars": {
+      "1": "Novice",
+      "2": "Expert",
+      "3": "Master"
+    }
+  },
+  "sidebar": {
+    "left": {
+      "system_language": "System Language",
+      "finger_mapping": "Finger Mapping"
+    },
+    "right": {
+      "support_title": "Support the Project",
+      "support_desc": "If you enjoy the cinematic experience of OveTyp_, please consider leaving a star on the repository. Your support is vital for ongoing improvement!",
+      "star_button": "Give Star on GitHub",
+      "footer": "Open Source © 2026"
+    }
+  },
+  "settings": {
+    "personalization": "Personalization",
+    "custom_color": "Custom Color",
+    "pure_black": "Pure Black Mode",
+    "day_mode": "Day Mode",
+    "debug_mode": "Debug Mode",
+    "sound": "Sound",
+    "music": "Music",
+    "debug_tools": "Debug Tools",
+    "floor_height": "Floor Height",
+    "fill_curtains": "Fill Curtains"
+  },
+  "practice": {
+    "fingers": "Finger Practice",
+    "indices": "Index Fingers",
+    "middle": "Middle Fingers",
+    "ring": "Ring Fingers",
+    "pinky": "Pinky Fingers",
+    "left": "Left",
+    "right": "Right"
+  },
+  "fingers": {
+    "left-index": "Left Index",
+    "left-middle": "Left Middle",
+    "left-ring": "Left Ring",
+    "left-pinky": "Left Pinky",
+    "right-index": "Right Index",
+    "right-middle": "Right Middle",
+    "right-ring": "Right Ring",
+    "right-pinky": "Right Pinky"
+  }
+}
