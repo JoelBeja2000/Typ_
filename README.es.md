@@ -41,7 +41,7 @@ Vive la música sincronizada y los visuales basados en física. Cada palabra que
 ### Modo de Entrenamiento
 Zonas dedicadas para dedos específicos con guías posturales en tiempo Real y enfoque por zonas.
 
-![OveTyp_ Modo Práctica](CAPTURAS/ModoPRactica.png)
+![OveTyp_ Modo Práctica](CAPTURAS/Practica.png)
 
 ## 🏆 Maestría de Niveles
 

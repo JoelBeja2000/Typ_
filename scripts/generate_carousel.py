@@ -10,7 +10,7 @@ def generate_pdf():
     images = [
         "Captura selecionador niveles.png",
         "Jugando.png",
-        "ModoPRactica.png"
+        "Practica.png"
     ]
     
     image_paths = [os.path.join(capturas_dir, img) for img in images if os.path.exists(os.path.join(capturas_dir, img))]

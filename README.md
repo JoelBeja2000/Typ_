@@ -41,7 +41,7 @@ Experience the synchronized music and physics-based visuals. Each word you type 
 ### Training Mode
 Dedicated zones for specific fingers with real-time postural guidance and zone-based focus.
 
-![OveTyp_ Practice Mode](CAPTURAS/ModoPRactica.png)
+![OveTyp_ Practice Mode](CAPTURAS/Practica.png)
 
 ## 🏆 Level Mastery
 
