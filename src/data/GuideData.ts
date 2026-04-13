@@ -31,7 +31,7 @@ export const GUIDE_PHASES: GuidePhase[] = [
         levels: [
             ...PHRASE_CATEGORIES.oneStar.levels.map(l => ({
                 id: `star_1_lvl_${l.id}`,
-                title: `1 Estrella - Nivel ${l.id}`,
+                title: `Nivel ${l.id}`,
                 description: 'Vocabulario esencial y fluidez básica.',
                 fingers: [],
                 keys: [],
@@ -40,7 +40,7 @@ export const GUIDE_PHASES: GuidePhase[] = [
             })),
             ...PHRASE_CATEGORIES.twoStars.levels.map(l => ({
                 id: `star_2_lvl_${l.id}`,
-                title: `2 Estrellas - Nivel ${l.id}`,
+                title: `Nivel ${l.id}`,
                 description: 'Puntuación, tildes y gramática compleja.',
                 fingers: [],
                 keys: [],
@@ -49,7 +49,7 @@ export const GUIDE_PHASES: GuidePhase[] = [
             })),
             ...PHRASE_CATEGORIES.threeStars.levels.map(l => ({
                 id: `star_3_lvl_${l.id}`,
-                title: `3 Estrellas - Nivel ${l.id}`,
+                title: `Nivel ${l.id}`,
                 description: 'Símbolos, código y términos técnicos densos.',
                 fingers: [],
                 keys: [],
