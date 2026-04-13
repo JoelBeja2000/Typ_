@@ -989,33 +989,35 @@ const App: React.FC = () => {
           </div>
 
           <div className="hidden xl:flex w-[450px] shrink-0 z-0 overflow-visible relative">
-            <div className="absolute inset-0 w-full h-full z-[60] pointer-events-none opacity-80">
-              {isLevelActive && (
-                <MorphSphere
-                    color={`rgb(${currentTheme.r}, ${currentTheme.g}, ${currentTheme.b})`}
-                    bands={frequencyBands}
-                    side="right"
-                    lightingEnabled={isMusicLightingEnabled}
-                    onClick={cycleShapes} 
-                    shape={visualsConfig.outerSphere.shape}
-                    floorHeight={floorHeight}
-                    masterStartTime={masterStartTime.current}
+            {isLevelActive && (
+              <>
+                <div className="absolute inset-0 w-full h-full z-[60] pointer-events-none opacity-80">
+                  <MorphSphere
+                      color={`rgb(${currentTheme.r}, ${currentTheme.g}, ${currentTheme.b})`}
+                      bands={frequencyBands}
+                      side="right"
+                      lightingEnabled={isMusicLightingEnabled}
+                      onClick={cycleShapes} 
+                      shape={visualsConfig.outerSphere.shape}
+                      floorHeight={floorHeight}
+                      masterStartTime={masterStartTime.current}
+                  />
+                </div>
+                <WordCurtain 
+                  className="relative z-[10]"
+                  text={solvedWords.join('  ') + (typedText ? '  ' + typedText : '')} 
+                  color={`rgb(${currentTheme.r}, ${currentTheme.g}, ${currentTheme.b})`} 
+                  frequencyBands={frequencyBands}
+                  combo={combo}
+                  repulsionCenter={{ x: -1, y: -1 }}
+                  repulsionEnergy={0.8}
+                  repulsionShape={visualsConfig.outerSphere.shape}
+                  repulsionRotation={(performance.now() - masterStartTime.current) * -0.002}
+                  floorHeight={floorHeight}
+                  masterStartTime={masterStartTime.current}
                 />
-              )}
-            </div>
-            <WordCurtain 
-              className="relative z-[10]"
-              text={solvedWords.join('  ') + (typedText ? '  ' + typedText : '')} 
-              color={`rgb(${currentTheme.r}, ${currentTheme.g}, ${currentTheme.b})`} 
-              frequencyBands={frequencyBands}
-              combo={combo}
-              repulsionCenter={{ x: -1, y: -1 }}
-              repulsionEnergy={0.8}
-              repulsionShape={visualsConfig.outerSphere.shape}
-              repulsionRotation={(performance.now() - masterStartTime.current) * -0.002}
-              floorHeight={floorHeight}
-              masterStartTime={masterStartTime.current}
-            />
+              </>
+            )}
           </div>
 
         </div>
