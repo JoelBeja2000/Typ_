@@ -29,6 +29,20 @@
 *   **Protocolo GHS**: Estándar Git History integrado para una trazabilidad profunda y mantenimiento asistido por IA.
 *   **Multiplataforma**: Construido sobre **Vite** y **React**, preparado para integración de escritorio.
 
+---
+
+## 📸 Experiencia Visual
+
+### Gameplay Cinematográfico
+Vive la música sincronizada y los visuales basados en física. Cada palabra que escribes correctamente añade una nueva capa a la partitura.
+
+![OveTyp_ Gameplay](CAPTURAS/Jugando.png)
+
+### Modo de Entrenamiento
+Zonas dedicadas para dedos específicos con guías posturales en tiempo Real y enfoque por zonas.
+
+![OveTyp_ Modo Práctica](CAPTURAS/ModoPRactica.png)
+
 ## 🏆 Maestría de Niveles
 
 Progresa a través de un sistema de desafíos diseñado para construir una velocidad estructural:

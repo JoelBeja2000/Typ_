@@ -29,6 +29,20 @@
 *   **GHS Protocol**: Integrated Git History Standard for deep traceability and AI-assisted maintenance.
 *   **Cross-Platform**: Built on top of **Vite** and **React**, prepared for desktop integration.
 
+---
+
+## 📸 Visual Experience
+
+### Cinematic Gameplay
+Experience the synchronized music and physics-based visuals. Each word you type correctly adds a new layer to the score.
+
+![OveTyp_ Gameplay](CAPTURAS/Jugando.png)
+
+### Training Mode
+Dedicated zones for specific fingers with real-time postural guidance and zone-based focus.
+
+![OveTyp_ Practice Mode](CAPTURAS/ModoPRactica.png)
+
 ## 🏆 Level Mastery
 
 Progress through a tiered challenge system designed to build structural speed:
