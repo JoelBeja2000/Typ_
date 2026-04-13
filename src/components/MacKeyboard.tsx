@@ -149,13 +149,13 @@ const LetterKey = ({ l, s }: { l: string, s: string }) => (
 );
 
 const IsoEnterKey = React.memo(({ focused }: { focused: boolean }) => {
-    let fill = "rgba(255,255,255,0.05)";
-    let stroke = "rgba(255,255,255,0.12)";
-    let textColor = "rgba(255,255,255,0.8)";
+    let fill = "var(--bg-glass)";
+    let stroke = "var(--border-strong)";
+    let textColor = "var(--text-primary)";
     if (focused) {
         fill = "rgba(var(--theme-r), var(--theme-g), var(--theme-b), 0.3)";
         stroke = "rgba(var(--theme-r), var(--theme-g), var(--theme-b), 1)";
-        textColor = "#fff";
+        textColor = "var(--text-primary)";
     }
 
     return (

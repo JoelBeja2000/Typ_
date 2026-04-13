@@ -26,7 +26,9 @@
     --text-secondary: #4b5563;
     --bg-glass: rgba(255, 255, 255, 0.7);
     --bg-glass-strong: rgba(255, 255, 255, 0.85);
+    --bg-floating: rgba(255, 255, 255, 0.95);
     --border-glass: rgba(0, 0, 0, 0.1);
+    --border-strong: rgba(0, 0, 0, 0.15);
 }
 
 /* Glass Keyboard Container */
@@ -58,11 +60,11 @@
     align-items: center;
     justify-content: center;
     border-radius: var(--radius-key);
-    background: rgba(255, 255, 255, 0.03); /* Subtle glass base */
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-top: 1px solid rgba(255, 255, 255, 0.12);
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
-    color: rgba(255, 255, 255, 0.8);
+    background: var(--bg-app-key, rgba(255, 255, 255, 0.03)); /* Subtle glass base */
+    border: 1px solid var(--border-glass);
+    border-top: 1px solid var(--border-strong);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    color: var(--text-primary);
     font-size: 11px;
     font-weight: 500;
     transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
@@ -95,9 +97,9 @@
 }
 
 .mac-key.highlighted {
-    border-color: #fff !important;
-    box-shadow: 0 0 15px rgba(255, 255, 255, 0.3) !important;
-    color: #fff !important;
+    border-color: var(--accent-primary) !important;
+    box-shadow: 0 0 15px var(--accent-glow) !important;
+    color: var(--text-primary) !important;
 }
 
 /* Animations */

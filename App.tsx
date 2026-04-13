@@ -198,7 +198,7 @@ const App: React.FC = () => {
     const practiceLevelsList = [
       { id: 'practice_indice', title: 'Dedos Índices', fingers: ['L2', 'R2'], keys: ['F', 'G', 'V', 'B', 'R', 'T', 'J', 'H', 'N', 'M', 'Y', 'U'] },
       { id: 'practice_anular', title: 'Anulares', fingers: ['L4', 'R4'], keys: ['S', 'W', 'X', 'L', 'O'] },
-      { id: 'practice_corazon', title: 'Dedos Corazón', fingers: ['L3', 'R3'], keys: ['D', 'E', 'C', 'K', 'I'] },
+      { id: 'practice_corazon', title: 'Corazones', fingers: ['L3', 'R3'], keys: ['D', 'E', 'C', 'K', 'I'] },
       { id: 'practice_menique', title: 'Dedos Meñique', fingers: ['L5', 'R5'], keys: ['A', 'Q', 'Z', 'Ñ', 'P'] },
     ];
     const practiceLevel = practiceLevelsList.find(l => l.id === currentLevelId);
