@@ -13,9 +13,9 @@ interface KeyboardProps {
 const Keyboard: React.FC<KeyboardProps> = ({ activeKey, targetKey, showZones = false, bands = { bass: 0, mid: 0, high: 0 } }) => {
 
   const renderKey = (keyData: KeyData, rowIndex: number, keyIndex: number, rowLength: number) => {
-    const isTarget = targetKey.toLowerCase() === keyData.key.toLowerCase() ||
-      (targetKey === ' ' && keyData.key === ' ');
-    const isActive = activeKey.toLowerCase() === keyData.key.toLowerCase();
+    const isTarget = targetKey && (targetKey.toLowerCase() === keyData.key.toLowerCase() ||
+      (targetKey === ' ' && keyData.key === ' '));
+    const isActive = activeKey && activeKey.toLowerCase() === keyData.key.toLowerCase();
     // base premium key style
     let className = `mac-key `;
     let style: any = {};

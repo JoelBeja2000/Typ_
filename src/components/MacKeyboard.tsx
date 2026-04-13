@@ -261,6 +261,7 @@ const MacKeyboard: React.FC<MacKeyboardProps> = React.memo(({
     const normalize = useCallback((str: string) => str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase(), []);
 
     const isTarget = useCallback((key: KeyDef) => {
+        if (!targetKey) return false;
         const lowerKey = key.id.toLowerCase();
         const baseKey = key.base.toLowerCase();
         const lowerTarget = targetKey.toLowerCase();
@@ -291,6 +292,7 @@ const MacKeyboard: React.FC<MacKeyboardProps> = React.memo(({
     }, [targetKey, normalize]);
 
     const isActive = useCallback((key: KeyDef) => {
+        if (!activeKey) return false;
         const lowerKey = key.id.toLowerCase();
         const base = key.base.toLowerCase();
         const current = activeKey.toLowerCase();
