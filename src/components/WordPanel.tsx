@@ -90,7 +90,7 @@ export const WordPanel: React.FC<WordPanelProps> = ({
     onCycleShapes,
     activeLevel,
 }) => {
-    const textColor = themeScheme === 'light' ? 'text-black' : 'text-white';
+    const textColor = 'text-[var(--text-primary)]';
     const themeColor = 'text-[var(--accent-primary)]';
     const musicStyles = [TECHNO_STYLE, AMBIENT_STYLE, ACID_HOUSE_STYLE];
     const musicIcons = ['fa-bolt', 'fa-leaf', 'fa-flask'];
@@ -106,7 +106,7 @@ export const WordPanel: React.FC<WordPanelProps> = ({
     const practiceLevels = [
         { id: 'practice_indice', title: 'Dedos Índices', fingers: ['L2', 'R2'], keys: ['F', 'G', 'V', 'B', 'R', 'T', 'J', 'H', 'N', 'M', 'Y', 'U'] },
         { id: 'practice_anular', title: 'Anulares', fingers: ['L4', 'R4'], keys: ['S', 'W', 'X', 'L', 'O'] },
-        { id: 'practice_corazon', title: 'Dedos Corazón', fingers: ['L3', 'R3'], keys: ['D', 'E', 'C', 'K', 'I'] },
+        { id: 'practice_corazon', title: 'Corazones', fingers: ['L3', 'R3'], keys: ['D', 'E', 'C', 'K', 'I'] },
         { id: 'practice_menique', title: 'Dedos Meñique', fingers: ['L5', 'R5'], keys: ['A', 'Q', 'Z', 'Ñ', 'P'] },
     ];
 
@@ -228,7 +228,7 @@ export const WordPanel: React.FC<WordPanelProps> = ({
                                 <div className="flex items-center gap-4">
                                     <div className="flex flex-col">
                                         <i className={`fa fa-hand-paper-o text-[14px] mb-1 ${practiceExpanded ? 'text-[var(--accent-primary)] animate-pulse' : 'text-amber-400 opacity-60'}`}></i>
-                                        <span className={`text-[12px] font-black uppercase tracking-wider ${practiceExpanded ? 'text-[var(--accent-primary)]' : 'text-white'}`}>
+                                        <span className={`text-[12px] font-black uppercase tracking-wider ${practiceExpanded ? 'text-[var(--accent-primary)]' : 'text-[var(--text-primary)]'}`}>
                                             Práctica de Dedos
                                         </span>
                                     </div>
@@ -274,7 +274,7 @@ export const WordPanel: React.FC<WordPanelProps> = ({
                                 <div className="flex items-center gap-4">
                                     <div className="flex flex-col">
                                         <i className={`fa ${musicIcons[musicStyles.indexOf(currentMusicStyle)] || 'fa-music'} text-[14px] mb-1 ${musicExpanded ? 'text-[var(--accent-primary)] animate-pulse' : 'text-amber-400 opacity-60'}`}></i>
-                                        <span className={`text-[12px] font-black uppercase tracking-wider ${musicExpanded ? 'text-[var(--accent-primary)]' : 'text-white'}`}>
+                                        <span className={`text-[12px] font-black uppercase tracking-wider ${musicExpanded ? 'text-[var(--accent-primary)]' : 'text-[var(--text-primary)]'}`}>
                                             {currentMusicStyle.name}
                                         </span>
                                     </div>
@@ -328,7 +328,7 @@ export const WordPanel: React.FC<WordPanelProps> = ({
                         style={{ transform: `translateX(calc(-${offset}ch))` }}
                     >
                         {currentPhrase.split('').map((char, i) => {
-                            let color = "text-white";
+                            let color = "text-[var(--text-primary)]";
                             let glow = "";
                             if (i < normalizedTypedText.length) {
                                 const isMismatch = normalizedTypedText[i] !== char;
@@ -336,12 +336,12 @@ export const WordPanel: React.FC<WordPanelProps> = ({
 
                                 if (isMismatch) {
                                     if (isLastChar && isComposingState) {
-                                        color = "text-white border-b-2 border-[var(--accent-primary)] animate-pulse";
+                                        color = "text-[var(--text-primary)] border-b-2 border-[var(--accent-primary)] animate-pulse";
                                     } else {
                                         color = "text-red-400 bg-red-500/10 border-b-2 border-red-500/30";
                                     }
                                 } else {
-                                    color = "text-white";
+                                    color = "text-[var(--text-primary)]";
                                     glow = "drop-shadow-[0_0_8px_var(--accent-primary)]";
                                 }
                             }
@@ -417,7 +417,7 @@ export const WordPanel: React.FC<WordPanelProps> = ({
                             
                             {/* Left Finger Guides */}
                             {isLevelActive && activeLevel && (
-                                <div className="hidden lg:flex flex-col gap-3 items-end flex-1 pr-4 animate-in fade-in slide-in-from-left-4 duration-1000">
+                                <div className="hidden lg:flex flex-col gap-3 items-start flex-1 pl-4 animate-in fade-in slide-in-from-left-4 duration-1000">
                                     {activeLevel.fingers.filter(f => f.startsWith('L')).map(fingerCode => {
                                         const fingerKey = Object.entries(FINGER_CODE_MAP).find(([k]) => k === fingerCode)?.[0];
                                         if (!fingerKey) return null;

@@ -34,7 +34,9 @@ export class BrowserThemeManager implements ThemePort {
             root.style.setProperty('--text-secondary', '#475569'); // Slate 600
             root.style.setProperty('--bg-glass', 'rgba(255, 255, 255, 0.4)');
             root.style.setProperty('--bg-glass-strong', 'rgba(255, 255, 255, 0.9)');
+            root.style.setProperty('--bg-floating', 'rgba(255, 255, 255, 0.95)');
             root.style.setProperty('--border-glass', 'rgba(0, 0, 0, 0.08)');
+            root.style.setProperty('--border-strong', 'rgba(0, 0, 0, 0.15)');
             root.style.setProperty('--bg-tint', 'rgba(0, 0, 0, 0.02)');
         } else {
             // Dark mode with theme tint
