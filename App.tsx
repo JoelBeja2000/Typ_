@@ -967,7 +967,7 @@ const App: React.FC = () => {
         </main>
       </div>
 
-      <footer className="fixed bottom-6 right-8 text-[var(--text-secondary)] text-[8px] font-black uppercase tracking-[0.5em] font-mono opacity-20 select-none">OVETYP_ // 2025</footer>
+      <footer className="fixed bottom-6 right-8 text-[var(--text-secondary)] text-[8px] font-black uppercase tracking-[0.5em] font-mono opacity-20 select-none">OVETYP_</footer>
     </div>
   );
 };
