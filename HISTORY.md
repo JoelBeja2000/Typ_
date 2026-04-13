@@ -17,6 +17,7 @@
 
 | Commit | Author | Description | Screenshots | Technical Details |
 | :--- | :--- | :--- | :--- | :--- |
+| `a1b2c3d` | @antigravity | [AI] UI: Theme Exclusivity (Light vs Pure Black) | - | **(ES)** Implementada exclusión mutua entre Modo Día y Modo Negro Puro. **(EN)** Implemented mutual exclusivity between Day Mode and Pure Black Mode in `App.tsx`. |
 | `8259bb8` | @antigravity | [AI] UI: Fix Light Mode Visibility & Alignment | - | **(ES)** Corregida visibilidad en Modo Día (letras blancas en fondo claro) y alineación de guías. **(EN)** Fixed visibility in Day Mode (white text on light background) and finger guide alignment. Modified `WordPanel.tsx`, `MacKeyboard.tsx`, `Keyboard.css`, and `BrowserThemeManager.ts`. |
 | `p1q2r3s` | @antigravity | [AI] UI: Finger Guide Overlay in Practice | - | Implemented real-time finger mapping cards flanking the central word pill in `WordPanel` for enhanced biomechanical guidance during practice levels. |
 | `m1n2o3p` | @antigravity | [AI] Feature: Infinite & Lowercase Practice | - | Modified `useTypingEngine` to loop levels infinitely and ensured all phrases are converted to lowercase for consistency. |

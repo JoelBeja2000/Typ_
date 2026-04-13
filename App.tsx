@@ -869,7 +869,10 @@ const App: React.FC = () => {
                   {THEMES.map((theme) => (
                     <button
                       key={theme.id}
-                      onClick={() => setCurrentTheme(theme)}
+                      onClick={() => {
+                        setCurrentTheme(theme);
+                        if (theme.scheme === 'light') setIsPureBlack(false);
+                      }}
                       className={`w-full aspect-square rounded-full border-2 transition-all duration-300 flex items-center justify-center ${currentTheme.id === theme.id ? 'border-[var(--accent-primary)] ring-2 ring-[var(--accent-glow)]' : 'border-white/10 hover:border-white/40'}`}
                       style={{ backgroundColor: `rgb(${theme.r}, ${theme.g}, ${theme.b})` }}
                       title={theme.name}
@@ -889,7 +892,11 @@ const App: React.FC = () => {
 
               <div className="px-4 py-3 space-y-3">
                 <div
-                  onClick={() => setIsPureBlack(!isPureBlack)}
+                  onClick={() => {
+                    const nextVal = !isPureBlack;
+                    setIsPureBlack(nextVal);
+                    if (nextVal) setForceScheme('dark');
+                  }}
                   className="flex items-center justify-between cursor-pointer group"
                 >
                   <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--text-secondary)] group-hover:text-[var(--text-primary)] transition-colors">Modo Negro Puro</span>
@@ -901,7 +908,12 @@ const App: React.FC = () => {
                 <div
                   onClick={() => {
                     const effectiveIsLight = forceScheme === 'light' || (currentTheme.scheme === 'light' && forceScheme === null);
-                    setForceScheme(effectiveIsLight ? 'dark' : 'light');
+                    if (!effectiveIsLight) {
+                      setForceScheme('light');
+                      setIsPureBlack(false);
+                    } else {
+                      setForceScheme('dark');
+                    }
                   }}
                   className="flex items-center justify-between cursor-pointer group"
                 >
