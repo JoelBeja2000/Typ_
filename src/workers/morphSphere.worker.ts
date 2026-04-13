@@ -97,6 +97,7 @@ let floorHeight = 0.62;
 let time = 0;
 let rafID: number;
 let startTime = 0;
+let isBouncing = false; // Explicit control relative to combo
 let bounceWeight = 0; // Target weight for delayed entry
 let currentBounceWeight = 0; // Smoothed weight
 
@@ -228,9 +229,9 @@ function animate() {
     const bounceTime = (performance.now() - startTime) * PHYSICS.sphere.bounceSpeed;
     const rawOffset = (1 - Math.abs(Math.cos(bounceTime))) * dynamicBounceAmplitude;
     
-    // DELAYED BOUNCE LOGIC: Only bounce if mid/high instruments (2nd instrument) are active
-    const bounceActivity = (bands.mid > 0.05 || bands.high > 0.02) ? 1.0 : 0.0;
-    currentBounceWeight = currentBounceWeight * 0.9 + bounceActivity * 0.1; // Smooth entry/exit
+    // DELAYED BOUNCE LOGIC: Controlled by main thread via isBouncing prop
+    const targetWeight = isBouncing ? 1.0 : 0.0;
+    currentBounceWeight = currentBounceWeight * 0.9 + targetWeight * 0.1; // Smooth entry/exit
     
     const currentOffset = rawOffset * currentBounceWeight;
 
@@ -296,6 +297,12 @@ self.onmessage = (e: MessageEvent) => {
             break;
         case 'updateLighting':
             lightingEnabled = payload.lightingEnabled;
+            break;
+        case 'updateBouncing':
+            isBouncing = payload.isBouncing;
+            break;
+        case 'updateStartTime':
+            startTime = payload.startTime;
             break;
     }
 };

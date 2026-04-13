@@ -11,6 +11,7 @@ interface MorphSphereProps {
     floorHeight?: number;
     masterStartTime?: number;
     offsetY?: number;
+    isBouncing?: boolean;
 }
 
 const MorphSphere: React.FC<MorphSphereProps> = ({
@@ -23,7 +24,8 @@ const MorphSphere: React.FC<MorphSphereProps> = ({
     shape = 'icosahedron',
     floorHeight = 0.62,
     masterStartTime,
-    offsetY
+    offsetY,
+    isBouncing = false
 }) => {
     const containerRef = useRef<HTMLDivElement>(null);
     const workerRef = useRef<Worker | null>(null);
@@ -107,6 +109,14 @@ const MorphSphere: React.FC<MorphSphereProps> = ({
     useEffect(() => {
         if (isInitializedRef.current) workerRef.current?.postMessage({ type: 'updateLighting', payload: { lightingEnabled } });
     }, [lightingEnabled]);
+
+    useEffect(() => {
+        if (isInitializedRef.current) workerRef.current?.postMessage({ type: 'updateBouncing', payload: { isBouncing } });
+    }, [isBouncing]);
+
+    useEffect(() => {
+        if (isInitializedRef.current) workerRef.current?.postMessage({ type: 'updateStartTime', payload: { startTime: masterStartTime } });
+    }, [masterStartTime]);
 
     const handleClick = (e: React.MouseEvent) => {
         e.stopPropagation();
