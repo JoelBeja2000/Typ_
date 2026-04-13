@@ -1,79 +1,72 @@
-> [!NOTE]
-> Este es un proyecto **pequeño y rápido** construido con **GitHub Copilot CLI**. No pretende ser un producto profesional, sino una exploración de capacidades de desarrollo asistido por IA.
+<div align="center">
+  <img src="https://raw.githubusercontent.com/JoelBeja2000/OveTyp_/main/docs/media/Captura.png" alt="OveTyp_ Logo" width="200" />
+  <h1>OveTyp_</h1>
+  <p><strong>La Experiencia Cinematográfica de Mecanografía</strong></p>
+  <p><i>Biomecánica · Audio-Reactividad · Elegancia Minimalista</i></p>
+  
+  [Leer en Inglés](README.md) | [Español]
+</div>
 
-# Typ_ (Type Master)
+---
 
-**Typ_** es un entrenador de mecanografía de nivel profesional diseñado para la eficiencia, velocidad y precisión. Construido con un enfoque en la biomecánica y la retroalimentación auditiva, proporciona una experiencia de entrenamiento cinematográfica para desarrolladores y entusiastas de la mecanografía.
+## 💎 La Filosofía
 
-![Typ_ Landing](docs/media/landing.png)
+**OveTyp_** no es solo un test de velocidad; es un ecosistema de entrenamiento profesional diseñado para el flujo cognitivo profundo (Deep Work). Al fusionar retroalimentación auditiva de alta fidelidad con un motor visual basado en física, transforma la práctica en una interpretación cinematográfica.
 
-## Características Principales
+## ⚡ Pilares Fundamentales
 
-- **Arquitectura Hexagonal**: Separación estricta de preocupaciones (Dominio, Puertos, Infraestructura).
-- **Latencia Ultra-Baja**: Motor de escritura síncrono con tiempos de respuesta sub-16ms.
-- **Niveles por Estrellas**: Dificultad progresiva de Novato (1★) → Experto (2★) → Maestro (3★).
-- **Práctica de Dedos**: Entrenamiento dedicado para cada dedo (Índice, Corazón, Anular, Meñique).
-- **Estilos de Música**: Retroalimentación dinámica (Berlín Techno, Cyber Ambient, Acid House 303).
-- **Guías Biomecánicas**: Representación visual del mapeo dedos-teclas.
-- **Retroalimentación Cinematográfica**: WPM, Precisión, sistemas de Combo en tiempo real.
-- **Modo Día/Noche**: Cambia entre temas claros y oscuros.
-- **Seguimiento de Progreso**: Muestra porcentaje y estadísticas al completar nivel.
-- **GHS Integrado**: Git History Standard para contexto de agentes IA.
+### 🧬 Precisión Biomecánica
+*   **Entrenamiento Dirigido**: Niveles dedicados a zonas específicas de los dedos (Índice, Corazón, Anular, Meñique).
+*   **Guías en Tiempo Real**: Superposición dinámica de mapeo de dedos para corregir la postura y la memoria muscular.
+*   **Latencia Ultra-Baja**: Motor de escritura síncrono con tiempos de respuesta sub-16ms para una respuesta instantánea.
 
-## Nuevo Sistema de Niveles
+### 🎵 Inmersión Auditiva
+*   **Estilos Musicales Procedurales**: Elige entre Berlín Techno, Cyber Ambient o Acid House 303.
+*   **Física Audio-Reactiva**: La interfaz "respira" con tu ritmo. Componentes como la `MorphSphere` y la `WordCurtain` vibran y rebotan en sincronía con las bandas de frecuencia de la música.
 
-### Niveles por Estrellas (Desafíos)
-- **Novato** (1★): Pares básicos de dedos
-- **Experto** (2★): Combinaciones avanzadas
-- **Maestro** (3★): Dominio completo del teclado
+### 🏗️ Excelencia en Ingeniería
+*   **Arquitectura Hexagonal**: Código desacoplado que separa el Dominio (Lógica de escritura) de la Infraestructura (React/Web Audio).
+*   **Protocolo GHS**: Estándar Git History integrado para una trazabilidad profunda y mantenimiento asistido por IA.
+*   **Multiplataforma**: Construido sobre **Vite** y **React**, preparado para integración de escritorio.
 
-### Práctica de Dedos
-- **Índice**: F, G, V, B, R, T, J, H, N, M...
-- **Corazón**: D, E, C, K, I
-- **Anular**: S, W, X, L, O
-- **Meñique**: A, Q, Z, Ñ, P
+## 🏆 Maestría de Niveles
 
-## Primeros Pasos
+Progresa a través de un sistema de desafíos diseñado para construir una velocidad estructural:
+
+| Nivel | Estrellas | Enfoque | Descripción |
+| :--- | :--- | :--- | :--- |
+| **Novato** | ★ | Home Row y Pares | Enfoque en posición básica y pares de alta frecuencia. |
+| **Experto** | ★★ | Cadenas Complejas | Estructuras de palabras avanzadas y transiciones multi-dedo. |
+| **Maestro** | ★★★ | Teclado Completo | Flujo de alta velocidad con caracteres especiales y biomecánica compleja. |
+
+## 🚀 Primeros Pasos
 
 ### Prerrequisitos
 
-- **Node.js**: Requerido para ejecutar el servidor de desarrollo Vite.
-- **Git**: Para control de versiones.
+- **Node.js**: (Se recomienda la versión LTS)
+- **NPM** o **Yarn**
 
 ### Instalación
 
-1. **Clonar el repositorio**:
+1. **Clona la experiencia**:
    ```bash
    git clone https://github.com/JoelBeja2000/OveTyp_.git
    cd OveTyp_
    ```
 
-2. **Instalar dependencias**:
+2. **Inicializa el motor**:
    ```bash
    npm install
    ```
 
-3. **Ejecutar la aplicación**:
+3. **Lanzamiento**:
    ```bash
    npm run dev
    ```
 
-### Configuración GHS (Opcional)
-
-Para contexto de agentes IA, configura Git History Standard:
-
-```bash
-source .venv/bin/activate
-python3 tools/search.py "tu consulta"   # Buscar en código
-python3 tools/indexer.py            # Re-indexar cambios
-```
-
-## Desarrollo
-
-Construido con:
-- **Tauri**: Integración de escritorio multiplataforma.
-- **React**: Interfaz de usuario.
-- **Web Audio API**: Retroalimentación auditiva de baja latencia.
-- **GitHub Copilot CLI**: Desarrollo asistido por IA.
-
 ---
+
+<div align="center">
+  <p>Desarrollado con un enfoque en el trabajo profundo y la precisión estructural.</p>
+  <p><b>OVETYP_ © 2026</b></p>
+</div>
