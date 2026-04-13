@@ -11,6 +11,9 @@
 | `BUG-005` | @antigravity | JSX Syntax Error in App.tsx | Removed stray tags and fixed corrupted container structure in the right sidebar. |
 | `BUG-006` | @antigravity | 404 & MIME Error on GH Pages | Identified root cause: Deployment from 'main' instead of 'gh-pages'. Restored standard Vite config and provided setup instructions. |
 | `BUG-007` | @antigravity | [AI-BUG] Invisible UI in "Mood Día" (Light Mode) | Replaced hardcoded white colors with `var(--text-primary)` across Keyboard and WordPanel. Added contrast tokens to `BrowserThemeManager`. |
+| `BUG-008` | @antigravity | [AI-BUG] Ghost Keyboard Highlights | Matching logic incorrectly identified empty strings as Space/Settings buttons. Added `!activeKey` guards. |
+| `BUG-009` | @antigravity | [AI-BUG] Inconsistent ISO Enter Color | Enter key used `var(--bg-glass)` while others used light glass. Standardized to `rgba(255,255,255,0.03)`. |
+| `BUG-010` | @antigravity | [AI-BUG] MorphSphere Physics Desync | Left/right spheres were using different time offsets and ranges. Unified to shared `startTime` and scale. |
 
 ## Active Bugs
 

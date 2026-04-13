@@ -17,6 +17,18 @@
 
 | Commit | Author | Description | Screenshots | Technical Details |
 | :--- | :--- | :--- | :--- | :--- |
+| `f8fc6e7` | @antigravity | [AI] Docs: Update practice image name | - | **(ES)** Actualizado nombre de imagen de práctica y regenerado carrusel PDF. **(EN)** Updated practice image name and regenerated PDF carousel. |
+| `3fe4585` | @antigravity | [AI] Docs: Visual Studio Assets | - | **(ES)** Añadidas capturas al README y generado PDF para LinkedIn. **(EN)** Added screenshots to README and generated PDF for LinkedIn. |
+| `4743a6f` | @antigravity | [AI] UI: Sidebar Header Cleanup | - | **(ES)** Eliminado logo redundante en la cabecera del menú izquierdo. **(EN)** Removed redundant logo in the left sidebar header. |
+| `5cd2b2f` | @antigravity | [AI] Style: Unify ISO Enter glass effect | - | **(ES)** Corregido color oscuro del Enter; ahora usa el mismo cristal transparente que el resto. **(EN)** Fixed dark Enter color; now uses the same transparent glass as other keys. |
+| `a8db184` | @antigravity | [AI] UI: Cleanup Preferences Menu | - | **(ES)** Eliminadas opciones redundantes (Luces/Guía) del menú de configuración. **(EN)** Removed redundant options (Lighting/Guide) from the configuration menu. |
+| `4350f9f` | @antigravity | [AI] Fix: Keyboard Ghost Highlights | - | **(ES)** Añadidas protecciones contra entradas vacías que iluminaban el Espacio por error. **(EN)** Added guards against empty inputs that incorrectly highlighted the Space bar. |
+| `778b79d` | @antigravity | [AI] Feat: Liquid Transitions & Torus | - | **(ES)** Transiciones de color fluidas (inercia) y Torus como forma inicial. **(EN)** Fluid color transitions (inertia) and Torus as initial shape. |
+| `a9fe688` | @antigravity | [AI] Feat: Continuous Color Flow | - | **(ES)** Implementado flujo de color temporal independiente del rendimiento. **(EN)** Implemented temporal color flow independent of performance. |
+| `7e30b7c` | @antigravity | [AI] Feat: Always-on Cinematic Lighting | - | **(ES)** Habilitada iluminación musical permanente con paleta complementaria. **(EN)** Enabled permanent music lighting with complementary color palette. |
+| `78d8e48` | @antigravity | [AI] Docs: Modernize READMEs | - | **(ES)** Redacción simplificada y branding cinemático en README y README.es. **(EN)** Simplified wording and cinematic branding in README and README.es. |
+| `c8ecc9b` | @antigravity | [AI] Fix: Synchronize MorphSpheres | - | **(ES)** Sincronizada lógica de rebote entre esferas izquierda y derecha. **(EN)** Synchronized bounce logic between left and right spheres. |
+| `6d2eb91` | @antigravity | [AI] Fix: Stabilize Bounce Logic | - | **(ES)** Estabilizado rebote y sincronización con el combo. **(EN)** Stabilized bounce and sync with combo. |
 | `6f7g8h9` | @antigravity | [AI] Visuals: Delayed MorphSphere Bounce | - | **(ES)** Rebote de esfera diferido hasta la entrada del segundo instrumento (mid/high bands). **(EN)** Delayed MorphSphere bounce animation until mid/high instrument entry in `morphSphere.worker.ts`. |
 | `a1b2c3d` | @antigravity | [AI] UI: Theme Exclusivity (Light vs Pure Black) | - | **(ES)** Implementada exclusión mutua entre Modo Día y Modo Negro Puro. **(EN)** Implemented mutual exclusivity between Day Mode and Pure Black Mode in `App.tsx`. |
 | `8259bb8` | @antigravity | [AI] UI: Fix Light Mode Visibility & Alignment | - | **(ES)** Corregida visibilidad en Modo Día (letras blancas en fondo claro) y alineación de guías. **(EN)** Fixed visibility in Day Mode (white text on light background) and finger guide alignment. Modified `WordPanel.tsx`, `MacKeyboard.tsx`, `Keyboard.css`, and `BrowserThemeManager.ts`. |
