@@ -97,6 +97,8 @@ let floorHeight = 0.62;
 let time = 0;
 let rafID: number;
 let startTime = 0;
+let bounceWeight = 0; // Target weight for delayed entry
+let currentBounceWeight = 0; // Smoothed weight
 
 function easeInOutCubic(t: number) {
     return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
@@ -224,7 +226,13 @@ function animate() {
     const dynamicSquashThreshold = Math.max(0, dynamicBounceAmplitude - 0.4);
 
     const bounceTime = (performance.now() - startTime) * PHYSICS.sphere.bounceSpeed;
-    const currentOffset = (1 - Math.abs(Math.cos(bounceTime))) * dynamicBounceAmplitude;
+    const rawOffset = (1 - Math.abs(Math.cos(bounceTime))) * dynamicBounceAmplitude;
+    
+    // DELAYED BOUNCE LOGIC: Only bounce if mid/high instruments (2nd instrument) are active
+    const bounceActivity = (bands.mid > 0.05 || bands.high > 0.02) ? 1.0 : 0.0;
+    currentBounceWeight = currentBounceWeight * 0.9 + bounceActivity * 0.1; // Smooth entry/exit
+    
+    const currentOffset = rawOffset * currentBounceWeight;
 
     mesh.position.y = fixedApexY - currentOffset;
     innerMesh.position.y = fixedApexY - currentOffset;

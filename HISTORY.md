@@ -17,6 +17,7 @@
 
 | Commit | Author | Description | Screenshots | Technical Details |
 | :--- | :--- | :--- | :--- | :--- |
+| `6f7g8h9` | @antigravity | [AI] Visuals: Delayed MorphSphere Bounce | - | **(ES)** Rebote de esfera diferido hasta la entrada del segundo instrumento (mid/high bands). **(EN)** Delayed MorphSphere bounce animation until mid/high instrument entry in `morphSphere.worker.ts`. |
 | `a1b2c3d` | @antigravity | [AI] UI: Theme Exclusivity (Light vs Pure Black) | - | **(ES)** Implementada exclusión mutua entre Modo Día y Modo Negro Puro. **(EN)** Implemented mutual exclusivity between Day Mode and Pure Black Mode in `App.tsx`. |
 | `8259bb8` | @antigravity | [AI] UI: Fix Light Mode Visibility & Alignment | - | **(ES)** Corregida visibilidad en Modo Día (letras blancas en fondo claro) y alineación de guías. **(EN)** Fixed visibility in Day Mode (white text on light background) and finger guide alignment. Modified `WordPanel.tsx`, `MacKeyboard.tsx`, `Keyboard.css`, and `BrowserThemeManager.ts`. |
 | `p1q2r3s` | @antigravity | [AI] UI: Finger Guide Overlay in Practice | - | Implemented real-time finger mapping cards flanking the central word pill in `WordPanel` for enhanced biomechanical guidance during practice levels. |
