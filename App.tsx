@@ -501,7 +501,7 @@ const App: React.FC = () => {
       setIsLoading(true);
       setIsGuideMode(false); // Reset to generator mode when language/focus changes
       const newPhrases = generateLocalPhrases(language, focus, 10);
-      setPhrases(newPhrases.map(p => p.normalize('NFC')));
+      setPhrases(newPhrases.map(p => p.normalize('NFC').toLowerCase()));
       setTypedText(''); lastProcessedText.current = ''; setPhraseIndex(0); setCombo(0); setWordHasMistake(false);
       if (inputRef.current) inputRef.current.value = '';
       setIsLoading(false);
@@ -582,7 +582,7 @@ const App: React.FC = () => {
     setIsGuideMode(true); // Enable Guide Mode
     if (levelId) setCurrentLevelId(levelId);
 
-    setPhrases(newPhrases.map(p => p.normalize('NFC')));
+    setPhrases(newPhrases.map(p => p.normalize('NFC').toLowerCase()));
     setTypedText('');
     lastProcessedText.current = '';
     setPhraseIndex(0);
