@@ -259,8 +259,11 @@ const App: React.FC = () => {
   const [currentMusicStyle, setCurrentMusicStyle] = useState<MusicStyle>(TECHNO_STYLE);
   const [isTypingSoundsEnabled, setIsTypingSoundsEnabled] = useState(true);
   const [comboMultiplier, setComboMultiplier] = useState(1.0);
-  const [isMusicLightingEnabled, setIsMusicLightingEnabled] = useState(false);
+  const [isMusicLightingEnabled, setIsMusicLightingEnabled] = useState(true);
   const [frequencyBands, setFrequencyBands] = useState({ bass: 0, mid: 0, high: 0 });
+  const oppositeColor = useMemo(() => {
+    return `rgb(${255 - currentTheme.r}, ${255 - currentTheme.g}, ${255 - currentTheme.b})`;
+  }, [currentTheme]);
 
   const [isGuideMode, setIsGuideMode] = useState(false);
   const [isCircuitMode, setIsCircuitMode] = useState(false);
@@ -747,6 +750,7 @@ const App: React.FC = () => {
                       floorHeight={floorHeight}
                       masterStartTime={startTime}
                       isBouncing={combo >= 5}
+                      oppositeColor={oppositeColor}
                   />
                 </div>
                 <WordCurtain 
@@ -836,6 +840,7 @@ const App: React.FC = () => {
                   isLevelActive={isLevelActive}
                   onGoHome={handleGoHome}
                   onDebugFillCurtain={handleDebugFillCurtain}
+                  oppositeColor={oppositeColor}
                 />
 
               </div>
@@ -951,9 +956,9 @@ const App: React.FC = () => {
                 <i className="fa fa-music w-4"></i>
                 <span>Música</span>
               </button>
-              <button onClick={() => { setIsMusicLightingEnabled(!isMusicLightingEnabled); }} className={`w-full px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wider flex items-center gap-3 transition-all ${isMusicLightingEnabled ? 'text-[var(--accent-primary)] bg-[var(--accent-primary)]/10' : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-white/5'}`}>
+              <button onClick={() => { /* Always enabled */ }} className={`w-full px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wider flex items-center gap-3 transition-all text-[var(--accent-primary)] bg-[var(--accent-primary)]/10 cursor-default`}>
                 <i className="fa fa-lightbulb-o w-4"></i>
-                <span>Luces</span>
+                <span>Luces (Siempre activo)</span>
               </button>
               <button onClick={() => { setShowZones(!showZones); }} className={`w-full px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wider flex items-center gap-3 transition-all ${showZones ? 'text-[var(--accent-primary)] bg-[var(--accent-primary)]/10' : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-white/5'}`}>
                 <i className="fa fa-hand-paper-o w-4"></i>
@@ -1015,6 +1020,7 @@ const App: React.FC = () => {
                       floorHeight={floorHeight}
                       masterStartTime={startTime}
                       isBouncing={combo >= 5}
+                      oppositeColor={oppositeColor}
                   />
                 </div>
                 <WordCurtain 

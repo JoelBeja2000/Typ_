@@ -36,6 +36,7 @@ interface KeyboardSectionProps {
     isLevelActive?: boolean;
     onGoHome?: () => void;
     onDebugFillCurtain?: () => void;
+    oppositeColor?: string;
 }
 
 export const KeyboardSection: React.FC<KeyboardSectionProps> = React.memo(({
@@ -65,6 +66,7 @@ export const KeyboardSection: React.FC<KeyboardSectionProps> = React.memo(({
     isLevelActive = false,
     onGoHome,
     onDebugFillCurtain,
+    oppositeColor = '#FFFFFF',
 }) => {
     const bands = isMusicLightingEnabled ? frequencyBands : { bass: 0, mid: 0, high: 0 };
 
@@ -100,7 +102,13 @@ export const KeyboardSection: React.FC<KeyboardSectionProps> = React.memo(({
                 </div>
 
                 {/* STATS BAR (CENTERED) */}
-                <div className="h-11 flex-grow max-w-[420px] bg-[var(--bg-glass)] border border-[var(--border-strong)] rounded-2xl flex items-center px-6 overflow-hidden shadow-2xl transition-all duration-500 relative" style={{ boxShadow: combo > 15 ? `0 0 30px ${hexToRgba(customColor, 0.3)}` : 'none' }}>
+                <div className="h-11 flex-grow max-w-[420px] bg-[var(--bg-glass)] border border-[var(--border-strong)] rounded-2xl flex items-center px-6 overflow-hidden shadow-2xl transition-all duration-500 relative" 
+                    style={{ 
+                        boxShadow: combo > 15 
+                            ? `0 0 30px ${hexToRgba(customColor, 0.3)}, 0 0 15px ${oppositeColor}44` 
+                            : 'none' 
+                    }}
+                >
                     {audioReady && audioSystem && currentMusicStyle.layers.map((layer: any) => (
                         combo * comboMultiplier >= layer.minCombo && (layer.maxCombo === undefined || combo * comboMultiplier <= layer.maxCombo) && (
                             <AudioWave key={layer.id} analyser={audioSystem.getAnalysers()[layer.id as keyof ReturnType<WebAudioSystem['getAnalysers']>] || audioSystem.getAnalysers().master} type={layer.type as any} color={layer.color} active={startTime !== null && !isFinished} opacityMultiplier={layer.opacity} yOffset={layer.yOffset} />

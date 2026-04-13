@@ -90,6 +90,7 @@ let shapeCache: Record<string, Float32Array> = {};
 let morph = { t: 1, src: new Float32Array(0), dst: new Float32Array(0), active: false, currentShape: 'icosahedron' };
 
 let color = '#7F77DD';
+let oppositeColor = '#DD777F';
 let bands = { bass: 0, mid: 0, high: 0 };
 let lightingEnabled = false;
 let floorHeight = 0.62;
@@ -113,6 +114,7 @@ function init(c: OffscreenCanvas, params: any) {
     bands = params.bands;
     lightingEnabled = params.lightingEnabled;
     floorHeight = params.floorHeight;
+    oppositeColor = params.oppositeColor || color;
     morph.currentShape = params.shape;
 
     scene = new THREE.Scene();
@@ -257,10 +259,16 @@ function animate() {
     innerMesh.rotation.z += 0.001;
 
     if (lightingEnabled) {
-        const hue = (time * 12 + bands.bass * 60) % 360;
-        const sat = 0.55 + bands.bass * 0.35;
-        const lit = 0.45 + bands.mid * 0.3;
-        material.color.setHSL(hue / 360, sat, lit);
+        // PALETTE LOGIC: Theme Color + Opposite Color
+        const themeCol = new THREE.Color(color);
+        const oppCol = new THREE.Color(oppositeColor);
+        
+        // Use bass for theme, mid/high for opposite
+        const t = Math.min(1.0, bands.mid * 2.5 + bands.high * 3.0);
+        material.color.copy(themeCol).lerp(oppCol, t);
+        
+        // Add a bit of brightness based on bass
+        material.color.multiplyScalar(0.8 + bands.bass * 0.4);
     }
 
     material.opacity = 0.7 + bands.bass * 0.25;
@@ -297,6 +305,9 @@ self.onmessage = (e: MessageEvent) => {
             break;
         case 'updateLighting':
             lightingEnabled = payload.lightingEnabled;
+            break;
+        case 'updateOppositeColor':
+            oppositeColor = payload.oppositeColor;
             break;
         case 'updateBouncing':
             isBouncing = payload.isBouncing;

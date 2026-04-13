@@ -12,6 +12,7 @@ interface MorphSphereProps {
     masterStartTime?: number;
     offsetY?: number;
     isBouncing?: boolean;
+    oppositeColor?: string;
 }
 
 const MorphSphere: React.FC<MorphSphereProps> = ({
@@ -25,7 +26,8 @@ const MorphSphere: React.FC<MorphSphereProps> = ({
     floorHeight = 0.62,
     masterStartTime,
     offsetY,
-    isBouncing = false
+    isBouncing = false,
+    oppositeColor
 }) => {
     const containerRef = useRef<HTMLDivElement>(null);
     const workerRef = useRef<Worker | null>(null);
@@ -74,7 +76,8 @@ const MorphSphere: React.FC<MorphSphereProps> = ({
                             params: { 
                                 startTime: masterStartTime || performance.now(),
                                 width, height, color, bands, 
-                                lightingEnabled, shape, floorHeight 
+                                lightingEnabled, shape, floorHeight,
+                                oppositeColor 
                             } 
                         }
                     }, [offscreenRef.current!]);
@@ -113,6 +116,10 @@ const MorphSphere: React.FC<MorphSphereProps> = ({
     useEffect(() => {
         if (isInitializedRef.current) workerRef.current?.postMessage({ type: 'updateBouncing', payload: { isBouncing } });
     }, [isBouncing]);
+
+    useEffect(() => {
+        if (isInitializedRef.current) workerRef.current?.postMessage({ type: 'updateOppositeColor', payload: { oppositeColor } });
+    }, [oppositeColor]);
 
     useEffect(() => {
         if (isInitializedRef.current) workerRef.current?.postMessage({ type: 'updateStartTime', payload: { startTime: masterStartTime } });
