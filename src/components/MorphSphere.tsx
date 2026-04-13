@@ -9,6 +9,7 @@ interface MorphSphereProps {
     onClick?: (e: React.MouseEvent) => void;
     lightingEnabled?: boolean;
     shape?: string;
+    offsetY?: number;
 }
 
 const SHAPES = ['icosahedron', 'sphere', 'torus', 'box', 'cone', 'octahedron', 'tetrahedron', 'dodecahedron', 'cylinder'];
@@ -36,7 +37,8 @@ const MorphSphere: React.FC<MorphSphereProps> = ({
     side = 'left',
     onClick,
     lightingEnabled = false,
-    shape = 'icosahedron'
+    shape = 'icosahedron',
+    offsetY = 0
 }) => {
     const containerRef = useRef<HTMLDivElement>(null);
     const bandsRef = useRef(bands);

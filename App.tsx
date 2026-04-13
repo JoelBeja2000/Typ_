@@ -101,6 +101,21 @@ const App: React.FC = () => {
   const [currentTheme, setCurrentTheme] = useState(THEMES.find(t => t.id === 'emerald') || THEMES[0]);
   const [isPureBlack, setIsPureBlack] = useState(false);
   const [forceScheme, setForceScheme] = useState<'dark' | 'light' | null>(null);
+  const [bounceOffset, setBounceOffset] = useState(0);
+
+  useEffect(() => {
+    let frameId: number;
+    const animateBounce = () => {
+      const time = performance.now() * 0.003;
+      // Absolute sine creates a bounce effect. 
+      // 1.2 is the height of the bounce in 3D units.
+      const offset = Math.abs(Math.sin(time)) * 1.2;
+      setBounceOffset(offset);
+      frameId = requestAnimationFrame(animateBounce);
+    };
+    frameId = requestAnimationFrame(animateBounce);
+    return () => cancelAnimationFrame(frameId);
+  }, []);
 
   const [language, setLanguage] = useState<Language>('es');
   const [focus, setFocus] = useState('Básico');
@@ -912,6 +927,7 @@ const App: React.FC = () => {
                     lightingEnabled={isMusicLightingEnabled}
                     onClick={cycleShapes} 
                     shape={visualsConfig.outerSphere.shape}
+                    offsetY={bounceOffset}
                 />
               )}
             </div>
@@ -920,7 +936,8 @@ const App: React.FC = () => {
               text={solvedWords.join('  ')} 
               color={`rgb(${currentTheme.r}, ${currentTheme.g}, ${currentTheme.b})`} 
               frequencyBands={frequencyBands}
-              repulsionCenter={{ x: -1, y: -1 }}
+              // Center Y is 45% + bounce offset (scaled roughly to pixels)
+              repulsionCenter={{ x: -1, y: -1 + (bounceOffset * 60) }}
               repulsionEnergy={0.35}
               repulsionShape={visualsConfig.outerSphere.shape}
               repulsionRotation={performance.now() * -0.002}
