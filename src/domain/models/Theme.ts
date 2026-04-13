@@ -19,5 +19,6 @@ export const THEMES: ThemeColor[] = [
     { id: 'crimson', name: 'Carmesí', r: 220, g: 80, b: 80, scheme: 'dark' },
     { id: 'amethyst', name: 'Amatista', r: 160, g: 100, b: 200, scheme: 'dark' },
     { id: 'amber', name: 'Ámbar', r: 240, g: 180, b: 60, scheme: 'dark' },
-    { id: 'emerald', name: 'Esmeralda', r: 16, g: 185, b: 129, scheme: 'dark' }
+    { id: 'emerald', name: 'Esmeralda', r: 16, g: 185, b: 129, scheme: 'dark' },
+    { id: 'daylight', name: 'Modo Día', r: 70, g: 130, b: 180, scheme: 'light' }
 ];

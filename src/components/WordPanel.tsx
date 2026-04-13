@@ -124,7 +124,7 @@ export const WordPanel: React.FC<WordPanelProps> = ({
         return (
             <div className="flex gap-0.5">
                 {[...Array(3)].map((_, i) => (
-                    <i key={i} className={`fa fa-star text-[6px] ${i < difficulty ? 'text-amber-400' : 'text-white/10'}`}></i>
+                    <i key={i} className={`fa fa-star text-[6px] ${i < difficulty ? 'text-amber-400' : 'text-[var(--text-ghost)] opacity-30'}`}></i>
                 ))}
             </div>
         );
@@ -161,7 +161,7 @@ export const WordPanel: React.FC<WordPanelProps> = ({
                                                     <i key={i} className={`fa fa-star text-[12px] ${isExpanded ? 'text-[var(--accent-primary)] animate-pulse' : 'text-amber-400 opacity-60'}`}></i>
                                                 ))}
                                             </div>
-                                            <span className={`text-[12px] font-black uppercase tracking-wider ${isExpanded ? 'text-[var(--accent-primary)]' : 'text-white'}`}>
+                                            <span className={`text-[12px] font-black uppercase tracking-wider ${isExpanded ? 'text-[var(--accent-primary)]' : 'text-[var(--text-primary)]'}`}>
                                                 {name}
                                             </span>
                                         </div>
@@ -196,7 +196,7 @@ export const WordPanel: React.FC<WordPanelProps> = ({
                                                         </div>
                                                     </div>
                                                     {levelProgress > 0 && (
-                                                        <div className="w-full h-[2px] bg-white/10 rounded-full relative overflow-hidden">
+                                                        <div className="w-full h-[2px] bg-[var(--text-muted)] rounded-full relative overflow-hidden">
                                                             <div 
                                                                 className={`absolute inset-y-0 left-0 ${isComplete ? 'bg-green-500 shadow-[0_0_8px_#22c55e]' : 'bg-[var(--accent-primary)] shadow-[0_0_8px_var(--accent-primary)]'} transition-all duration-1000`} 
                                                                 style={{ width: `${levelProgress}%` }}
@@ -324,7 +324,7 @@ export const WordPanel: React.FC<WordPanelProps> = ({
 
                 <div className="font-mono text-xl md:text-3xl relative overflow-hidden h-20 w-full max-w-2xl flex items-center">
                     <div 
-                        className="absolute top-0 left-0 h-full text-white/40 whitespace-nowrap leading-none transition-transform duration-300 ease-out flex items-center will-change-transform"
+                        className="absolute top-0 left-0 h-full text-[var(--text-secondary)] opacity-40 whitespace-nowrap leading-none transition-transform duration-300 ease-out flex items-center will-change-transform"
                         style={{ transform: `translateX(calc(-${offset}ch))` }}
                     >
                         {currentPhrase.split('').map((char, i) => {

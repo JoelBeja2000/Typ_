@@ -69,7 +69,7 @@ const FingerGuide: React.FC<FingerGuideProps> = ({ targetKeyData, onSelectLevel,
                                 {[...Array(3)].map((_, i) => (
                                   <i 
                                     key={i} 
-                                    className={`fa ${i < level.difficulty ? 'fa-star text-amber-400 drop-shadow-[0_0_5px_rgba(251,191,36,0.5)]' : 'fa-star-o text-white/10'} text-[8px]`}
+                                    className={`fa ${i < level.difficulty ? 'fa-star text-amber-400 drop-shadow-[0_0_5px_rgba(251,191,36,0.5)]' : 'fa-star-o text-[var(--text-ghost)] opacity-20'} text-[8px]`}
                                   ></i>
                                 ))}
                               </div>
