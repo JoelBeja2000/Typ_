@@ -116,11 +116,19 @@ export const useTypingEngine = (
         if (currentLevelId) {
           saveLevelProgress(currentLevelId, 100);
         }
-        // Instead of setIsFinished(true), we wrap around to the first phrase
-        setTimeout(() => {
-          setPhraseIndex(0);
-          setTypedText('');
-        }, 50);
+        
+        const isPracticeLevel = currentLevelId?.startsWith('practice_');
+        
+        if (isPracticeLevel || isInfiniteMode) {
+          // Wrap around to the first phrase
+          setTimeout(() => {
+            setPhraseIndex(0);
+            setTypedText('');
+          }, 50);
+        } else {
+          // Standard finish for challenge levels
+          setIsFinished(true);
+        }
       }
     }
   }, [isFinished, startTime, typedText.length, currentPhrase, stats.mistakes, combo, isInfiniteMode, typingService, callbacks, phraseIndex, phrases.length, score, storageProvider, phraseProvider]);
