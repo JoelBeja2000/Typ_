@@ -745,7 +745,8 @@ const App: React.FC = () => {
                       onClick={cycleShapes} 
                       shape={visualsConfig.outerSphere.shape}
                       floorHeight={floorHeight}
-                      masterStartTime={masterStartTime.current}
+                      masterStartTime={startTime}
+                      isBouncing={combo >= 5}
                   />
                 </div>
                 <WordCurtain 
