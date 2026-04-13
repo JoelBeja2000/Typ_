@@ -77,7 +77,3 @@ Built with:
 - **React**: User interface.
 - **Web Audio API**: Low-latency auditory feedback.
 - **GitHub Copilot CLI**: AI-assisted development.
-
----
-
-*ALPINE_ECODECOR_PRO // 2026*

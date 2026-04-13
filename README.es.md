@@ -77,5 +77,3 @@ Construido con:
 - **GitHub Copilot CLI**: Desarrollo asistido por IA.
 
 ---
-
-*ALPINE_ECODECOR_PRO // 2026*
