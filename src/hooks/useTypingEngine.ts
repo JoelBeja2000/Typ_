@@ -112,10 +112,15 @@ export const useTypingEngine = (
           setTypedText('');
         }, 50);
       } else {
+        // Infinite Loop for practice levels/modes
         if (currentLevelId) {
           saveLevelProgress(currentLevelId, 100);
         }
-        setIsFinished(true);
+        // Instead of setIsFinished(true), we wrap around to the first phrase
+        setTimeout(() => {
+          setPhraseIndex(0);
+          setTypedText('');
+        }, 50);
       }
     }
   }, [isFinished, startTime, typedText.length, currentPhrase, stats.mistakes, combo, isInfiniteMode, typingService, callbacks, phraseIndex, phrases.length, score, storageProvider, phraseProvider]);

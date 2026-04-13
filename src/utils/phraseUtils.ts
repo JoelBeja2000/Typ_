@@ -15,5 +15,5 @@ export const generateLocalPhrases = (language: Language, focus: string, count: n
   while (result.length < count) {
     result.push(...shuffled);
   }
-  return result.slice(0, count);
+  return result.slice(0, count).map(p => p.toLowerCase());
 };

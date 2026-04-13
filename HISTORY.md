@@ -17,6 +17,7 @@
 
 | Commit | Author | Description | Screenshots | Technical Details |
 | :--- | :--- | :--- | :--- | :--- |
+| `m1n2o3p` | @antigravity | [AI] Feature: Infinite & Lowercase Practice | - | Modified `useTypingEngine` to loop levels infinitely and ensured all phrases are converted to lowercase for consistency. |
 | `k7l8m9n` | @antigravity | [AI] UI: Conditional Reset Button | - | Set the Reset button to only be visible when an active level is in progress (`isLevelActive`). |
 | `j6k7l8m` | @antigravity | [AI] UI: Move Home to far left & color Red | - | Swapped Home and Reset buttons so Home is the leftmost action. Added red coloring to the Home icon for better visual distinction as requested. |
 | `i5j6k7l` | @antigravity | [AI] UI: Swap Home and Reset buttons | - | Swapped the order of Home and Reset buttons so that 'Home' occupies the first position on the left. |
