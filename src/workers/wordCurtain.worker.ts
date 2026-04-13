@@ -157,12 +157,14 @@ let repCenter = { x: -1, y: -1 };
 let repEnergy = 0;
 let repShape = 'icosahedron';
 let repRot = 0;
+let startTime = 0;
 
 function init(c: OffscreenCanvas, params: any) {
   console.log('WordCurtain Worker: init', params);
   canvas = c;
   ctx = canvas.getContext('2d') as OffscreenCanvasRenderingContext2D;
   
+  startTime = params.startTime || 0;
   // Initial state sync
   color = params.color || color;
   text = params.text || text;
@@ -319,7 +321,7 @@ function loop(time: number) {
   const floorYUnit = - (floorHeight - 0.5) * PHYSICS.curtain.frustumHeightReference;
   const targetFloorUnit = floorYUnit + PHYSICS.sphere.baseSize;
   const dynamicBounceAmplitude = fixedApexY - targetFloorUnit;
-  const bounceTime = time * PHYSICS.sphere.bounceSpeed;
+  const bounceTime = (performance.now() - startTime) * PHYSICS.sphere.bounceSpeed;
   const currentOffset = (1 - Math.abs(Math.cos(bounceTime))) * dynamicBounceAmplitude;
   const currentY = fixedApexY - currentOffset;
 
@@ -327,22 +329,30 @@ function loop(time: number) {
   const audioEnergy = b.bass * PHYSICS.audio.bassWeight + b.mid * PHYSICS.audio.midWeight + b.high * PHYSICS.audio.highWeight;
   const sizeMultiplier = 1 + (audioEnergy * PHYSICS.audio.sizeMultiplier);
   const structuralDeform = 1 + audioEnergy;
+  
+  // SYNC DEFORMATION LOGIC
+  const dynamicSquashThreshold = Math.max(0, dynamicBounceAmplitude - 0.4);
+  const squashFactor = currentOffset > dynamicSquashThreshold ? 
+      1 - ((currentOffset - dynamicSquashThreshold) * PHYSICS.sphere.squashIntensity) : 1;
+  const stretchFactor = 1 + (1 - squashFactor) * PHYSICS.sphere.stretchIntensity;
+
   const pixelsPerUnit = config.aheight / PHYSICS.curtain.frustumHeightReference;
-  const reactiveBaseRadius = (PHYSICS.sphere.baseSize * pixelsPerUnit) * structuralDeform * sizeMultiplier * PHYSICS.curtain.repulsionPadding;
+  const reactiveBaseRadius = (PHYSICS.sphere.baseSize * pixelsPerUnit) * structuralDeform * sizeMultiplier * 0.92;
 
   particles.forEach(p => {
     if (!p.char || p.char === ' ') return;
     
     // 1. Resolve geometric repulsion (from MorphSphere)
     const centerX = repCenter.x === -1 ? config.awidth / 2 : repCenter.x;
-    const baseCenterY = repCenter.y === -1 ? config.aheight * 0.50 : repCenter.y;
-    // MorphSphere bounce in screen space matches currentOffset
-    const centerY = baseCenterY + (currentOffset * pixelsPerUnit);
+    const centerY = (config.aheight / 2) - ((fixedApexY - currentOffset) * pixelsPerUnit);
     
     let dx = p.pos.x - centerX; 
     let dy = p.pos.y - centerY;
-    const rx = dx * cosR - dy * sinR; 
-    const ry = dx * sinR + dy * cosR;
+    
+    // Apply visual squash/stretch to the collision coordinates
+    // When sphere stretches (horizontal), we must contract the distance check to match
+    const rx = (dx * cosR - dy * sinR) / stretchFactor; 
+    const ry = (dx * sinR + dy * cosR) / squashFactor;
     
     let dist = 0; 
     switch (repShape) {

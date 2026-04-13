@@ -11,6 +11,7 @@ interface WordCurtainProps {
   repulsionShape?: string;
   repulsionRotation?: number;
   floorHeight?: number;
+  masterStartTime?: number;
 }
 
 export const WordCurtain: React.FC<WordCurtainProps> = ({ 
@@ -23,7 +24,8 @@ export const WordCurtain: React.FC<WordCurtainProps> = ({
   repulsionEnergy = 0,
   repulsionShape = 'icosahedron',
   repulsionRotation = 0,
-  floorHeight = 0.62
+  floorHeight = 0.62,
+  masterStartTime
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const workerRef = useRef<Worker | null>(null);
@@ -74,6 +76,7 @@ export const WordCurtain: React.FC<WordCurtainProps> = ({
               payload: { 
                 canvas: offscreenRef.current, 
                 dims: newDims,
+                startTime: masterStartTime || performance.now(),
                 text, color, frequencyBands, floorHeight,
                 repulsion: { 
                   center: repulsionCenter, energy: repulsionEnergy, 

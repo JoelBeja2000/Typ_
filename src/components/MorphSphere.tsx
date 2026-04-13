@@ -9,6 +9,7 @@ interface MorphSphereProps {
     lightingEnabled?: boolean;
     shape?: string;
     floorHeight?: number;
+    masterStartTime?: number;
     offsetY?: number;
 }
 
@@ -20,7 +21,9 @@ const MorphSphere: React.FC<MorphSphereProps> = ({
     onClick,
     lightingEnabled = false,
     shape = 'icosahedron',
-    floorHeight = 0.62
+    floorHeight = 0.62,
+    masterStartTime,
+    offsetY
 }) => {
     const containerRef = useRef<HTMLDivElement>(null);
     const workerRef = useRef<Worker | null>(null);
@@ -66,7 +69,11 @@ const MorphSphere: React.FC<MorphSphereProps> = ({
                         type: 'init',
                         payload: { 
                             canvas: offscreenRef.current, 
-                            params: { width, height, color, bands, lightingEnabled, shape, floorHeight } 
+                            params: { 
+                                startTime: masterStartTime || performance.now(),
+                                width, height, color, bands, 
+                                lightingEnabled, shape, floorHeight 
+                            } 
                         }
                     }, [offscreenRef.current!]);
                     isInitializedRef.current = true;

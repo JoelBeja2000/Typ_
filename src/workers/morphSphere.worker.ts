@@ -96,6 +96,7 @@ let floorHeight = 0.62;
 
 let time = 0;
 let rafID: number;
+let startTime = 0;
 
 function easeInOutCubic(t: number) {
     return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
@@ -104,6 +105,7 @@ function easeInOutCubic(t: number) {
 function init(c: OffscreenCanvas, params: any) {
     console.log('MorphSphere Worker: init', params);
     canvas = c;
+    startTime = params.startTime || 0;
     color = params.color;
     bands = params.bands;
     lightingEnabled = params.lightingEnabled;
@@ -221,7 +223,7 @@ function animate() {
     const dynamicBounceAmplitude = fixedApexY - targetFloor;
     const dynamicSquashThreshold = Math.max(0, dynamicBounceAmplitude - 0.4);
 
-    const bounceTime = performance.now() * PHYSICS.sphere.bounceSpeed;
+    const bounceTime = (performance.now() - startTime) * PHYSICS.sphere.bounceSpeed;
     const currentOffset = (1 - Math.abs(Math.cos(bounceTime))) * dynamicBounceAmplitude;
 
     mesh.position.y = fixedApexY - currentOffset;
