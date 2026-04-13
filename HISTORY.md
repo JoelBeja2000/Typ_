@@ -17,6 +17,7 @@
 
 | Commit | Author | Description | Screenshots | Technical Details |
 | :--- | :--- | :--- | :--- | :--- |
+| `a6b1c2d` | @antigravity | [AI] Fix GH Pages 404 & GHS Sync | - | Changed absolute asset paths to relative in index.html and verified base path in vite.config.ts for JoelBeja2000.github.io/OveTyp_. |
 | `da3e7f1` | @antigravity | [AI] Remove Frost Theme & GHS Compliance | - | Removed the 'frost' (light blue) theme from the personalization menu. Finalized GHS documentation for the synchronization phase. |
 | `9cfe057` | @antigravity | [AI] Stabilize 1:1 Physics Sync & Growth | - | Implemented a master shared clock (`masterStartTime`) via Web Workers, Unified text growth logic (`solvedWords` + `typedText`), and synchronized both sidebars for identical physical response. |
 | `884db3e` | @antigravity | [AI] Modular Physics & Fixed Apex Math | - | Reverted global stateful physics to a pure mathematical `Math.cos()` algorithm mapped to a fixed ceiling origin at 62%, ensuring rhythmic audio sync while tracking dynamic floor heights. |
