@@ -9,7 +9,7 @@
 | `BUG-003` | @antigravity | 3D vs 2D Synchronization Delay | Implemented Shared Master Clock (`masterStartTime`) across all Web Workers. |
 | `BUG-004` | @antigravity | Component ReferenceErrors | Corrected destructuring and variable names in App.tsx, WordCurtain and MorphSphere. |
 | `BUG-005` | @antigravity | JSX Syntax Error in App.tsx | Removed stray tags and fixed corrupted container structure in the right sidebar. |
-| `BUG-006` | @antigravity | 404 & MIME Error on GH Pages | Unified entry point to root index.tsx and set universal relative base ('./') for robust asset resolution. |
+| `BUG-006` | @antigravity | 404 & MIME Error on GH Pages | Identified root cause: Deployment from 'main' instead of 'gh-pages'. Restored standard Vite config and provided setup instructions. |
 
 ## Active Bugs
 

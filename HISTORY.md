@@ -17,6 +17,7 @@
 
 | Commit | Author | Description | Screenshots | Technical Details |
 | :--- | :--- | :--- | :--- | :--- |
+| `c6d7e8f` | @antigravity | [AI] Restore Production Config & GHS | - | Restored standard production `base` path and script entry points. Documented deployment misconfiguration in BUGS.md. |
 | `f1e2d3c` | @antigravity | [AI] Remove ALPINE Branding & Final Cleanup | - | Removed all references to ALPINE_ECODECOR_PRO branding from the UI footer and documentation files. |
 | `b7c8d9e` | @antigravity | [AI] Final Deploy Fix & Entry Point Unified | - | Unified entry point to root `index.tsx` and moved to universal relative base (`./`) to resolve persistent MIME and 404 errors on GitHub Pages. |
 | `a6b1c2d` | @antigravity | [AI] Fix GH Pages 404 & GHS Sync | - | Changed absolute asset paths to relative in index.html and verified base path in vite.config.ts for JoelBeja2000.github.io/OveTyp_. |
