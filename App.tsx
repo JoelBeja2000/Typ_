@@ -99,7 +99,20 @@ const themeManager = new BrowserThemeManager();
 
 const App: React.FC = () => {
   const masterStartTime = useRef(performance.now());
-  const [currentTheme, setCurrentTheme] = useState(THEMES.find(t => t.id === 'emerald') || THEMES[0]);
+  const [currentTheme, setCurrentTheme] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const savedId = localStorage.getItem('ovetyp-theme-id');
+      if (savedId) {
+        return THEMES.find(t => t.id === savedId) || THEMES.find(t => t.id === 'emerald') || THEMES[0];
+      }
+    }
+    return THEMES.find(t => t.id === 'emerald') || THEMES[0];
+  });
+
+  // Persist theme choice
+  useEffect(() => {
+    localStorage.setItem('ovetyp-theme-id', currentTheme.id);
+  }, [currentTheme]);
   const [isPureBlack, setIsPureBlack] = useState(false);
   const [forceScheme, setForceScheme] = useState<'dark' | 'light' | null>(null);
   const [language, setLanguage] = useState<Language>('es');
