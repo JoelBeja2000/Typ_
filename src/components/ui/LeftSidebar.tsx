@@ -54,7 +54,7 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
             Typ_
           </div>
           <h2 className="text-[10px] font-black uppercase tracking-[0.4em] text-[var(--text-primary)]">
-            System_Core
+            OveTyp_
           </h2>
         </div>
         <button
