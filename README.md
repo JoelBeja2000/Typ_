@@ -5,7 +5,7 @@
 
 **OveTyp_** is a professional-grade typing trainer designed for efficiency, speed, and precision. Built with a focus on biomechanics and auditory feedback, it provides a cinematic training experience for developers and typing enthusiasts.
 
-![OveTyp_ Landing](docs/media/landing.png)
+![OveTyp_ Landing](docs/media/Captura.png)
 
 ## Core Features
 
