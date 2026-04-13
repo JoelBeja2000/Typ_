@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { VisualsConfig } from '../types/visuals';
 import { MusicStyle, TECHNO_STYLE, AMBIENT_STYLE, ACID_HOUSE_STYLE } from '../domain/models/MusicStyles';
+import { FINGER_COLORS, FINGER_NAMES, KEY_TO_FINGER_MAP } from '../../constants';
 
 const PHASE_COLORS: Record<string, string> = {
     'fase_1': '#22d3ee',
@@ -52,6 +53,7 @@ interface WordPanelProps {
     currentLevelScore?: number;
     currentLevelAccuracy?: number;
     onCycleShapes?: () => void;
+    activeLevel?: any;
 }
 
 import { GUIDE_PHASES } from '../data/GuideData';
@@ -86,6 +88,7 @@ export const WordPanel: React.FC<WordPanelProps> = ({
     currentLevelScore = 0,
     currentLevelAccuracy = 100,
     onCycleShapes,
+    activeLevel,
 }) => {
     const textColor = themeScheme === 'light' ? 'text-black' : 'text-white';
     const themeColor = 'text-[var(--accent-primary)]';
@@ -407,8 +410,38 @@ export const WordPanel: React.FC<WordPanelProps> = ({
                             </button>
                         )}
 
-                        {/* CURRENT WORD PILL SECTION */}
-                        <div className="relative overflow-visible flex items-center justify-center gap-8 min-h-[144px]">
+                        {/* CURRENT WORD PILL SECTION WITH FINGER GUIDES */}
+                        <div className="relative overflow-visible flex items-center justify-center gap-8 min-h-[144px] w-full max-w-6xl">
+                            
+                            {/* Left Finger Guides */}
+                            {isLevelActive && activeLevel && (
+                                <div className="hidden lg:flex flex-col gap-3 items-end flex-1 pr-4 animate-in fade-in slide-in-from-left-4 duration-1000">
+                                    {activeLevel.fingers.filter(f => f.startsWith('L')).map(fingerCode => {
+                                        const fingerKey = Object.entries(FINGER_CODE_MAP).find(([k]) => k === fingerCode)?.[0];
+                                        if (!fingerKey) return null;
+                                        const mappingKey = fingerCode === 'L2' ? 'left-index' : fingerCode === 'L3' ? 'left-middle' : fingerCode === 'L4' ? 'left-ring' : 'left-pinky';
+                                        return (
+                                            <div key={fingerCode} className="p-3 rounded-2xl bg-[var(--bg-glass)] border border-[var(--border-glass)] min-w-[140px] shadow-lg backdrop-blur-sm">
+                                                <div className="flex items-center gap-2 mb-1.5 justify-end">
+                                                    <span className="text-[10px] font-black uppercase tracking-wider text-[var(--accent-primary)]">
+                                                        {FINGER_NAMES[mappingKey as any]}
+                                                    </span>
+                                                    <span className="w-2 h-2 rounded-full shadow-[0_0_8px]" style={{ backgroundColor: FINGER_COLORS[mappingKey as any], boxShadow: `0 0 10px ${FINGER_COLORS[mappingKey as any]}` }} />
+                                                </div>
+                                                <div className="flex flex-wrap gap-1 justify-end">
+                                                    {activeLevel.keys.filter(k => KEY_TO_FINGER_MAP[k.toLowerCase()]?.finger === mappingKey).map(k => (
+                                                        <span key={k} className="px-1.5 py-0.5 text-[10px] font-black rounded bg-[var(--bg-app)]/50 border border-[var(--border-glass)] text-[var(--text-primary)]">
+                                                            {k}
+                                                        </span>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            )}
+
+                            {/* CENTRAL PILL */}
                             <div className="bg-[var(--bg-floating)] backdrop-blur-3xl border border-[var(--border-strong)] rounded-[2.5rem] px-14 h-24 flex items-center justify-center min-w-[400px] shadow-3xl scale-110 z-30 relative overflow-visible">
                                 <div className="relative font-mono text-4xl flex items-center h-full min-w-[200px]">
                                     <div className={`absolute inset-0 whitespace-pre flex items-center justify-start pointer-events-none ${textColor}`}>
@@ -433,6 +466,32 @@ export const WordPanel: React.FC<WordPanelProps> = ({
                                     </div>
                                 </div>
                             </div>
+
+                            {/* Right Finger Guides */}
+                            {isLevelActive && activeLevel && (
+                                <div className="hidden lg:flex flex-col gap-3 items-start flex-1 pl-4 animate-in fade-in slide-in-from-right-4 duration-1000">
+                                    {activeLevel.fingers.filter(f => f.startsWith('R')).map(fingerCode => {
+                                        const mappingKey = fingerCode === 'R2' ? 'right-index' : fingerCode === 'R3' ? 'right-middle' : fingerCode === 'R4' ? 'right-ring' : 'right-pinky';
+                                        return (
+                                            <div key={fingerCode} className="p-3 rounded-2xl bg-[var(--bg-glass)] border border-[var(--border-glass)] min-w-[140px] shadow-lg backdrop-blur-sm">
+                                                <div className="flex items-center gap-2 mb-1.5 justify-start">
+                                                    <span className="w-2 h-2 rounded-full shadow-[0_0_8px]" style={{ backgroundColor: FINGER_COLORS[mappingKey as any], boxShadow: `0 0 10px ${FINGER_COLORS[mappingKey as any]}` }} />
+                                                    <span className="text-[10px] font-black uppercase tracking-wider text-[var(--accent-primary)]">
+                                                        {FINGER_NAMES[mappingKey as any]}
+                                                    </span>
+                                                </div>
+                                                <div className="flex flex-wrap gap-1 justify-start">
+                                                    {activeLevel.keys.filter(k => KEY_TO_FINGER_MAP[k.toLowerCase()]?.finger === mappingKey).map(k => (
+                                                        <span key={k} className="px-1.5 py-0.5 text-[10px] font-black rounded bg-[var(--bg-app)]/50 border border-[var(--border-glass)] text-[var(--text-primary)]">
+                                                            {k}
+                                                        </span>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>

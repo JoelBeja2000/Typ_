@@ -781,6 +781,7 @@ const App: React.FC = () => {
                   onDimensionalMenu={(e) => { setShowDimensionalSettings(!showDimensionalSettings); }}
                   onCycleShapes={cycleShapes}
                   isLevelActive={isLevelActive}
+                  activeLevel={activeLevel}
                   onSelectLevel={(level: any) => handleSelectPhrases(level.phrases, level.id)}
                   themeScheme={(forceScheme === 'light' || (currentTheme.scheme === 'light' && !forceScheme)) ? 'light' : currentTheme.scheme}
                   currentMusicStyle={currentMusicStyle}

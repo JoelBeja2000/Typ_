@@ -17,6 +17,7 @@
 
 | Commit | Author | Description | Screenshots | Technical Details |
 | :--- | :--- | :--- | :--- | :--- |
+| `p1q2r3s` | @antigravity | [AI] UI: Finger Guide Overlay in Practice | - | Implemented real-time finger mapping cards flanking the central word pill in `WordPanel` for enhanced biomechanical guidance during practice levels. |
 | `m1n2o3p` | @antigravity | [AI] Feature: Infinite & Lowercase Practice | - | Modified `useTypingEngine` to loop levels infinitely and ensured all phrases are converted to lowercase for consistency. |
 | `k7l8m9n` | @antigravity | [AI] UI: Conditional Reset Button | - | Set the Reset button to only be visible when an active level is in progress (`isLevelActive`). |
 | `j6k7l8m` | @antigravity | [AI] UI: Move Home to far left & color Red | - | Swapped Home and Reset buttons so Home is the leftmost action. Added red coloring to the Home icon for better visual distinction as requested. |
