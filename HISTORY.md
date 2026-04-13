@@ -17,6 +17,7 @@
 
 | Commit | Author | Description | Screenshots | Technical Details |
 | :--- | :--- | :--- | :--- | :--- |
+| `g3h4i5j` | @antigravity | [AI] UI Reorg: Implemented Debug Mode Section | - | Moved 'Floor Height' and 'Debug Fill' options into a newly created Debug Mode section within the main configuration menu. |
 | `f2e3g4h` | @antigravity | [AI] Remove Year Branding & Deploy | - | Removed the '2025' year indicator from the UI footer and triggered a fresh build for the new GitHub Actions deployment. |
 | `d2e3f4g` | @antigravity | [AI] Modernize GH Actions Deployment | - | Transitioned from `gh-pages` branch push to official `actions/deploy-pages` method for direct deployment from `main`. |
 | `c6d7e8f` | @antigravity | [AI] Restore Production Config & GHS | - | Restored standard production `base` path and script entry points. Documented deployment misconfiguration in BUGS.md. |

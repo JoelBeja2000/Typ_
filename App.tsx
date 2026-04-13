@@ -253,6 +253,7 @@ const App: React.FC = () => {
     }
     return 0.62;
   });
+  const [isDebugMode, setIsDebugMode] = useState(false);
 
   // GUIDE STATE
   const [highlightedKeys, setHighlightedKeys] = useState<string[]>([]);
@@ -888,6 +889,16 @@ const App: React.FC = () => {
                     );
                   })()}
                 </div>
+
+                <div
+                  onClick={() => setIsDebugMode(!isDebugMode)}
+                  className="flex items-center justify-between cursor-pointer group pt-1"
+                >
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--text-secondary)] group-hover:text-[var(--text-primary)] transition-colors">Modo Debug</span>
+                  <div className={`w-8 h-4 rounded-full relative transition-colors ${isDebugMode ? 'bg-pink-500 shadow-[0_0_8px_rgba(236,72,153,0.4)]' : 'bg-white/10'}`}>
+                    <div className={`absolute top-0.5 w-3 h-3 rounded-full bg-white transition-all ${isDebugMode ? 'left-4.5' : 'left-0.5'}`} />
+                  </div>
+                </div>
               </div>
 
               <button onClick={() => { setIsTypingSoundsEnabled(!isTypingSoundsEnabled); }} className={`w-full px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wider flex items-center gap-3 transition-all ${isTypingSoundsEnabled ? 'text-[var(--accent-primary)] bg-[var(--accent-primary)]/10' : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-white/5'}`}>
@@ -913,21 +924,36 @@ const App: React.FC = () => {
                     <span className="leading-none">{visualsConfig.outerSphere.shape}</span>
                 </div>
               </button>
-              <div className="w-full px-4 py-3 flex flex-col gap-2 transition-all text-[var(--accent-primary)] bg-black/40 hover:bg-black/60">
-                <div className="flex justify-between items-center text-[10px] font-semibold uppercase tracking-wider opacity-80">
-                  <span><i className="fa fa-level-up w-4"></i> Altura Suelo</span>
-                  <span>{Math.round(floorHeight * 100)}%</span>
+
+              {isDebugMode && (
+                <div className="bg-pink-500/5 border-t border-pink-500/20">
+                  <div className="px-4 py-2 text-[9px] font-black uppercase tracking-[0.2em] text-pink-500 opacity-60">Herramientas Debug</div>
+                  
+                  <div className="px-4 py-3 flex flex-col gap-2">
+                    <div className="flex justify-between items-center text-[10px] font-semibold uppercase tracking-wider text-pink-500/80">
+                      <span><i className="fa fa-level-up w-4"></i> Altura Suelo</span>
+                      <span>{Math.round(floorHeight * 100)}%</span>
+                    </div>
+                    <input 
+                      type="range" 
+                      min="0.5" 
+                      max="1.5" 
+                      step="0.01" 
+                      value={floorHeight}
+                      onChange={(e) => setFloorHeight(parseFloat(e.target.value))}
+                      className="w-full h-1 bg-pink-500/20 rounded-lg appearance-none cursor-pointer accent-pink-500"
+                    />
+                  </div>
+
+                  <button 
+                    onClick={handleDebugFillCurtain} 
+                    className="w-full px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wider flex items-center gap-3 transition-all text-pink-400 hover:text-pink-300 hover:bg-pink-500/10"
+                  >
+                    <i className="fa fa-bug w-4"></i>
+                    <span>Llenar Cortinas</span>
+                  </button>
                 </div>
-                <input 
-                  type="range" 
-                  min="0.5" 
-                  max="1.5" 
-                  step="0.01" 
-                  value={floorHeight}
-                  onChange={(e) => setFloorHeight(parseFloat(e.target.value))}
-                  className="w-full h-1 bg-[var(--border-glass)] rounded-lg appearance-none cursor-pointer accent-[var(--accent-primary)]"
-                />
-              </div>
+              )}
             </div>
 
           </div>
