@@ -171,10 +171,20 @@ const MorphSphere: React.FC<MorphSphereProps> = ({
             pos.needsUpdate = true;
             innerPos.needsUpdate = true;
 
+            // Apply external vertical offset (bounce)
+            mesh.position.y = -offsetY;
+            innerMesh.position.y = -offsetY;
+
+            // Squash and Stretch: scale Y down and X/Z up when hitting bottom
+            // offsetY max is 1.5. Squash happens when offsetY > 1.3
+            const squashFactor = offsetY > 1.3 ? 1 - (offsetY - 1.3) * 0.8 : 1;
+            const stretchFactor = 1 + (1 - squashFactor) * 0.5;
+            
             // Audio deformation
-            const deform = 1 + b.bass * 0.5 + b.mid * 0.3 + b.high * 0.15;
-            mesh.scale.setScalar(deform);
-            innerMesh.scale.setScalar(deform * 0.55);
+            const audioDeform = 1 + b.bass * 0.5 + b.mid * 0.3 + b.high * 0.15;
+            
+            mesh.scale.set(stretchFactor * audioDeform, squashFactor * audioDeform, stretchFactor * audioDeform);
+            innerMesh.scale.set(stretchFactor * audioDeform * 0.55, squashFactor * audioDeform * 0.55, stretchFactor * audioDeform * 0.55);
 
             // Rotation
             mesh.rotation.x += 0.004 + b.bass * 0.015;

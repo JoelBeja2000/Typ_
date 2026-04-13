@@ -106,10 +106,10 @@ const App: React.FC = () => {
   useEffect(() => {
     let frameId: number;
     const animateBounce = () => {
-      const time = performance.now() * 0.003;
-      // Absolute sine creates a bounce effect. 
-      // 1.2 is the height of the bounce in 3D units.
-      const offset = Math.abs(Math.sin(time)) * 1.2;
+      const time = performance.now() * 0.0025;
+      // Formula: 1 - |cos(time)| creates a smooth hang at 0 (top) 
+      // and a sharp snap at 1 (bottom).
+      const offset = (1 - Math.abs(Math.cos(time))) * 1.5;
       setBounceOffset(offset);
       frameId = requestAnimationFrame(animateBounce);
     };
