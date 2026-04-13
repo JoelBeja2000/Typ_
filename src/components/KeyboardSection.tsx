@@ -76,15 +76,18 @@ export const KeyboardSection: React.FC<KeyboardSectionProps> = React.memo(({
 
                 {/* ACTION BUTTONS (LEFT) */}
                 <div className="flex gap-2">
+                    {/* HOME BUTTON (LEFTMOST) */}
                     {isLevelActive && (
                         <button 
                             onClick={onGoHome} 
-                            className="h-11 w-11 flex items-center justify-center bg-[var(--bg-glass)] border border-[var(--border-strong)] rounded-2xl text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-all shadow-lg hover:scale-105" 
+                            className="h-11 w-11 flex items-center justify-center bg-[var(--bg-glass)] border border-[var(--border-strong)] rounded-2xl text-red-500 hover:text-red-400 transition-all shadow-lg hover:scale-105" 
                             title="Volver al Selector"
                         >
-                            <i className="fa fa-home"></i>
+                            <i className="fa fa-home text-lg"></i>
                         </button>
                     )}
+                    
+                    {/* RESET BUTTON */}
                     <button 
                         onClick={onRestart} 
                         className="h-11 w-11 flex items-center justify-center bg-[var(--bg-glass)] border border-[var(--border-strong)] rounded-2xl text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-all shadow-lg hover:scale-105" 
