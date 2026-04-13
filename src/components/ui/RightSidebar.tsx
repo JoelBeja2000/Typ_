@@ -47,8 +47,8 @@ export const RightSidebar: React.FC<RightSidebarProps> = ({
       </div>
 
       <div className="flex-grow flex flex-col items-center justify-center text-center px-4">
-        <div className="w-20 h-20 bg-[var(--accent-primary)]/10 rounded-3xl flex items-center justify-center mb-8 border border-[var(--accent-primary)]/30 shadow-[0_0_30px_var(--accent-glow)]">
-          <i className="fa fa-github text-4xl text-[var(--accent-primary)]"></i>
+        <div className="w-32 h-32 bg-[var(--accent-primary)]/10 rounded-[40px] flex items-center justify-center mb-10 border border-[var(--accent-primary)]/30 shadow-[0_0_50px_var(--accent-glow)]">
+          <i className="fa fa-github text-6xl text-[var(--accent-primary)]"></i>
         </div>
         
         <h2 className="text-2xl font-black text-[var(--text-primary)] mb-4 tracking-tighter">
