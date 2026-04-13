@@ -1,5 +1,3 @@
-> [!NOTE]
-> This is a **small and fast** project built with **GitHub Copilot CLI**. Not intended to be a professional product, but an exploration of AI-assisted development capabilities.
 
 [Leer en Español](README.es.md)
 
