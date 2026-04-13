@@ -88,13 +88,15 @@ export const KeyboardSection: React.FC<KeyboardSectionProps> = React.memo(({
                     )}
                     
                     {/* RESET BUTTON */}
-                    <button 
-                        onClick={onRestart} 
-                        className="h-11 w-11 flex items-center justify-center bg-[var(--bg-glass)] border border-[var(--border-strong)] rounded-2xl text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-all shadow-lg hover:scale-105" 
-                        title="Reiniciar"
-                    >
-                        <i className="fa fa-refresh"></i>
-                    </button>
+                    {isLevelActive && (
+                        <button 
+                            onClick={onRestart} 
+                            className="h-11 w-11 flex items-center justify-center bg-[var(--bg-glass)] border border-[var(--border-strong)] rounded-2xl text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-all shadow-lg hover:scale-105" 
+                            title="Reiniciar"
+                        >
+                            <i className="fa fa-refresh"></i>
+                        </button>
+                    )}
                 </div>
 
                 {/* STATS BAR (CENTERED) */}
