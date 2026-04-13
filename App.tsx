@@ -956,14 +956,6 @@ const App: React.FC = () => {
                 <i className="fa fa-music w-4"></i>
                 <span>Música</span>
               </button>
-              <button onClick={() => { /* Always enabled */ }} className={`w-full px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wider flex items-center gap-3 transition-all text-[var(--accent-primary)] bg-[var(--accent-primary)]/10 cursor-default`}>
-                <i className="fa fa-lightbulb-o w-4"></i>
-                <span>Luces (Siempre activo)</span>
-              </button>
-              <button onClick={() => { setShowZones(!showZones); }} className={`w-full px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wider flex items-center gap-3 transition-all ${showZones ? 'text-[var(--accent-primary)] bg-[var(--accent-primary)]/10' : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-white/5'}`}>
-                <i className="fa fa-hand-paper-o w-4"></i>
-                <span>Guía</span>
-              </button>
               <button onClick={cycleShapes} className="w-full px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wider flex items-center gap-3 transition-all text-[var(--accent-primary)] bg-[var(--accent-primary)]/10 hover:bg-[var(--accent-primary)]/20">
                 <i className="fa fa-cube w-4"></i>
                 <div className="flex flex-col">
