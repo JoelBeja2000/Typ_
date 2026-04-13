@@ -1,86 +1,38 @@
 <div align="center">
-  <img src="https://raw.githubusercontent.com/JoelBeja2000/OveTyp_/main/docs/media/Captura.png" alt="OveTyp_ Logo" width="200" />
+  <img src="https://raw.githubusercontent.com/JoelBeja2000/OveTyp_/main/docs/media/Captura.png" alt="OveTyp_ Logo" width="120" />
   <h1>OveTyp_</h1>
-  <p><strong>The Cinematic Typing Experience</strong></p>
-  <p><i>Biomechanics · Audio-Reactivity · Minimalist Elegance</i></p>
+  <p><b>A dynamic typing experience where music evolves with your accuracy.</b></p>
   
   [English] | [Leer en Español](README.es.md)
 </div>
 
 ---
 
-## 💎 The Philosophy
+## 🎹 Overview
+OveTyp_ is a simple keyboard application designed to make typing practice more engaging. As you type correctly and hit words, electronic instruments are progressively added to the background track, creating a synchronized musical performance.
 
-**OveTyp_** is not just a typing speed test; it is a professional-grade training ecosystem designed for cognitive flow. By merging high-fidelity auditory feedback with a physics-based visual engine, it transforms practice into a cinematic performance.
+## ✨ Key Features
+- **Instrumental Discovery**: Maintain your rhythm to unlock new layers of electronic music in real-time.
+- **Practice Mode**: Dedicated levels focused on specific keyboard zones (Indices, Medios, Anulares, Meñiques).
+- **Audio-Reactive Visuals**: A 3D MorphSphere that reacts to music frequency bands and your typing speed.
 
-## ⚡ Core Pillars
+## 🛠️ Tech Stack
+Built for performance and scalability:
+- **Core**: React 18 & TypeScript
+- **Build Tool**: Vite
+- **Graphics**: Three.js (WebGL) & Web Workers for physics
+- **Audio**: Web Audio API (Procedural track layering)
+- **Architecture**: Modular logic following Hexagonal principles
 
-### 🧬 Biomechanical Precision
-*   **Targeted Training**: Dedicated levels for specific finger zones (Índice, Corazón, Anular, Meñique).
-*   **Real-time Guidance**: Dynamic finger-to-key mapping overlays to correct posture and muscle memory.
-*   **Ultra-Low Latency**: A custom-built typing engine with sub-16ms synchronous response times for zero perceived delay.
-
-### 🎵 Auditory Immersion
-*   **Procedural Music Styles**: Choose between Berliner Techno, Cyber Ambient, or Acid House 303.
-*   **Audio-Reactive Physics**: The interface "breathes" and rets to your rhythm. The `MorphSphere` and `WordCurtain` pulse and bounce in sync with the frequency bands of the music.
-
-### 🏗️ Engineering Excellence
-*   **Hexagonal Architecture**: A strictly decoupled codebase separating the Domain (Typing logic) from Infrastructure (React/Web Audio).
-*   **GHS Protocol**: Integrated Git History Standard for deep traceability and AI-assisted maintenance.
-*   **Cross-Platform**: Built on top of **Vite** and **React**, prepared for desktop integration.
-
----
-
-## 📸 Visual Experience
-
-### Cinematic Gameplay
-Experience the synchronized music and physics-based visuals. Each word you type correctly adds a new layer to the score.
-
+## 📸 Visuals
 ![OveTyp_ Gameplay](CAPTURAS/Jugando.png)
-
-### Training Mode
-Dedicated zones for specific fingers with real-time postural guidance and zone-based focus.
-
-![OveTyp_ Practice Mode](CAPTURAS/Practica.png)
-
-## 🏆 Level Mastery
-
-Progress through a tiered challenge system designed to build structural speed:
-
-| Level | Stars | Focus | Description |
-| :--- | :--- | :--- | :--- |
-| **Novato** | ★ | Home Row & Pairs | Focus on basic finger positioning and high-frequency pairs. |
-| **Experto** | ★★ | Complex Chains | Advanced word structures and multi-finger transitions. |
-| **Maestro** | ★★★ | Full Keyboard | High-speed flow with special characters and complex biomechanics. |
+![OveTyp_ Practice](CAPTURAS/Practica.png)
 
 ## 🚀 Getting Started
-
-### Prerequisites
-
-- **Node.js**: (LTS recommended)
-- **NPM** or **Yarn**
-
-### Installation
-
-1. **Clone the experience**:
-   ```bash
-   git clone https://github.com/JoelBeja2000/OveTyp_.git
-   cd OveTyp_
-   ```
-
-2. **Initialize the engine**:
-   ```bash
-   npm install
-   ```
-
-3. **Launch**:
-   ```bash
-   npm run dev
-   ```
+1. `npm install`
+2. `npm run dev`
 
 ---
-
 <div align="center">
-  <p>Developed with a focus on deep work and structural precision.</p>
   <p><b>OVETYP_ © 2026</b></p>
 </div>
