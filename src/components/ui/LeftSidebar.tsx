@@ -49,10 +49,7 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
         } overflow-y-auto custom-scrollbar`}
     >
       <div className="flex items-center justify-between mb-12">
-        <div className="flex items-center gap-4">
-          <div className="px-3 h-10 flex items-center justify-center rounded-xl border border-[var(--accent-primary)] text-[var(--accent-primary)] bg-[var(--accent-primary)]/10 font-black text-lg shadow-[0_0_15px_var(--accent-glow)] min-w-[80px]">
-            OveTyp_
-          </div>
+        <div className="flex items-center">
           <h2 className="text-[10px] font-black uppercase tracking-[0.4em] text-[var(--text-primary)]">
             OveTyp_
           </h2>
