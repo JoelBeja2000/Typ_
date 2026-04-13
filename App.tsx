@@ -1,3 +1,26 @@
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import FingerGuide from './src/components/FingerGuide';
+import { WordPanel } from './src/components/WordPanel';
+import { KeyboardSection } from './src/components/KeyboardSection';
+import LeftSidebar from './src/components/ui/LeftSidebar';
+import RightSidebar from './src/components/ui/RightSidebar';
+import { WordCurtain } from './src/components/ui/WordCurtain';
+import MorphSphere from './src/components/MorphSphere';
+import BackgroundSphere from './src/components/BackgroundSphere';
+import { WebAudioSystem } from './src/infrastructure/audio/WebAudioSystem';
+import { MusicSequencer } from './src/domain/services/MusicSequencer';
+import { TECHNO_STYLE, AMBIENT_STYLE, ACID_HOUSE_STYLE, MusicStyle } from './src/domain/models/MusicStyles';
+import { KEY_TO_FINGER_MAP, SPACE_DATA } from './constants';
+import { Language, TypingStats } from './types';
+import { generateLocalPhrases } from './src/utils/phraseUtils';
+import { VisualsConfig, DEFAULT_VISUALS_CONFIG, GeometryType } from './src/types/visuals';
+import { GUIDE_PHASES } from './src/data/GuideData';
+import { BrowserThemeManager } from './src/infrastructure/ui/BrowserThemeManager';
+import { ZEN_PHRASES, PHRASE_CATEGORIES } from './src/data/ZenPhrases';
+import { THEMES } from './src/domain/models/Theme';
+import { TypingService } from './src/domain/services/TypingService';
+import { BrowserPhraseProvider, BrowserStorageProvider } from './src/infrastructure/adapters/BrowserAdapters';
+import { useTypingEngine } from './src/hooks/useTypingEngine';
 import { useTranslation, LanguageProvider } from './src/i18n/LanguageContext';
 
 import './src/infrastructure/ui/styles/Keyboard.css';
