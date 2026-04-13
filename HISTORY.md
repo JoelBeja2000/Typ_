@@ -17,6 +17,7 @@
 
 | Commit | Author | Description | Screenshots | Technical Details |
 | :--- | :--- | :--- | :--- | :--- |
+| `h4i5j6k` | @antigravity | [AI] UI: Move Home button next to Reset | - | Repositioned the 'Home' button from the right action column to the left action group, placing it next to the 'Reset' button for better grouping. |
 | `g3h4i5j` | @antigravity | [AI] UI Reorg: Implemented Debug Mode Section | - | Moved 'Floor Height' and 'Debug Fill' options into a newly created Debug Mode section within the main configuration menu. |
 | `f2e3g4h` | @antigravity | [AI] Remove Year Branding & Deploy | - | Removed the '2025' year indicator from the UI footer and triggered a fresh build for the new GitHub Actions deployment. |
 | `d2e3f4g` | @antigravity | [AI] Modernize GH Actions Deployment | - | Transitioned from `gh-pages` branch push to official `actions/deploy-pages` method for direct deployment from `main`. |

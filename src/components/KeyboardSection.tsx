@@ -77,6 +77,15 @@ export const KeyboardSection: React.FC<KeyboardSectionProps> = React.memo(({
                 {/* ACTION BUTTONS (LEFT) */}
                 <div className="flex gap-2">
                     <button onClick={onRestart} className="h-11 w-11 flex items-center justify-center bg-[var(--bg-glass)] border border-[var(--border-strong)] rounded-2xl text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-all shadow-lg" title="Reiniciar"><i className="fa fa-refresh"></i></button>
+                    {isLevelActive && (
+                        <button 
+                            onClick={onGoHome} 
+                            className={`h-11 w-11 flex items-center justify-center backdrop-blur-xl border rounded-2xl transition-all duration-500 bg-[var(--bg-glass)] border-[var(--border-strong)] text-[var(--text-secondary)] hover:bg-[var(--accent-primary)]/10 hover:text-[var(--accent-primary)] shadow-lg hover:scale-105 active:scale-95 animate-in fade-in slide-in-from-top-2 duration-300`} 
+                            title="Volver al Selector"
+                        >
+                            <i className="fa fa-home"></i>
+                        </button>
+                    )}
                 </div>
 
                 {/* STATS BAR (CENTERED) */}
@@ -104,16 +113,6 @@ export const KeyboardSection: React.FC<KeyboardSectionProps> = React.memo(({
                     >
                         <i className="fa fa-gear"></i>
                     </button>
-
-                    {isLevelActive && (
-                        <button 
-                            onClick={onGoHome} 
-                            className={`h-11 w-11 flex items-center justify-center backdrop-blur-xl border rounded-2xl transition-all duration-500 bg-[var(--bg-glass)] border-[var(--border-strong)] text-[var(--text-secondary)] hover:bg-[var(--accent-primary)]/10 hover:text-[var(--accent-primary)] shadow-lg hover:scale-105 active:scale-95 animate-in fade-in slide-in-from-top-2 duration-300`} 
-                            title="Volver al Selector"
-                        >
-                            <i className="fa fa-home"></i>
-                        </button>
-                    )}
                 </div>
             </div>
 
