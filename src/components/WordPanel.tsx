@@ -422,13 +422,13 @@ export const WordPanel: React.FC<WordPanelProps> = ({
                                         const mappingKey = fingerCode === 'L2' ? 'left-index' : fingerCode === 'L3' ? 'left-middle' : fingerCode === 'L4' ? 'left-ring' : 'left-pinky';
                                         return (
                                             <div key={fingerCode} className="p-3 rounded-2xl bg-[var(--bg-glass)] border border-[var(--border-glass)] min-w-[140px] shadow-lg backdrop-blur-sm">
-                                                <div className="flex items-center gap-2 mb-1.5 justify-end">
+                                                <div className="flex items-center gap-2 mb-1.5 justify-start">
+                                                    <span className="w-2 h-2 rounded-full shadow-[0_0_8px]" style={{ backgroundColor: FINGER_COLORS[mappingKey as any], boxShadow: `0 0 10px ${FINGER_COLORS[mappingKey as any]}` }} />
                                                     <span className="text-[10px] font-black uppercase tracking-wider text-[var(--accent-primary)]">
                                                         {FINGER_NAMES[mappingKey as any]}
                                                     </span>
-                                                    <span className="w-2 h-2 rounded-full shadow-[0_0_8px]" style={{ backgroundColor: FINGER_COLORS[mappingKey as any], boxShadow: `0 0 10px ${FINGER_COLORS[mappingKey as any]}` }} />
                                                 </div>
-                                                <div className="flex flex-wrap gap-1 justify-end">
+                                                <div className="flex flex-wrap gap-1 justify-start">
                                                     {activeLevel.keys.filter(k => KEY_TO_FINGER_MAP[k.toLowerCase()]?.finger === mappingKey).map(k => (
                                                         <span key={k} className="px-1.5 py-0.5 text-[10px] font-black rounded bg-[var(--bg-app)]/50 border border-[var(--border-glass)] text-[var(--text-primary)]">
                                                             {k}
