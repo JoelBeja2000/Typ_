@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import * as THREE from 'three';
+import { PHYSICS } from '../config/physics';
 
 interface MorphSphereProps {
     className?: string;
@@ -38,7 +39,7 @@ const MorphSphere: React.FC<MorphSphereProps> = ({
     onClick,
     lightingEnabled = false,
     shape = 'icosahedron',
-    offsetY = 0
+    floorHeight = 0.62
 }) => {
     const containerRef = useRef<HTMLDivElement>(null);
     const bandsRef = useRef(bands);
@@ -61,18 +62,32 @@ const MorphSphere: React.FC<MorphSphereProps> = ({
         }
 
         const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(50, 1, 0.1, 1000);
+        const initialWidth = container.clientWidth || 300;
+        const initialHeight = container.clientHeight || 500;
+        
+        // Ensure camera aspect matches initial container size to avoid squashing
+        const camera = new THREE.PerspectiveCamera(50, initialWidth / initialHeight, 0.1, 1000);
         camera.position.z = 9;
 
         const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
-        const width = container.clientWidth || 180;
-        const height = container.clientHeight || 180;
-        renderer.setSize(width, height);
+        renderer.setSize(initialWidth, initialHeight);
         renderer.setClearColor(0x000000, 0);
         container.appendChild(renderer.domElement);
+        
+        // Handle dynamic resizing
+        const resizeObserver = new ResizeObserver((entries) => {
+            if (!entries[0]) return;
+            const { width, height } = entries[0].contentRect;
+            if (width === 0 || height === 0) return;
+            
+            renderer.setSize(width, height);
+            camera.aspect = width / height;
+            camera.updateProjectionMatrix();
+        });
+        resizeObserver.observe(container);
 
         // Use lower segments to avoid NaN issues
-        const BASE_SIZE = 2;
+        const BASE_SIZE = PHYSICS.sphere.baseSize;
         const BASE_SEGMENTS = 2;
         
         // Create base geometry
@@ -171,20 +186,44 @@ const MorphSphere: React.FC<MorphSphereProps> = ({
             pos.needsUpdate = true;
             innerPos.needsUpdate = true;
 
-            // Apply external vertical offset (bounce)
-            mesh.position.y = -offsetY;
-            innerMesh.position.y = -offsetY;
+            // Apply internal vertical physical bounce (Gravitational acceleration model)
+            const bounceTime = performance.now() * PHYSICS.sphere.bounceSpeed;
+
+            // Dynamically calculate bounce apex based on maintaining a constant proportional amplitude
+            // Floor Level in 3D Space = -(floorHeight% - 50%) * Viewport_Height_Units
+            const floorY = - (floorHeight - 0.5) * 8.39;
+            const dynamicBounceAmplitude = PHYSICS.sphere.bounceAmplitude;
+            const dynamicSquashThreshold = Math.max(0, dynamicBounceAmplitude - 0.4);
+            const apexY = floorY + PHYSICS.sphere.baseSize + dynamicBounceAmplitude;
+
+            // Mathematically precise range mapped to dynamic central gravity model
+            const currentOffset = (1 - Math.abs(Math.cos(bounceTime))) * dynamicBounceAmplitude;
+            
+            mesh.position.y = apexY - currentOffset;
+            innerMesh.position.y = apexY - currentOffset;
 
             // Squash and Stretch: scale Y down and X/Z up when hitting bottom
-            // offsetY max is 1.5. Squash happens when offsetY > 1.3
-            const squashFactor = offsetY > 1.3 ? 1 - (offsetY - 1.3) * 0.8 : 1;
-            const stretchFactor = 1 + (1 - squashFactor) * 0.5;
+            const squashFactor = currentOffset > dynamicSquashThreshold ? 
+                1 - (currentOffset - dynamicSquashThreshold) * PHYSICS.sphere.squashIntensity : 1;
+            const stretchFactor = 1 + (1 - squashFactor) * PHYSICS.sphere.stretchIntensity;
             
-            // Audio deformation
-            const audioDeform = 1 + b.bass * 0.5 + b.mid * 0.3 + b.high * 0.15;
+            // Audio deformation math
+            const audioEnergy = b.bass * PHYSICS.audio.bassWeight + b.mid * PHYSICS.audio.midWeight + b.high * PHYSICS.audio.highWeight;
             
-            mesh.scale.set(stretchFactor * audioDeform, squashFactor * audioDeform, stretchFactor * audioDeform);
-            innerMesh.scale.set(stretchFactor * audioDeform * 0.55, squashFactor * audioDeform * 0.55, stretchFactor * audioDeform * 0.55);
+            // 1. Structural vertex deformation
+            const visualDeform = 1 + audioEnergy;
+            
+            // 2. Physical geometric scaling (New robust feature!)
+            const sizeMultiplier = 1 + (audioEnergy * PHYSICS.audio.sizeMultiplier);
+            
+            mesh.scale.set(
+                stretchFactor * visualDeform * sizeMultiplier, 
+                squashFactor * visualDeform * sizeMultiplier, 
+                stretchFactor * visualDeform * sizeMultiplier
+            );
+            
+            const innerScale = stretchFactor * visualDeform * sizeMultiplier * PHYSICS.audio.innerMeshScale;
+            innerMesh.scale.set(innerScale, innerScale, innerScale);
 
             // Rotation
             mesh.rotation.x += 0.004 + b.bass * 0.015;
@@ -210,6 +249,7 @@ const MorphSphere: React.FC<MorphSphereProps> = ({
         animate();
 
         return () => {
+            resizeObserver.disconnect();
             while (container.firstChild) {
                 container.removeChild(container.firstChild);
             }

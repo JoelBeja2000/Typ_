@@ -101,22 +101,6 @@ const App: React.FC = () => {
   const [currentTheme, setCurrentTheme] = useState(THEMES.find(t => t.id === 'emerald') || THEMES[0]);
   const [isPureBlack, setIsPureBlack] = useState(false);
   const [forceScheme, setForceScheme] = useState<'dark' | 'light' | null>(null);
-  const [bounceOffset, setBounceOffset] = useState(0);
-
-  useEffect(() => {
-    let frameId: number;
-    const animateBounce = () => {
-      const time = performance.now() * 0.0025;
-      // Formula: 1 - |cos(time)| creates a smooth hang at 0 (top) 
-      // and a sharp snap at 1 (bottom).
-      const offset = (1 - Math.abs(Math.cos(time))) * 1.5;
-      setBounceOffset(offset);
-      frameId = requestAnimationFrame(animateBounce);
-    };
-    frameId = requestAnimationFrame(animateBounce);
-    return () => cancelAnimationFrame(frameId);
-  }, []);
-
   const [language, setLanguage] = useState<Language>('es');
   const [focus, setFocus] = useState('Básico');
 
@@ -261,6 +245,7 @@ const App: React.FC = () => {
   const [birdSize, setBirdSize] = useState(180);
   const [visualsConfig, setVisualsConfig] = useState<VisualsConfig>({ ...DEFAULT_VISUALS_CONFIG, type: 'circle' });
   const [showDimensionalSettings, setShowDimensionalSettings] = useState(false);
+  const [floorHeight, setFloorHeight] = useState(0.62);
 
   // GUIDE STATE
   const [highlightedKeys, setHighlightedKeys] = useState<string[]>([]);
@@ -708,7 +693,7 @@ const App: React.FC = () => {
           <div 
             className="hidden xl:flex w-[450px] shrink-0 z-0 overflow-visible relative"
           >
-            <div className="absolute left-1/2 -translate-x-1/2 -translate-y-1/2 top-[45%] w-[400px] h-[400px] z-[60] pointer-events-none opacity-80">
+            <div className="absolute inset-0 w-full h-full z-[60] pointer-events-none opacity-80">
               {isLevelActive && (
                 <MorphSphere
                     color={`rgb(${currentTheme.r}, ${currentTheme.g}, ${currentTheme.b})`}
@@ -717,6 +702,7 @@ const App: React.FC = () => {
                     lightingEnabled={isMusicLightingEnabled}
                     onClick={cycleShapes} 
                     shape={visualsConfig.outerSphere.shape}
+                    floorHeight={floorHeight}
                 />
               )}
             </div>
@@ -729,6 +715,7 @@ const App: React.FC = () => {
               repulsionEnergy={0.35}
               repulsionShape={visualsConfig.outerSphere.shape}
               repulsionRotation={performance.now() * 0.002}
+              floorHeight={floorHeight}
             />
           </div>
 
@@ -910,6 +897,21 @@ const App: React.FC = () => {
                     <span className="leading-none">{visualsConfig.outerSphere.shape}</span>
                 </div>
               </button>
+              <div className="w-full px-4 py-3 flex flex-col gap-2 transition-all text-[var(--accent-primary)] bg-black/40 hover:bg-black/60">
+                <div className="flex justify-between items-center text-[10px] font-semibold uppercase tracking-wider opacity-80">
+                  <span><i className="fa fa-level-up w-4"></i> Altura Suelo</span>
+                  <span>{Math.round(floorHeight * 100)}%</span>
+                </div>
+                <input 
+                  type="range" 
+                  min="0.5" 
+                  max="1.5" 
+                  step="0.01" 
+                  value={floorHeight}
+                  onChange={(e) => setFloorHeight(parseFloat(e.target.value))}
+                  className="w-full h-1 bg-[var(--border-glass)] rounded-lg appearance-none cursor-pointer accent-[var(--accent-primary)]"
+                />
+              </div>
             </div>
 
           </div>
@@ -918,7 +920,7 @@ const App: React.FC = () => {
           <div 
             className="hidden xl:flex w-[450px] shrink-0 z-0 overflow-visible relative"
           >
-            <div className="absolute left-1/2 -translate-x-1/2 -translate-y-1/2 top-[45%] w-[400px] h-[400px] z-[60] pointer-events-none opacity-80">
+            <div className="absolute inset-0 w-full h-full z-[60] pointer-events-none opacity-80">
               {isLevelActive && (
                 <MorphSphere
                     color={`rgb(${currentTheme.r}, ${currentTheme.g}, ${currentTheme.b})`}
@@ -927,7 +929,7 @@ const App: React.FC = () => {
                     lightingEnabled={isMusicLightingEnabled}
                     onClick={cycleShapes} 
                     shape={visualsConfig.outerSphere.shape}
-                    offsetY={bounceOffset}
+                    floorHeight={floorHeight}
                 />
               )}
             </div>
@@ -936,11 +938,12 @@ const App: React.FC = () => {
               text={solvedWords.join('  ')} 
               color={`rgb(${currentTheme.r}, ${currentTheme.g}, ${currentTheme.b})`} 
               frequencyBands={frequencyBands}
-              // Center Y is 45% + bounce offset (scaled roughly to pixels)
-              repulsionCenter={{ x: -1, y: -1 + (bounceOffset * 60) }}
+              combo={combo}
+              repulsionCenter={{ x: -1, y: -1 }}
               repulsionEnergy={0.35}
               repulsionShape={visualsConfig.outerSphere.shape}
               repulsionRotation={performance.now() * -0.002}
+              floorHeight={floorHeight}
             />
           </div>
 

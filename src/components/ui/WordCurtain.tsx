@@ -4,7 +4,7 @@
  */
 
 import React, { useState, useEffect, useRef } from 'react';
-
+import { PHYSICS } from '../../config/physics';
 // --- Physics Engine Utilities ---
 
 function getPointID(r: number, c: number, cols: number) {
@@ -295,17 +295,20 @@ interface WordCurtainProps {
   repulsionCenter?: { x: number; y: number };
   repulsionShape?: string;
   repulsionRotation?: number;
+  floorHeight?: number;
 }
 
 export const WordCurtain: React.FC<WordCurtainProps> = ({ 
   text, 
-  color = '#FFFFFF',
+  color = '#00ffcc', 
+  className = '',
   frequencyBands = { bass: 0, mid: 0, high: 0 },
   combo = 0,
+  repulsionCenter = { x: -1, y: -1 },
   repulsionEnergy = 0,
-  repulsionCenter,
-  repulsionShape = 'sphere',
-  repulsionRotation = 0
+  repulsionShape = 'icosahedron',
+  repulsionRotation = 0,
+  floorHeight = 0.62
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -433,6 +436,22 @@ export const WordCurtain: React.FC<WordCurtainProps> = ({
       if (!c || !ctx) return;
       ctx.clearRect(0, 0, c.width, c.height);
       
+      // Draw Ground Line Glow
+      ctx.beginPath();
+      // Recalibrated dynamic floor
+      const floorY = c.height * floorHeight;
+      const floorGradient = ctx.createLinearGradient(c.width * 0.1, floorY, c.width * 0.9, floorY);
+      floorGradient.addColorStop(0, 'transparent');
+      floorGradient.addColorStop(0.5, color);
+      floorGradient.addColorStop(1, 'transparent');
+      ctx.strokeStyle = floorGradient;
+      ctx.lineWidth = 2;
+      ctx.globalAlpha = 0.3;
+      ctx.moveTo(c.width * 0.1, floorY);
+      ctx.lineTo(c.width * 0.9, floorY);
+      ctx.stroke();
+      ctx.globalAlpha = 1.0;
+      
       const offset = [c.width / 2 - configRef.current.awidth / 2, 0];
       const audio = audioRef.current;
       
@@ -499,11 +518,35 @@ export const WordCurtain: React.FC<WordCurtainProps> = ({
       const cosR = Math.cos(rot);
       const sinR = Math.sin(rot);
 
+      // 0. Synchronized Internal Bounce (Decoupled from React to ensure 60FPS)
+      const bounceTime = performance.now() * PHYSICS.sphere.bounceSpeed;
+      
+      // Calculate amplitude dynamically matching the 3D MorphSphere
+      const floorYUnit = - (floorHeight - 0.5) * PHYSICS.curtain.frustumHeightReference;
+      const dynamicBounceAmplitude = PHYSICS.sphere.bounceAmplitude;
+      const dynamicSquashThreshold = Math.max(0, dynamicBounceAmplitude - 0.4);
+      const apexY = floorYUnit + PHYSICS.sphere.baseSize + dynamicBounceAmplitude;
+
+      // Mathematically precise range mapped to dynamic central gravity model
+      const currentOffset = (1 - Math.abs(Math.cos(bounceTime))) * dynamicBounceAmplitude;
+
+      // Squash and Stretch: scale Y down and X/Z up when hitting bottom
+      const squashFactor = currentOffset > dynamicSquashThreshold ? 
+            1 - (currentOffset - dynamicSquashThreshold) * PHYSICS.sphere.squashIntensity : 1;
+      const stretchFactor = 1 + (1 - squashFactor) * PHYSICS.sphere.stretchIntensity;
+
       // 1. Calculate reactive baseRadius ONCE for the whole loop to ensure consistency
       const b = audioRef.current || { bass: 0, mid: 0, high: 0 };
-      const deform = 1 + b.bass * 0.5 + b.mid * 0.3 + b.high * 0.15;
-      // Precision Calibration: Reduced from 115 to 95 for a maximum snug fit
-      const reactiveBaseRadius = (95 + (currentEnergy || 0) * 45) * deform;
+      
+      // Dynamic audio size reactivity that matches the 3D geometry identically
+      const audioEnergy = b.bass * PHYSICS.audio.bassWeight + b.mid * PHYSICS.audio.midWeight + b.high * PHYSICS.audio.highWeight;
+      const sizeMultiplier = 1 + (audioEnergy * PHYSICS.audio.sizeMultiplier);
+      const structuralDeform = 1 + audioEnergy;
+
+      // Precision Calibration: Base radius matches exactly the configured units in screen pixels
+      const pixelsPerUnit = currentDims.h / PHYSICS.curtain.frustumHeightReference;
+      
+      const reactiveBaseRadius = (PHYSICS.sphere.baseSize * pixelsPerUnit) * structuralDeform * sizeMultiplier * PHYSICS.curtain.repulsionPadding;
 
       particles.forEach(p => {
         // Only apply physical interactions to active characters
@@ -512,7 +555,9 @@ export const WordCurtain: React.FC<WordCurtainProps> = ({
         // External Repulsion Logic (Advanced Shape-Aware)
         if (currentCenter) {
           const centerX = currentCenter.x === -1 ? currentDims.w / 2 : currentCenter.x;
-          const centerY = currentCenter.y === -1 ? currentDims.h * 0.45 : currentCenter.y;
+          // Synchronized bounce mapping: Start at 50% height (matching the absolute inset-0 MorphSphere center)
+          const baseCenterY = currentCenter.y === -1 ? currentDims.h * 0.50 : currentCenter.y;
+          const centerY = baseCenterY + (currentOffset * pixelsPerUnit);
           
           // 1. Get relative coordinates
           let dx = p.pos.x - centerX;
@@ -613,7 +658,9 @@ export const WordCurtain: React.FC<WordCurtainProps> = ({
       // FINAL HARD BARRIER PASS
       if (currentCenter) {
         const centerX = currentCenter.x === -1 ? currentDims.w / 2 : currentCenter.x;
-        const centerY = currentCenter.y === -1 ? currentDims.h * 0.45 : currentCenter.y;
+        // Apex is shifting upward, mapped from 3D coords to pixels. 0 in 3D = 50%
+        const baseCenterY = currentCenter.y === -1 ? (currentDims.h * 0.50 - apexY * pixelsPerUnit) : currentCenter.y;
+        const centerY = baseCenterY + (currentOffset * pixelsPerUnit);
 
         particles.forEach(p => {
           if (!p.char || p.char === ' ') return;
