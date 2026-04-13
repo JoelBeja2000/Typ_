@@ -843,6 +843,10 @@ const AppContent: React.FC = () => {
                   onGoHome={handleGoHome}
                   onDebugFillCurtain={handleDebugFillCurtain}
                   oppositeColor={oppositeColor}
+                  isMusicEnabled={isMusicEnabled}
+                  setIsMusicEnabled={setIsMusicEnabled}
+                  isTypingSoundsEnabled={isTypingSoundsEnabled}
+                  setIsTypingSoundsEnabled={setIsTypingSoundsEnabled}
                 />
 
               </div>

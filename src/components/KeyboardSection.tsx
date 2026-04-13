@@ -37,6 +37,10 @@ interface KeyboardSectionProps {
     onGoHome?: () => void;
     onDebugFillCurtain?: () => void;
     oppositeColor?: string;
+    isMusicEnabled: boolean;
+    setIsMusicEnabled: (enabled: boolean) => void;
+    isTypingSoundsEnabled: boolean;
+    setIsTypingSoundsEnabled: (enabled: boolean) => void;
 }
 
 export const KeyboardSection: React.FC<KeyboardSectionProps> = React.memo(({
@@ -67,6 +71,10 @@ export const KeyboardSection: React.FC<KeyboardSectionProps> = React.memo(({
     onGoHome,
     onDebugFillCurtain,
     oppositeColor = '#FFFFFF',
+    isMusicEnabled,
+    setIsMusicEnabled,
+    isTypingSoundsEnabled,
+    setIsTypingSoundsEnabled,
 }) => {
     const bands = isMusicLightingEnabled ? frequencyBands : { bass: 0, mid: 0, high: 0 };
 
@@ -99,6 +107,24 @@ export const KeyboardSection: React.FC<KeyboardSectionProps> = React.memo(({
                             <i className="fa fa-refresh"></i>
                         </button>
                     )}
+
+                    {/* SOUND TOGGLE */}
+                    <button 
+                        onClick={() => setIsTypingSoundsEnabled(!isTypingSoundsEnabled)} 
+                        className={`h-11 w-11 flex items-center justify-center backdrop-blur-xl border rounded-2xl transition-all duration-300 shadow-lg hover:scale-105 active:scale-95 ${isTypingSoundsEnabled ? 'bg-[var(--accent-primary)]/10 border-[var(--accent-primary)] text-[var(--accent-primary)]' : 'bg-[var(--bg-glass)] border-[var(--border-strong)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]'}`}
+                        title="Sonido de Teclado"
+                    >
+                        <i className={`fa ${isTypingSoundsEnabled ? 'fa-keyboard-o' : 'fa-keyboard-o opacity-40'}`}></i>
+                    </button>
+
+                    {/* MUSIC TOGGLE */}
+                    <button 
+                        onClick={() => setIsMusicEnabled(!isMusicEnabled)} 
+                        className={`h-11 w-11 flex items-center justify-center backdrop-blur-xl border rounded-2xl transition-all duration-300 shadow-lg hover:scale-105 active:scale-95 ${isMusicEnabled ? 'bg-[var(--accent-primary)]/10 border-[var(--accent-primary)] text-[var(--accent-primary)]' : 'bg-[var(--bg-glass)] border-[var(--border-strong)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]'}`}
+                        title="Música de Fondo"
+                    >
+                        <i className={`fa ${isMusicEnabled ? 'fa-music' : 'fa-music opacity-40'}`}></i>
+                    </button>
                 </div>
 
                 {/* STATS BAR (CENTERED) */}
