@@ -21,6 +21,7 @@
 | `j6k7l8m` | @antigravity | [AI] UI: Move Home to far left & color Red | - | Swapped Home and Reset buttons so Home is the leftmost action. Added red coloring to the Home icon for better visual distinction as requested. |
 | `i5j6k7l` | @antigravity | [AI] UI: Swap Home and Reset buttons | - | Swapped the order of Home and Reset buttons so that 'Home' occupies the first position on the left. |
 | `h4i5j6k` | @antigravity | [AI] UI: Move Home button next to Reset | - | Repositioned the 'Home' button from the right action column to the left action group, placing it next to the 'Reset' button for better grouping. |
+| `l9m0n1o` | @antigravity | [AI] Feature: Theme persistence via localStorage | - | Implemented `localStorage` persistence for the selected theme ID, ensuring the theme remains consistent after page refresh. |
 | `g3h4i5j` | @antigravity | [AI] UI Reorg: Implemented Debug Mode Section | - | Moved 'Floor Height' and 'Debug Fill' options into a newly created Debug Mode section within the main configuration menu. |
 | `f2e3g4h` | @antigravity | [AI] Remove Year Branding & Deploy | - | Removed the '2025' year indicator from the UI footer and triggered a fresh build for the new GitHub Actions deployment. |
 | `d2e3f4g` | @antigravity | [AI] Modernize GH Actions Deployment | - | Transitioned from `gh-pages` branch push to official `actions/deploy-pages` method for direct deployment from `main`. |
