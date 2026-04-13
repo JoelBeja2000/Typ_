@@ -17,7 +17,7 @@
 
 | Commit | Author | Description | Screenshots | Technical Details |
 | :--- | :--- | :--- | :--- | :--- |
-| `PENDING` | @antigravity | [AI] Modular Physics & Dynamic Floor | - | Extracted physics params to src/config/physics.ts, implemented dynamic apex proportional bounding based on a UI floor height slider. |
+| `884db3e` | @antigravity | [AI] Modular Physics & Fixed Apex Math | - | Reverted global stateful physics to a pure mathematical `Math.cos()` algorithm mapped to a fixed ceiling origin at 62%, ensuring rhythmic audio sync while tracking dynamic floor heights. |
 | `0b43e08` | @antigravity | [AI] Realistic Ball Bounce & Squash/Stretch | - | Refined bounce formula for gravitational acceleration and added elastic squash-and-stretch deformations. |
 | `308c397` | @antigravity | [AI] Bounce Animation & Fix Theme Error | - | Standardized bounce logic across 3D and physics engine. Resolved ReferenceError caused by missing currentTheme state. |
 | `a31ab8a` | @antigravity | [AI] Sync Physics & Geometry + Unified Scale | - | Unified multipliers in WordCurtain.tsx, standardized MorphSphere.tsx primitives, and implemented isLevelActive gating. |

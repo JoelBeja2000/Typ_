@@ -325,6 +325,7 @@ export const WordCurtain: React.FC<WordCurtainProps> = ({
   const dimsRef = useRef(dims);
   const audioRef = useRef(frequencyBands);
   const floorHeightRef = useRef(floorHeight);
+  const colorRef = useRef(color);
 
   useEffect(() => { audioRef.current = frequencyBands; }, [frequencyBands]);
   useEffect(() => { energyRef.current = repulsionEnergy; }, [repulsionEnergy]);
@@ -333,6 +334,7 @@ export const WordCurtain: React.FC<WordCurtainProps> = ({
   useEffect(() => { rotateRef.current = repulsionRotation; }, [repulsionRotation]);
   useEffect(() => { dimsRef.current = dims; }, [dims]);
   useEffect(() => { floorHeightRef.current = floorHeight; }, [floorHeight]);
+  useEffect(() => { colorRef.current = color; }, [color]);
 
   // Monitor container size
   useEffect(() => {
@@ -445,7 +447,7 @@ export const WordCurtain: React.FC<WordCurtainProps> = ({
       const floorY = c.height * currentFloorHeight;
       const floorGradient = ctx.createLinearGradient(c.width * 0.1, floorY, c.width * 0.9, floorY);
       floorGradient.addColorStop(0, 'transparent');
-      floorGradient.addColorStop(0.5, color);
+      floorGradient.addColorStop(0.5, colorRef.current);
       floorGradient.addColorStop(1, 'transparent');
       ctx.strokeStyle = floorGradient;
       ctx.lineWidth = 2;

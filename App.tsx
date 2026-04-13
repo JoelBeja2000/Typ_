@@ -245,7 +245,13 @@ const App: React.FC = () => {
   const [birdSize, setBirdSize] = useState(180);
   const [visualsConfig, setVisualsConfig] = useState<VisualsConfig>({ ...DEFAULT_VISUALS_CONFIG, type: 'circle' });
   const [showDimensionalSettings, setShowDimensionalSettings] = useState(false);
-  const [floorHeight, setFloorHeight] = useState(0.62);
+  const [floorHeight, setFloorHeight] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('ovetyp-floorHeight');
+      if (saved) return parseFloat(saved);
+    }
+    return 0.62;
+  });
 
   // GUIDE STATE
   const [highlightedKeys, setHighlightedKeys] = useState<string[]>([]);
@@ -277,6 +283,11 @@ const App: React.FC = () => {
     const p3 = GUIDE_PHASES.find(p => p.id === 'fase_3')?.levels || [];
     return [...p1, ...p2, ...p3];
   }, []);
+
+  // Sync floorHeight to persistent browser memory
+  useEffect(() => {
+    localStorage.setItem('ovetyp-floorHeight', floorHeight.toString());
+  }, [floorHeight]);
 
   // Load Level Data when Index or Mode changes
   useEffect(() => {
