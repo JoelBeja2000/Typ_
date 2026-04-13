@@ -22,6 +22,7 @@ Built for performance and scalability:
 - **Build Tool**: Vite
 - **Graphics**: Three.js (WebGL) & Web Workers for physics
 - **Audio**: Web Audio API (Procedural track layering)
+- **Automation & Tools**: Python (Custom scripts for asset generation & GHS maintenance)
 - **Architecture**: Modular logic following Hexagonal principles
 
 ## 📸 Visuals

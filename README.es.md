@@ -22,6 +22,7 @@ Construido para rendimiento y escalabilidad:
 - **Herramienta de Construcción**: Vite
 - **Gráficos**: Three.js (WebGL) & Web Workers para física
 - **Audio**: Web Audio API (Capas de pistas procedurales)
+- **Automatización y Herramientas**: Python (Scripts personalizados para generación de activos y mantenimiento GHS)
 - **Arquitectura**: Lógica modular siguiendo principios de Arquitectura Hexagonal
 
 ## 📸 Visuales
