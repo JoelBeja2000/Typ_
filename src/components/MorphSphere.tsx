@@ -48,8 +48,10 @@ const MorphSphere: React.FC<MorphSphereProps> = ({
     const morphRef = useRef({ t: 1, src: new Float32Array(0), dst: new Float32Array(0), active: false, currentShape: shape });
     const shapeCacheRef = useRef<Record<string, Float32Array>>({});
     const vcRef = useRef(0);
+    const floorHeightRef = useRef(floorHeight);
 
     useEffect(() => { bandsRef.current = bands; }, [bands]);
+    useEffect(() => { floorHeightRef.current = floorHeight; }, [floorHeight]);
 
     useEffect(() => {
         if (typeof window === 'undefined') return;
@@ -187,24 +189,28 @@ const MorphSphere: React.FC<MorphSphereProps> = ({
             innerPos.needsUpdate = true;
 
             // Apply internal vertical physical bounce (Gravitational acceleration model)
-            const bounceTime = performance.now() * PHYSICS.sphere.bounceSpeed;
-
-            // Dynamically calculate bounce apex based on maintaining a constant proportional amplitude
-            // Floor Level in 3D Space = -(floorHeight% - 50%) * Viewport_Height_Units
-            const floorY = - (floorHeight - 0.5) * 8.39;
-            const dynamicBounceAmplitude = PHYSICS.sphere.bounceAmplitude;
-            const dynamicSquashThreshold = Math.max(0, dynamicBounceAmplitude - 0.4);
-            const apexY = floorY + PHYSICS.sphere.baseSize + dynamicBounceAmplitude;
-
-            // Mathematically precise range mapped to dynamic central gravity model
-            const currentOffset = (1 - Math.abs(Math.cos(bounceTime))) * dynamicBounceAmplitude;
+            // Calculate fixed ceiling originating from the 62% mark
+            const fixedApexY = 2.5432;
             
-            mesh.position.y = apexY - currentOffset;
-            innerMesh.position.y = apexY - currentOffset;
+            // Current user floor
+            const currentFloorHeight = floorHeightRef.current;
+            const floorY = - (currentFloorHeight - 0.5) * 8.39;
+            const targetFloor = floorY + PHYSICS.sphere.baseSize;
 
-            // Squash and Stretch: scale Y down and X/Z up when hitting bottom
+            // Total vertical stretch needed to connect the fixed ceiling to the new floor distance
+            const dynamicBounceAmplitude = fixedApexY - targetFloor;
+            const dynamicSquashThreshold = Math.max(0, dynamicBounceAmplitude - 0.4);
+
+            const bounceTime = performance.now() * PHYSICS.sphere.bounceSpeed;
+            const currentOffset = (1 - Math.abs(Math.cos(bounceTime))) * dynamicBounceAmplitude;
+
+            mesh.position.y = fixedApexY - currentOffset;
+            innerMesh.position.y = fixedApexY - currentOffset;
+
+            // Squash down from currentOffset
             const squashFactor = currentOffset > dynamicSquashThreshold ? 
-                1 - (currentOffset - dynamicSquashThreshold) * PHYSICS.sphere.squashIntensity : 1;
+                1 - ((currentOffset - dynamicSquashThreshold) * PHYSICS.sphere.squashIntensity) : 1;
+            
             const stretchFactor = 1 + (1 - squashFactor) * PHYSICS.sphere.stretchIntensity;
             
             // Audio deformation math

@@ -20,7 +20,7 @@ export const PHYSICS = {
         /** The speed of the internal gravitational pull loop */
         bounceSpeed: 0.0025,
 
-        /** Amplitude of the drop (increase this to fall further down) */
+        /** Default Amplitude used to calculate the Fixed Apex from the 62% mark */
         bounceAmplitude: 3.1,
 
         /** When (in amplitude units) the sphere starts squashing against the floor */

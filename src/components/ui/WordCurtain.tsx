@@ -324,6 +324,7 @@ export const WordCurtain: React.FC<WordCurtainProps> = ({
   const rotateRef = useRef(repulsionRotation);
   const dimsRef = useRef(dims);
   const audioRef = useRef(frequencyBands);
+  const floorHeightRef = useRef(floorHeight);
 
   useEffect(() => { audioRef.current = frequencyBands; }, [frequencyBands]);
   useEffect(() => { energyRef.current = repulsionEnergy; }, [repulsionEnergy]);
@@ -331,6 +332,7 @@ export const WordCurtain: React.FC<WordCurtainProps> = ({
   useEffect(() => { shapeRef.current = repulsionShape; }, [repulsionShape]);
   useEffect(() => { rotateRef.current = repulsionRotation; }, [repulsionRotation]);
   useEffect(() => { dimsRef.current = dims; }, [dims]);
+  useEffect(() => { floorHeightRef.current = floorHeight; }, [floorHeight]);
 
   // Monitor container size
   useEffect(() => {
@@ -439,7 +441,8 @@ export const WordCurtain: React.FC<WordCurtainProps> = ({
       // Draw Ground Line Glow
       ctx.beginPath();
       // Recalibrated dynamic floor
-      const floorY = c.height * floorHeight;
+      const currentFloorHeight = floorHeightRef.current;
+      const floorY = c.height * currentFloorHeight;
       const floorGradient = ctx.createLinearGradient(c.width * 0.1, floorY, c.width * 0.9, floorY);
       floorGradient.addColorStop(0, 'transparent');
       floorGradient.addColorStop(0.5, color);
@@ -518,21 +521,27 @@ export const WordCurtain: React.FC<WordCurtainProps> = ({
       const cosR = Math.cos(rot);
       const sinR = Math.sin(rot);
 
-      // 0. Synchronized Internal Bounce (Decoupled from React to ensure 60FPS)
-      const bounceTime = performance.now() * PHYSICS.sphere.bounceSpeed;
+      // 0. Synchronized Internal Bounce (Gravitational acceleration model)
+      // Calculate fixed ceiling originating from the 62% mark
+      const fixedApexY = 2.5432;
       
-      // Calculate amplitude dynamically matching the 3D MorphSphere
-      const floorYUnit = - (floorHeight - 0.5) * PHYSICS.curtain.frustumHeightReference;
-      const dynamicBounceAmplitude = PHYSICS.sphere.bounceAmplitude;
+      const currentFloorHeightLoop = floorHeightRef.current;
+      const floorYUnit = - (currentFloorHeightLoop - 0.5) * PHYSICS.curtain.frustumHeightReference;
+      const targetFloorUnit = floorYUnit + PHYSICS.sphere.baseSize;
+      
+      // Total vertical stretch needed to connect the fixed ceiling to the new floor distance
+      const dynamicBounceAmplitude = fixedApexY - targetFloorUnit;
       const dynamicSquashThreshold = Math.max(0, dynamicBounceAmplitude - 0.4);
-      const apexY = floorYUnit + PHYSICS.sphere.baseSize + dynamicBounceAmplitude;
 
-      // Mathematically precise range mapped to dynamic central gravity model
+      const bounceTime = performance.now() * PHYSICS.sphere.bounceSpeed;
       const currentOffset = (1 - Math.abs(Math.cos(bounceTime))) * dynamicBounceAmplitude;
+      
+      const currentY = fixedApexY - currentOffset;
 
       // Squash and Stretch: scale Y down and X/Z up when hitting bottom
-      const squashFactor = currentOffset > dynamicSquashThreshold ? 
-            1 - (currentOffset - dynamicSquashThreshold) * PHYSICS.sphere.squashIntensity : 1;
+      const distToFloor = currentY - targetFloorUnit;
+      const squashFactor = distToFloor < PHYSICS.sphere.squashMargin ? 
+            1 - ((PHYSICS.sphere.squashMargin - distToFloor) * PHYSICS.sphere.squashIntensity) : 1;
       const stretchFactor = 1 + (1 - squashFactor) * PHYSICS.sphere.stretchIntensity;
 
       // 1. Calculate reactive baseRadius ONCE for the whole loop to ensure consistency
@@ -658,9 +667,9 @@ export const WordCurtain: React.FC<WordCurtainProps> = ({
       // FINAL HARD BARRIER PASS
       if (currentCenter) {
         const centerX = currentCenter.x === -1 ? currentDims.w / 2 : currentCenter.x;
-        // Apex is shifting upward, mapped from 3D coords to pixels. 0 in 3D = 50%
-        const baseCenterY = currentCenter.y === -1 ? (currentDims.h * 0.50 - apexY * pixelsPerUnit) : currentCenter.y;
-        const centerY = baseCenterY + (currentOffset * pixelsPerUnit);
+        // The real-world coordinate is projected downward inversely into HTML pixel coordinates
+        const baseCenterY = currentCenter.y === -1 ? currentDims.h * 0.50 : currentCenter.y;
+        const centerY = baseCenterY - (currentY * pixelsPerUnit);
 
         particles.forEach(p => {
           if (!p.char || p.char === ' ') return;
