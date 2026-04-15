@@ -424,11 +424,27 @@ const AppContent: React.FC = () => {
 
   const currentWordInfo = useMemo(() => {
     const phraseParts = currentPhrase.split(' ');
-    const typedParts = typedText.split(' ');
-    const currentIdx = Math.min(typedParts.length - 1, phraseParts.length - 1);
+    
+    // Calculate current word index based on target phrase instead of typed text
+    // We find which word the current character (typedText.length) belongs to
+    let charCount = 0;
+    let wordIdx = 0;
+    
+    for (let i = 0; i < phraseParts.length; i++) {
+      const wordLenWithSpace = phraseParts[i].length + 1; // +1 for the space
+      if (typedText.length < charCount + wordLenWithSpace) {
+        wordIdx = i;
+        break;
+      }
+      charCount += wordLenWithSpace;
+      wordIdx = i;
+    }
 
-    const currentWord = phraseParts[currentIdx] || '';
-    const userTypedSlice = typedParts[typedParts.length - 1] || '';
+    const currentWord = phraseParts[wordIdx] || '';
+    
+    // For the user typed slice, we take the part of typedText that corresponds to this word
+    const startOfWordIdx = phraseParts.slice(0, wordIdx).join(' ').length + (wordIdx > 0 ? 1 : 0);
+    const userTypedSlice = typedText.substring(startOfWordIdx);
 
     return { word: currentWord, userTypedSlice: userTypedSlice };
   }, [currentPhrase, typedText]);
