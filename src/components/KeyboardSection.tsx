@@ -96,35 +96,6 @@ export const KeyboardSection: React.FC<KeyboardSectionProps> = React.memo(({
                             <i className="fa fa-home text-lg"></i>
                         </button>
                     )}
-                    
-                    {/* RESET BUTTON */}
-                    {isLevelActive && (
-                        <button 
-                            onClick={onRestart} 
-                            className="h-11 w-11 flex items-center justify-center bg-[var(--bg-glass)] border border-[var(--border-strong)] rounded-2xl text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-all shadow-lg hover:scale-105" 
-                            title="Reiniciar"
-                        >
-                            <i className="fa fa-refresh"></i>
-                        </button>
-                    )}
-
-                    {/* SOUND TOGGLE */}
-                    <button 
-                        onClick={() => setIsTypingSoundsEnabled(!isTypingSoundsEnabled)} 
-                        className={`h-11 w-11 flex items-center justify-center backdrop-blur-xl border rounded-2xl transition-all duration-300 shadow-lg hover:scale-105 active:scale-95 ${isTypingSoundsEnabled ? 'bg-[var(--accent-primary)]/10 border-[var(--accent-primary)] text-[var(--accent-primary)]' : 'bg-[var(--bg-glass)] border-[var(--border-strong)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]'}`}
-                        title="Sonido de Teclado"
-                    >
-                        <i className={`fa ${isTypingSoundsEnabled ? 'fa-keyboard-o' : 'fa-keyboard-o opacity-40'}`}></i>
-                    </button>
-
-                    {/* MUSIC TOGGLE */}
-                    <button 
-                        onClick={() => setIsMusicEnabled(!isMusicEnabled)} 
-                        className={`h-11 w-11 flex items-center justify-center backdrop-blur-xl border rounded-2xl transition-all duration-300 shadow-lg hover:scale-105 active:scale-95 ${isMusicEnabled ? 'bg-[var(--accent-primary)]/10 border-[var(--accent-primary)] text-[var(--accent-primary)]' : 'bg-[var(--bg-glass)] border-[var(--border-strong)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]'}`}
-                        title="Música de Fondo"
-                    >
-                        <i className={`fa ${isMusicEnabled ? 'fa-music' : 'fa-music opacity-40'}`}></i>
-                    </button>
                 </div>
 
                 {/* STATS BAR (CENTERED) */}
@@ -150,7 +121,37 @@ export const KeyboardSection: React.FC<KeyboardSectionProps> = React.memo(({
                 </div>
 
                 {/* SIDE ACTIONS (RIGHT) */}
-                <div className="flex flex-col gap-2 relative">
+                <div className="flex items-center gap-2 relative">
+                    {/* RESET BUTTON */}
+                    {isLevelActive && (
+                        <button 
+                            onClick={onRestart} 
+                            className="h-11 w-11 flex items-center justify-center bg-[var(--bg-glass)] border border-[var(--border-strong)] rounded-2xl text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-all shadow-lg hover:scale-105" 
+                            title="Reiniciar"
+                        >
+                            <i className="fa fa-refresh text-sm"></i>
+                        </button>
+                    )}
+
+                    {/* SOUND TOGGLE */}
+                    <button 
+                        onClick={() => setIsTypingSoundsEnabled(!isTypingSoundsEnabled)} 
+                        className={`h-11 w-11 flex items-center justify-center backdrop-blur-xl border rounded-2xl transition-all duration-300 shadow-lg hover:scale-105 active:scale-95 ${isTypingSoundsEnabled ? 'bg-[var(--accent-primary)]/10 border-[var(--accent-primary)] text-[var(--accent-primary)]' : 'bg-[var(--bg-glass)] border border-[var(--border-strong)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]'}`}
+                        title="Sonido de Teclado"
+                    >
+                        <i className={`fa ${isTypingSoundsEnabled ? 'fa-keyboard-o' : 'fa-keyboard-o opacity-40'}`}></i>
+                    </button>
+
+                    {/* MUSIC TOGGLE */}
+                    <button 
+                        onClick={() => setIsMusicEnabled(!isMusicEnabled)} 
+                        className={`h-11 w-11 flex items-center justify-center backdrop-blur-xl border rounded-2xl transition-all duration-300 shadow-lg hover:scale-105 active:scale-95 ${isMusicEnabled ? 'bg-[var(--accent-primary)]/10 border-[var(--accent-primary)] text-[var(--accent-primary)]' : 'bg-[var(--bg-glass)] border border-[var(--border-strong)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]'}`}
+                        title="Música de Fondo"
+                    >
+                        <i className={`fa ${isMusicEnabled ? 'fa-music' : 'fa-music opacity-40'}`}></i>
+                    </button>
+
+                    {/* GEAR BUTTON (CONFIG) */}
                     <button 
                         onClick={onDimensionalMenu} 
                         className={`h-11 w-11 flex items-center justify-center backdrop-blur-xl border rounded-2xl transition-all duration-500 bg-[var(--bg-glass)] border-[var(--border-strong)] text-[var(--text-secondary)] hover:bg-[var(--accent-primary)]/10 hover:text-[var(--accent-primary)] shadow-lg hover:scale-105 active:scale-95`} 

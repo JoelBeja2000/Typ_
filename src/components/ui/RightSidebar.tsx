@@ -49,9 +49,6 @@ export const RightSidebar: React.FC<RightSidebarProps> = ({
           {t('sidebar.right.star_button')}
         </a>
 
-        <div className="mt-12 pt-12 border-t border-[var(--border-glass)] w-full text-[10px] font-black uppercase tracking-[0.4em] text-[var(--text-secondary)] opacity-30">
-          {t('sidebar.right.footer')}
-        </div>
       </div>
     </aside>
   );

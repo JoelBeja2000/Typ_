@@ -21,8 +21,7 @@
     "right": {
       "support_title": "Support the Project",
       "support_desc": "If you enjoy the cinematic experience of OveTyp_, please consider leaving a star on the repository. Your support is vital for ongoing improvement!",
-      "star_button": "Give Star on GitHub",
-      "footer": "Open Source © 2026"
+      "star_button": "Give Star on GitHub"
     }
   },
   "settings": {
@@ -42,9 +41,11 @@
     "indices": "Index Fingers",
     "middle": "Middle Fingers",
     "ring": "Ring Fingers",
-    "pinky": "Pinky Fingers",
+    "pinky": "Pinkies",
+    "full_hand": "Full Hand",
     "left": "Left",
-    "right": "Right"
+    "right": "Right",
+    "training_label": "Training Pair"
   },
   "fingers": {
     "left-index": "Left Index",

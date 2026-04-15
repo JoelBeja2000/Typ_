@@ -33,6 +33,18 @@ export class TypingService {
     let newMistakes = currentMistakes;
     let newCombo = currentCombo;
 
+    // If user typed space, verify it's at a valid word boundary
+    if (typedChar === ' ' && !isCorrect) {
+      // Check if previous char was a letter and next char is a letter (mid-word space)
+      const prevChar = targetPhrase[lastCharIdx - 1];
+      const nextChar = targetPhrase[lastCharIdx + 1];
+      
+      // If space is in the middle of a word (letter before AND letter after), it's an error
+      if (prevChar && prevChar !== ' ' && nextChar && nextChar !== ' ') {
+        isCorrect = false;
+      }
+    }
+
     if (!isCorrect && !isInfiniteMode) {
       newMistakes++;
       newCombo = 0;
